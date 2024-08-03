@@ -26,6 +26,17 @@ struct Player {
     int score;
 };
 
+struct GameAction {
+    enum class Type {
+        Move,
+        Unknown
+    };
+
+    Type type;
+    int dx = 0;
+    int dy = 0;
+};
+
 class GameState {
 public:
     GameState() : m_next_id(1) {}
@@ -40,14 +51,13 @@ public:
         m_players.erase(id);
     }
 
-    bool movePlayer(int id, int dx, int dy) {
-        auto it = m_players.find(id);
-        if (it != m_players.end()) {
-            it->second->x += dx;
-            it->second->y += dy;
-            return true;
+    bool handleAction(int playerId, const GameAction& action) {
+        switch (action.type) {
+            case GameAction::Type::Move:
+                return movePlayer(playerId, action.dx, action.dy);
+            default:
+                return false;
         }
-        return false;
     }
 
     json getState() const {
@@ -68,6 +78,16 @@ public:
 private:
     std::map<int, std::shared_ptr<Player>> m_players;
     int m_next_id;
+
+    bool movePlayer(int id, int dx, int dy) {
+        auto it = m_players.find(id);
+        if (it != m_players.end()) {
+            it->second->x += dx;
+            it->second->y += dy;
+            return true;
+        }
+        return false;
+    }
 };
 
 class WebSocketServer {
@@ -152,26 +172,18 @@ private:
             auto j = json::parse(msg->get_payload());
             std::cout << "Parsed JSON: " << j.dump(4) << std::endl;
             
-            if (j.contains("action")) {
-                std::string action = j["action"];
-                std::cout << "Action: " << action << std::endl;
-
-                if (action == "move") {
-                    if (j.contains("dx") && j.contains("dy")) {
-                        int dx = j["dx"];
-                        int dy = j["dy"];
-                        std::cout << "Move command received: dx=" << dx << ", dy=" << dy << std::endl;
-                        if (move_player(hdl, dx, dy)) {
-                            broadcast_game_state();
-                        }
-                    } else {
-                        std::cerr << "Invalid move action: missing dx or dy" << std::endl;
-                    }
+            GameAction action = parseGameAction(j);
+            
+            auto it = m_connections.find(hdl);
+            if (it != m_connections.end()) {
+                int playerId = it->second->id;
+                if (m_game_state.handleAction(playerId, action)) {
+                    broadcast_game_state();
                 } else {
-                    std::cerr << "Unknown action: " << action << std::endl;
+                    std::cerr << "Failed to handle action" << std::endl;
                 }
             } else {
-                std::cerr << "Invalid message: missing action" << std::endl;
+                std::cerr << "Unknown connection sent a message" << std::endl;
             }
         } catch (const json::exception& e) {
             std::cerr << "JSON parsing error: " << e.what() << std::endl;
@@ -181,14 +193,22 @@ private:
         }
     }
 
-    bool move_player(connection_hdl hdl, int dx, int dy) {
-        auto it = m_connections.find(hdl);
-        if (it != m_connections.end()) {
-            return m_game_state.movePlayer(it->second->id, dx, dy);
-        } else {
-            std::cerr << "Error: Tried to move non-existent player" << std::endl;
-            return false;
+    GameAction parseGameAction(const json& j) {
+        GameAction action;
+        action.type = GameAction::Type::Unknown;
+
+        if (j.contains("action")) {
+            std::string actionStr = j["action"];
+            if (actionStr == "move") {
+                action.type = GameAction::Type::Move;
+                if (j.contains("dx") && j.contains("dy")) {
+                    action.dx = j["dx"];
+                    action.dy = j["dy"];
+                }
+            }
         }
+
+        return action;
     }
 
     void broadcast_game_state() {
