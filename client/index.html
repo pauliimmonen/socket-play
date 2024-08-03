@@ -26,6 +26,7 @@
         <h1>Simple Network Game</h1>
         <div id="game-area"></div>
         <p>Use arrow keys to move your player</p>
+        <p id="connection-status">Connecting...</p>
     </div>
     <script>
         class Game {
@@ -34,6 +35,7 @@
                 this.gameArea = document.getElementById('game-area');
                 this.players = {};
                 this.myPlayerId = null;
+                this.connectionStatus = document.getElementById('connection-status');
 
                 this.initializeSocketListeners();
                 this.initializeKeyboardListener();
@@ -42,6 +44,7 @@
             initializeSocketListeners() {
                 this.socket.onopen = () => {
                     console.log('Connected to server');
+                    this.connectionStatus.textContent = 'Connected';
                     this.sendMove(0, 0);
                 };
 
@@ -49,12 +52,22 @@
                     console.log('Received message:', event.data);
                     try {
                         const gameState = JSON.parse(event.data);
-                        if (gameState.players && gameState.players.length > 0) {
+                        if (gameState.players && Array.isArray(gameState.players)) {
                             this.updatePlayers(gameState.players);
                         }
                     } catch (error) {
                         console.error('Error parsing server message:', error);
                     }
+                };
+
+                this.socket.onclose = () => {
+                    console.log('Disconnected from server');
+                    this.connectionStatus.textContent = 'Disconnected. Please refresh the page.';
+                };
+
+                this.socket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    this.connectionStatus.textContent = 'Connection error. Please refresh the page.';
                 };
             }
 
@@ -70,15 +83,29 @@
             }
 
             sendMove(dx, dy) {
-                const moveMessage = {
-                    action: "move",
-                    dx: dx,
-                    dy: dy
-                };
-                this.socket.send(JSON.stringify(moveMessage));
+                if (this.socket.readyState === WebSocket.OPEN) {
+                    const moveMessage = {
+                        action: "move",
+                        dx: dx,
+                        dy: dy
+                    };
+                    this.socket.send(JSON.stringify(moveMessage));
+                } else {
+                    console.warn('Cannot send move: WebSocket is not open');
+                }
             }
 
             updatePlayers(playerList) {
+                const currentPlayers = new Set(playerList.map(p => p.id));
+                
+                // Remove disconnected players
+                for (const id in this.players) {
+                    if (!currentPlayers.has(Number(id))) {
+                        this.removePlayer(Number(id));
+                    }
+                }
+
+                // Update or add current players
                 playerList.forEach(playerData => {
                     if (!this.players[playerData.id]) {
                         this.createPlayerElement(playerData);
@@ -106,6 +133,14 @@
 
                 if (playerData.id === this.myPlayerId) {
                     playerElement.style.backgroundColor = 'blue';
+                }
+            }
+
+            removePlayer(playerId) {
+                const playerElement = this.players[playerId];
+                if (playerElement) {
+                    this.gameArea.removeChild(playerElement);
+                    delete this.players[playerId];
                 }
             }
         }
