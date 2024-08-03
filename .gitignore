@@ -1,0 +1,62 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake build directory
+build/
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+server/server
+server/_deps
+Makefile
+
+# IDE-specific files
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Custom executables (add your specific executable names here)
+
+# Logs
+*.log
+
+# Dependency directories (add if you're using any package managers)
+# node_modules/
+# vcpkg_installed/
+
+# Any other project-specific files or directories you want to ignore
