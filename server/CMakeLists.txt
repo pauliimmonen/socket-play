@@ -18,8 +18,23 @@ FetchContent_MakeAvailable(json)
 set(WEBSOCKETPP_INCLUDE_DIR "/usr/include" CACHE PATH "WebSocket++ include directory")
 include_directories(${WEBSOCKETPP_INCLUDE_DIR})
 
+# Add all source files
+set(SOURCES
+    main.cpp
+    WebSocketServer.cpp
+    GameState.cpp
+)
+
+# Add all header files
+set(HEADERS
+    WebSocketServer.hpp
+    GameState.hpp
+    Player.hpp
+    GameAction.hpp
+)
+
 # Add the executable
-add_executable(server server.cpp)
+add_executable(server ${SOURCES} ${HEADERS})
 
 # Link against required libraries
 target_link_libraries(server PRIVATE Threads::Threads nlohmann_json::nlohmann_json)
