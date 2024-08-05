@@ -36,7 +36,10 @@ build/
 CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
+CTestTestfile.cmake
 server/server
+server/Testing
+server/server_tests
 server/_deps
 Makefile
 

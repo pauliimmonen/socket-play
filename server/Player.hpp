@@ -2,7 +2,8 @@
 
 struct Player {
     int id;
-    int x;
-    int y;
     int score;
+    int money;
+
+    Player(int _id) : id(_id), score(0), money(30) {}
 };

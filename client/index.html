@@ -3,58 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Network Game</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Simplified Brass Birmingham</title>
     <style>
-        #game-area {
-            position: relative;
-            width: 500px;
-            height: 500px;
-            border: 1px solid black;
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .player {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: red;
+        .city {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+        .city-slots {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        .slot {
+            border: 1px solid #ccc;
+            padding: 5px;
+            min-width: 80px;
+        }
+        .tile {
+            background-color: #f0f0f0;
+            padding: 2px;
+            margin: 2px 0;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>Simple Network Game</h1>
-        <div id="game-area"></div>
-        <p>Use arrow keys to move your player</p>
-        <p id="connection-status">Connecting...</p>
+    <h1>Simplified Brass Birmingham</h1>
+    <div id="game-board"></div>
+    <div id="player-info"></div>
+    <div id="tile-placement">
+        <h2>Place a Tile</h2>
+        <select id="city-select"></select>
+        <select id="slot-select"></select>
+        <select id="tile-select">
+            <option value="Coal">Coal</option>
+            <option value="Iron">Iron</option>
+            <option value="Cotton">Cotton</option>
+            <option value="Manufacturer">Manufacturer</option>
+        </select>
+        <button id="place-tile-btn">Place Tile</button>
     </div>
+    <p id="connection-status">Connecting...</p>
+
     <script>
         class Game {
             constructor() {
                 this.socket = new WebSocket('ws://localhost:9002');
-                this.gameArea = document.getElementById('game-area');
-                this.players = {};
-                this.myPlayerId = null;
+                this.gameBoard = document.getElementById('game-board');
+                this.playerInfo = document.getElementById('player-info');
+                this.citySelect = document.getElementById('city-select');
+                this.slotSelect = document.getElementById('slot-select');
+                this.tileSelect = document.getElementById('tile-select');
+                this.placeTileBtn = document.getElementById('place-tile-btn');
                 this.connectionStatus = document.getElementById('connection-status');
+                this.playerId = null;
+                this.gameState = null;
 
                 this.initializeSocketListeners();
-                this.initializeKeyboardListener();
+                this.initializeTilePlacement();
             }
 
             initializeSocketListeners() {
                 this.socket.onopen = () => {
                     console.log('Connected to server');
                     this.connectionStatus.textContent = 'Connected';
-                    this.sendMove(0, 0);
                 };
 
                 this.socket.onmessage = (event) => {
                     console.log('Received message:', event.data);
                     try {
-                        const gameState = JSON.parse(event.data);
-                        if (gameState.players && Array.isArray(gameState.players)) {
-                            this.updatePlayers(gameState.players);
-                        }
+                        this.gameState = JSON.parse(event.data);
+                        this.updateGameBoard();
+                        this.updatePlayerInfo();
+                        this.updateCitySelect();
+                        this.updateSlotSelect();
                     } catch (error) {
                         console.error('Error parsing server message:', error);
                     }
@@ -71,77 +100,104 @@
                 };
             }
 
-            initializeKeyboardListener() {
-                document.addEventListener('keydown', (event) => {
-                    switch(event.key) {
-                        case 'ArrowUp': this.sendMove(0, -10); break;
-                        case 'ArrowDown': this.sendMove(0, 10); break;
-                        case 'ArrowLeft': this.sendMove(-10, 0); break;
-                        case 'ArrowRight': this.sendMove(10, 0); break;
-                    }
+            initializeTilePlacement() {
+                this.citySelect.addEventListener('change', () => this.updateSlotSelect());
+                this.placeTileBtn.addEventListener('click', () => {
+                    const cityName = this.citySelect.value;
+                    const slotIndex = this.slotSelect.value;
+                    const tileType = this.tileSelect.value;
+                    this.sendPlaceTile(cityName, slotIndex, tileType);
                 });
             }
 
-            sendMove(dx, dy) {
+            sendPlaceTile(cityName, slotIndex, tileType) {
                 if (this.socket.readyState === WebSocket.OPEN) {
-                    const moveMessage = {
-                        action: "move",
-                        dx: dx,
-                        dy: dy
+                    const placeTileMessage = {
+                        action: "placeTile",
+                        cityName: cityName,
+                        slotIndex: parseInt(slotIndex),
+                        tileType: tileType
                     };
-                    this.socket.send(JSON.stringify(moveMessage));
+                    this.socket.send(JSON.stringify(placeTileMessage));
                 } else {
-                    console.warn('Cannot send move: WebSocket is not open');
+                    console.warn('Cannot send place tile: WebSocket is not open');
                 }
             }
 
-            updatePlayers(playerList) {
-                const currentPlayers = new Set(playerList.map(p => p.id));
-                
-                // Remove disconnected players
-                for (const id in this.players) {
-                    if (!currentPlayers.has(Number(id))) {
-                        this.removePlayer(Number(id));
-                    }
-                }
+            updateGameBoard() {
+                if (!this.gameState) return;
+                this.gameBoard.innerHTML = '';
 
-                // Update or add current players
-                playerList.forEach(playerData => {
-                    if (!this.players[playerData.id]) {
-                        this.createPlayerElement(playerData);
+                for (const [cityName, cityData] of Object.entries(this.gameState.cities)) {
+                    const cityElement = document.createElement('div');
+                    cityElement.className = 'city';
+                    cityElement.innerHTML = `
+                        <h3>${cityName}</h3>
+                        <p>Connections: ${cityData.connections.join(', ')}</p>
+                        <div class="city-slots"></div>
+                    `;
+                    
+                    const slotsContainer = cityElement.querySelector('.city-slots');
+                    cityData.slots.forEach((slot, index) => {
+                        const slotElement = document.createElement('div');
+                        slotElement.className = 'slot';
+                        slotElement.innerHTML = `
+                            <p>Slot ${index + 1}</p>
+                            <p>Allowed: ${slot.allowedTileTypes.join(', ')}</p>
+                            ${slot.placedTile ? `<div class="tile">${slot.placedTile}</div>` : ''}
+                        `;
+                        slotsContainer.appendChild(slotElement);
+                    });
+
+                    this.gameBoard.appendChild(cityElement);
+                }
+            }
+
+            updateCitySelect() {
+                if (!this.gameState) return;
+                this.citySelect.innerHTML = '';
+                for (const cityName of Object.keys(this.gameState.cities)) {
+                    const option = document.createElement('option');
+                    option.value = cityName;
+                    option.textContent = cityName;
+                    this.citySelect.appendChild(option);
+                }
+            }
+
+            updateSlotSelect() {
+                if (!this.gameState) return;
+                const selectedCity = this.citySelect.value;
+                const cityData = this.gameState.cities[selectedCity];
+                this.slotSelect.innerHTML = '';
+
+                if (cityData) {
+                    cityData.slots.forEach((slot, index) => {
+                        if (!slot.placedTile) {
+                            const option = document.createElement('option');
+                            option.value = index;
+                            option.textContent = `Slot ${index + 1}`;
+                            this.slotSelect.appendChild(option);
+                        }
+                    });
+                }
+            }
+
+            updatePlayerInfo() {
+                if (!this.gameState) return;
+                this.playerInfo.innerHTML = '';
+                this.gameState.players.forEach(player => {
+                    const playerElement = document.createElement('div');
+                    playerElement.innerHTML = `
+                        <h3>Player ${player.id}</h3>
+                        <p>Score: ${player.score}</p>
+                        <p>Money: ${player.money}</p>
+                    `;
+                    this.playerInfo.appendChild(playerElement);
+
+                    if (this.playerId === null) {
+                        this.playerId = player.id;
                     }
-                    this.updatePlayerPosition(playerData);
                 });
-            }
-
-            createPlayerElement(playerData) {
-                const playerElement = document.createElement('div');
-                playerElement.className = 'player';
-                playerElement.id = `player-${playerData.id}`;
-                this.gameArea.appendChild(playerElement);
-                this.players[playerData.id] = playerElement;
-
-                if (this.myPlayerId === null) {
-                    this.myPlayerId = playerData.id;
-                }
-            }
-
-            updatePlayerPosition(playerData) {
-                const playerElement = this.players[playerData.id];
-                playerElement.style.left = `${playerData.x}px`;
-                playerElement.style.top = `${playerData.y}px`;
-
-                if (playerData.id === this.myPlayerId) {
-                    playerElement.style.backgroundColor = 'blue';
-                }
-            }
-
-            removePlayer(playerId) {
-                const playerElement = this.players[playerId];
-                if (playerElement) {
-                    this.gameArea.removeChild(playerElement);
-                    delete this.players[playerId];
-                }
             }
         }
 

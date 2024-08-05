@@ -99,21 +99,21 @@ void WebSocketServer::on_message(websocketpp::connection_hdl hdl, server::messag
 }
 
 GameAction WebSocketServer::parseGameAction(const nlohmann::json& j) {
-    GameAction action;
-    action.type = GameAction::Type::Unknown;
-
-    if (j.contains("action")) {
-        std::string actionStr = j["action"];
-        if (actionStr == "move") {
-            action.type = GameAction::Type::Move;
-            if (j.contains("dx") && j.contains("dy")) {
-                action.dx = j["dx"];
-                action.dy = j["dy"];
-            }
-        }
-    }
-
-    return action;
+     GameAction action;
+     if (j.contains("action")) {
+         std::string actionStr = j["action"];
+         if (actionStr == "placeTile") {
+             action.type = GameAction::Type::PlaceTile;
+             if (j.contains("cityName") && j.contains("tileType") && j.contains("slotIndex")) {
+                 action.cityName = j["cityName"];
+                 action.tileType = j["tileType"];
+                 action.slotIndex = j["slotIndex"];
+             } else {
+                 std::cerr << "Missing required fields for placeTile action" << std::endl;
+             }
+         }
+     }
+     return action;
 }
 
 void WebSocketServer::broadcast_game_state() {

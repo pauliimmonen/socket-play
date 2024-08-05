@@ -1,12 +1,16 @@
 #pragma once
+#include <string>
 
 struct GameAction {
     enum class Type {
-        Move,
+        PlaceTile,
         Unknown
     };
 
     Type type;
-    int dx = 0;
-    int dy = 0;
+    std::string cityName;
+    std::string tileType;
+    int slotIndex;
+
+    GameAction() : type(Type::Unknown), slotIndex(-1) {}
 };
