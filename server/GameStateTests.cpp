@@ -14,6 +14,15 @@ TEST_F(GameStateTest, AddPlayer) {
     EXPECT_EQ(player->money, 30);
 }
 
+TEST_F(GameStateTest, BoardInitialization) {
+    auto state = gameState.getState();
+    EXPECT_TRUE(state["board"].contains("cities"));
+    EXPECT_TRUE(state["board"]["cities"].contains("Birmingham"));
+    EXPECT_TRUE(state["board"]["cities"].contains("Coventry"));
+    EXPECT_TRUE(state["board"]["cities"].contains("Worcester"));
+    EXPECT_TRUE(state["board"]["cities"].contains("Oxford"));
+}
+
 TEST_F(GameStateTest, PlaceTile) {
     auto player = gameState.addPlayer();
     int initialMoney = player->money;
@@ -29,7 +38,7 @@ TEST_F(GameStateTest, PlaceTile) {
     EXPECT_TRUE(result);
 
     auto state = gameState.getState();
-    EXPECT_EQ(state["cities"]["Birmingham"]["slots"][0]["placedTile"], "Coal");
+    EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"], "Coal");
     EXPECT_EQ(player->score, initialScore + 1);
     EXPECT_EQ(player->money, initialMoney - 5);
 }

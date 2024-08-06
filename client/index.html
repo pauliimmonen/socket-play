@@ -18,19 +18,49 @@
             text-align: center;
         }
         .city-slots {
-            display: flex;
-            justify-content: space-around;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             margin-top: 10px;
         }
         .slot {
             border: 1px solid #ccc;
             padding: 5px;
             min-width: 80px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .slot:hover {
+            background-color: #f0f0f0;
         }
         .tile {
-            background-color: #f0f0f0;
-            padding: 2px;
+            background-color: #ddd;
+            padding: 5px;
             margin: 2px 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .allowed-tiles {
+            font-size: 0.8em;
+            color: #666;
+        }
+        #tile-selection {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid black;
+            padding: 20px;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -38,17 +68,10 @@
     <h1>Simplified Brass Birmingham</h1>
     <div id="game-board"></div>
     <div id="player-info"></div>
-    <div id="tile-placement">
-        <h2>Place a Tile</h2>
-        <select id="city-select"></select>
-        <select id="slot-select"></select>
-        <select id="tile-select">
-            <option value="Coal">Coal</option>
-            <option value="Iron">Iron</option>
-            <option value="Cotton">Cotton</option>
-            <option value="Manufacturer">Manufacturer</option>
-        </select>
-        <button id="place-tile-btn">Place Tile</button>
+    <div id="tile-selection">
+        <h2>Select a Tile to Place</h2>
+        <div id="tile-options"></div>
+        <button id="cancel-tile-selection">Cancel</button>
     </div>
     <p id="connection-status">Connecting...</p>
 
@@ -58,16 +81,17 @@
                 this.socket = new WebSocket('ws://localhost:9002');
                 this.gameBoard = document.getElementById('game-board');
                 this.playerInfo = document.getElementById('player-info');
-                this.citySelect = document.getElementById('city-select');
-                this.slotSelect = document.getElementById('slot-select');
-                this.tileSelect = document.getElementById('tile-select');
-                this.placeTileBtn = document.getElementById('place-tile-btn');
+                this.tileSelection = document.getElementById('tile-selection');
+                this.tileOptions = document.getElementById('tile-options');
+                this.cancelTileSelection = document.getElementById('cancel-tile-selection');
                 this.connectionStatus = document.getElementById('connection-status');
                 this.playerId = null;
                 this.gameState = null;
+                this.selectedCity = null;
+                this.selectedSlot = null;
 
                 this.initializeSocketListeners();
-                this.initializeTilePlacement();
+                this.initializeTileSelection();
             }
 
             initializeSocketListeners() {
@@ -82,8 +106,6 @@
                         this.gameState = JSON.parse(event.data);
                         this.updateGameBoard();
                         this.updatePlayerInfo();
-                        this.updateCitySelect();
-                        this.updateSlotSelect();
                     } catch (error) {
                         console.error('Error parsing server message:', error);
                     }
@@ -100,14 +122,10 @@
                 };
             }
 
-            initializeTilePlacement() {
-                this.citySelect.addEventListener('change', () => this.updateSlotSelect());
-                this.placeTileBtn.addEventListener('click', () => {
-                    const cityName = this.citySelect.value;
-                    const slotIndex = this.slotSelect.value;
-                    const tileType = this.tileSelect.value;
-                    this.sendPlaceTile(cityName, slotIndex, tileType);
-                });
+            initializeTileSelection() {
+                this.cancelTileSelection.onclick = () => {
+                    this.tileSelection.style.display = 'none';
+                };
             }
 
             sendPlaceTile(cityName, slotIndex, tileType) {
@@ -115,7 +133,7 @@
                     const placeTileMessage = {
                         action: "placeTile",
                         cityName: cityName,
-                        slotIndex: parseInt(slotIndex),
+                        slotIndex: slotIndex,
                         tileType: tileType
                     };
                     this.socket.send(JSON.stringify(placeTileMessage));
@@ -141,11 +159,17 @@
                     cityData.slots.forEach((slot, index) => {
                         const slotElement = document.createElement('div');
                         slotElement.className = 'slot';
-                        slotElement.innerHTML = `
-                            <p>Slot ${index + 1}</p>
-                            <p>Allowed: ${slot.allowedTileTypes.join(', ')}</p>
-                            ${slot.placedTile ? `<div class="tile">${slot.placedTile}</div>` : ''}
-                        `;
+                        if (slot.placedTile) {
+                            slotElement.innerHTML = `<div class="tile">${slot.placedTile}</div>`;
+                        } else {
+                            slotElement.innerHTML = `
+                                Slot ${index + 1}<br>
+                                <span class="allowed-tiles">
+                                    Allowed: ${slot.allowedTileTypes.join(', ')}
+                                </span>
+                            `;
+                            slotElement.onclick = () => this.handleSlotClick(cityName, index, slot.allowedTileTypes);
+                        }
                         slotsContainer.appendChild(slotElement);
                     });
 
@@ -153,33 +177,26 @@
                 }
             }
 
-            updateCitySelect() {
-                if (!this.gameState) return;
-                this.citySelect.innerHTML = '';
-                for (const cityName of Object.keys(this.gameState.cities)) {
-                    const option = document.createElement('option');
-                    option.value = cityName;
-                    option.textContent = cityName;
-                    this.citySelect.appendChild(option);
-                }
+            handleSlotClick(cityName, slotIndex, allowedTileTypes) {
+                this.selectedCity = cityName;
+                this.selectedSlot = slotIndex;
+                this.showTileSelection(allowedTileTypes);
             }
 
-            updateSlotSelect() {
-                if (!this.gameState) return;
-                const selectedCity = this.citySelect.value;
-                const cityData = this.gameState.cities[selectedCity];
-                this.slotSelect.innerHTML = '';
+            showTileSelection(allowedTileTypes) {
+                this.tileOptions.innerHTML = '';
+                allowedTileTypes.forEach(tileType => {
+                    const button = document.createElement('button');
+                    button.textContent = tileType;
+                    button.onclick = () => this.handleTileSelection(tileType);
+                    this.tileOptions.appendChild(button);
+                });
+                this.tileSelection.style.display = 'block';
+            }
 
-                if (cityData) {
-                    cityData.slots.forEach((slot, index) => {
-                        if (!slot.placedTile) {
-                            const option = document.createElement('option');
-                            option.value = index;
-                            option.textContent = `Slot ${index + 1}`;
-                            this.slotSelect.appendChild(option);
-                        }
-                    });
-                }
+            handleTileSelection(tileType) {
+                this.sendPlaceTile(this.selectedCity, this.selectedSlot, tileType);
+                this.tileSelection.style.display = 'none';
             }
 
             updatePlayerInfo() {

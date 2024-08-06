@@ -21,6 +21,10 @@ struct City {
     std::vector<CitySlot> slots;
 };
 
+struct Board {
+    std::map<std::string, City> cities;
+};
+
 struct Tile {
     std::string type;
     int playerId;
@@ -38,7 +42,7 @@ public:
 private:
     std::map<int, std::shared_ptr<Player>> m_players;
     int m_next_id;
-    std::map<std::string, City> m_cities;
+    Board m_board;
     std::vector<Tile> m_availableTiles;
 
     bool placeTile(int playerId, const std::string& cityName, int slotIndex, const std::string& tileType);

@@ -39,8 +39,8 @@ nlohmann::json GameState::getState() const {
         });
     }
     
-    state["cities"] = nlohmann::json::object();
-    for (const auto& pair : m_cities) {
+    state["board"] = nlohmann::json::object();
+    for (const auto& pair : m_board.cities) {
         const auto& city = pair.second;
         nlohmann::json cityJson = {
             {"x", city.x},
@@ -54,7 +54,7 @@ nlohmann::json GameState::getState() const {
                 {"placedTile", slot.placedTile}
             });
         }
-        state["cities"][city.name] = cityJson;
+        state["board"]["cities"][city.name] = cityJson;
     }
     
     state["availableTiles"] = nlohmann::json::array();
@@ -70,7 +70,7 @@ nlohmann::json GameState::getState() const {
 
 void GameState::initializeBoard() {
     // Create a simple board with a few cities and connections
-    m_cities["Birmingham"] = {
+    m_board.cities["Birmingham"] = {
         "Birmingham", 0, 0, 
         {"Coventry", "Worcester"},
         {
@@ -80,7 +80,7 @@ void GameState::initializeBoard() {
             {{"Coal", "Iron", "Cotton", "Manufacturer"}, ""}
         }
     };
-    m_cities["Coventry"] = {
+    m_board.cities["Coventry"] = {
         "Coventry", 1, 0, 
         {"Birmingham", "Oxford"},
         {
@@ -89,7 +89,7 @@ void GameState::initializeBoard() {
             {{"Coal", "Iron", "Cotton", "Manufacturer"}, ""}
         }
     };
-    m_cities["Worcester"] = {
+    m_board.cities["Worcester"] = {
         "Worcester", 0, 1, 
         {"Birmingham", "Oxford"},
         {
@@ -98,7 +98,7 @@ void GameState::initializeBoard() {
             {{"Coal", "Iron", "Cotton", "Manufacturer"}, ""}
         }
     };
-    m_cities["Oxford"] = {
+    m_board.cities["Oxford"] = {
         "Oxford", 1, 1, 
         {"Coventry", "Worcester"},
         {
@@ -111,8 +111,8 @@ void GameState::initializeBoard() {
 }
 
 bool GameState::placeTile(int playerId, const std::string& cityName, int slotIndex, const std::string& tileType) {
-    auto cityIt = m_cities.find(cityName);
-    if (cityIt == m_cities.end() || slotIndex < 0 || static_cast<std::vector<CitySlot>::size_type>(slotIndex) >= cityIt->second.slots.size()) {
+    auto cityIt = m_board.cities.find(cityName);
+    if (cityIt == m_board.cities.end() || slotIndex < 0 || static_cast<std::vector<CitySlot>::size_type>(slotIndex) >= cityIt->second.slots.size()) {
         return false;
     }
     
