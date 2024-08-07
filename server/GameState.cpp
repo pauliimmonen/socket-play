@@ -13,13 +13,11 @@ GameState::GameState() : m_next_id(1) {
 std::shared_ptr<Player> GameState::addPlayer() {
     auto new_player = std::make_shared<Player>(m_next_id++);
     m_players[new_player->id] = new_player;
-    generateAvailableTiles();
     return new_player;
 }
 
 void GameState::removePlayer(int id) {
     m_players.erase(id);
-    generateAvailableTiles();
 }
 
 bool GameState::handleAction(int playerId, const GameAction& action) {
@@ -85,25 +83,6 @@ nlohmann::json GameState::getState() const {
             });
         }
         state["board"]["cities"][city.name] = cityJson;
-    }
-
-    state["availableTiles"] = nlohmann::json::array();
-    for (const auto& tile : m_availableTiles) {
-        state["availableTiles"].push_back({
-            {"type", tile.type},
-            {"playerId", tile.owner ? tile.owner->id : -1},
-            {"level", tile.level},
-            {"flipped", tile.flipped},
-            {"income", tile.income},
-            {"victory_points", tile.victory_points},
-            {"link_points", tile.link_points},
-            {"cost_money", tile.cost_money},
-            {"cost_coal", tile.cost_coal},
-            {"cost_iron", tile.cost_iron},
-            {"resource_coal", tile.resource_coal},
-            {"resource_iron", tile.resource_iron},
-            {"initial_resource_amount", tile.initial_resource_amount}
-        });
     }
 
     return state;
@@ -192,20 +171,6 @@ bool GameState::placeTile(int playerId, const std::string& cityName, int slotInd
     return true;
 }
 
-void GameState::generateAvailableTiles() {
-    m_availableTiles.clear();
-    std::vector<TileType> tileTypes = {TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer};
-    for (const auto& player : m_players) {
-        for (const auto& tileType : tileTypes) {
-            m_availableTiles.push_back(TileFactory::createTile(tileType, 1, player.second));
-        }
-    }
-    
-    // Shuffle the tiles
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(m_availableTiles.begin(), m_availableTiles.end(), g);
-}
 
 void GameState::calculateLinkPoints(const std::string& cityName) {
     // TODO: Implement link points calculation logic

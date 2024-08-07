@@ -116,34 +116,13 @@ TEST_F(GameStateTest, TileProperties) {
     EXPECT_EQ(testTile.resource_coal, 0);
     EXPECT_EQ(testTile.resource_iron, 0);
     EXPECT_EQ(testTile.initial_resource_amount, 2);
-    EXPECT_EQ(testTile.sell_beer_cost, 0);
+    EXPECT_EQ(testTile.beer_demand, 0);
 
     // Verify essential game state information
     auto state = gameState.getState();
     auto placedTile = state["board"]["cities"]["Birmingham"]["slots"][0];
     EXPECT_EQ(placedTile["placedTile"], TileType::Coal);
     EXPECT_EQ(placedTile["owner"], player->id);
-}
-
-TEST_F(GameStateTest, InitialResourceAmount) {
-    auto player = gameState.addPlayer();
-    auto state = gameState.getState();
-
-    // Check Coal tile
-    ASSERT_NE(coalTile, state["availableTiles"].end());
-    EXPECT_EQ((*coalTile)["initial_resource_amount"], 2);
-
-    // Check Iron tile
-    ASSERT_NE(ironTile, state["availableTiles"].end());
-    EXPECT_EQ((*ironTile)["initial_resource_amount"], 2);
-
-    // Check Cotton tile
-    ASSERT_NE(cottonTile, state["availableTiles"].end());
-    EXPECT_EQ((*cottonTile)["initial_resource_amount"], 0);
-
-    // Check Manufacturer tile
-    ASSERT_NE(manufacturerTile, state["availableTiles"].end());
-    EXPECT_EQ((*manufacturerTile)["initial_resource_amount"], 0);
 }
 
 int main(int argc, char **argv) {

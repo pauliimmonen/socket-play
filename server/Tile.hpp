@@ -33,10 +33,10 @@ public:
     int resource_coal;
     int resource_iron;
     int initial_resource_amount;
-    int sell_beer_cost;
+    int beer_demand;
 
     Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
-         int cm, int cc, int ci, int rc, int ri, int ira, int sbc);
+         int cm, int cc, int ci, int rc, int ri, int ira, int bd);
 
     static TileType stringToTileType(const std::string& typeStr);
 
@@ -65,7 +65,7 @@ public:
     Builder& resourceCoal(int rc);
     Builder& resourceIron(int ri);
     Builder& initialResourceAmount(int ira);
-    Builder& sellBeerCost(int sbc);
+    Builder& beerDemand(int bd);
 
     Tile build();
 };
