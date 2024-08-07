@@ -30,6 +30,8 @@ include_directories(${WEBSOCKETPP_INCLUDE_DIR})
 set(SOURCES
     WebSocketServer.cpp
     GameState.cpp
+    Tile.cpp
+    TileFactory.cpp
 )
 
 # Add all header files
@@ -38,6 +40,8 @@ set(HEADERS
     GameState.hpp
     Player.hpp
     GameAction.hpp
+    Tile.hpp
+    TileFactory.hpp
 )
 
 # Add the main executable

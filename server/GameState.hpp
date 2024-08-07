@@ -1,16 +1,25 @@
-#pragma once
+#ifndef GAMESTATE_HPP
+#define GAMESTATE_HPP
 
+#include <string>
+#include <vector>
+#include <map>
+#include <memory>
+#include <nlohmann/json.hpp>
 #include "Player.hpp"
 #include "GameAction.hpp"
-#include <nlohmann/json.hpp>
-#include <map>
-#include <vector>
-#include <string>
-#include <memory>
+#include "Tile.hpp"
+
+// Define a macro for unused parameters that works across different compilers
+#if defined(__GNUC__) || defined(__clang__)
+#define UNUSED __attribute__((unused))
+#else
+#define UNUSED
+#endif
 
 struct CitySlot {
     std::vector<std::string> allowedTileTypes;
-    std::string placedTile;
+    std::shared_ptr<Tile> placedTile;
 };
 
 struct City {
@@ -21,13 +30,8 @@ struct City {
     std::vector<CitySlot> slots;
 };
 
-struct Board {
+struct GameBoard {
     std::map<std::string, City> cities;
-};
-
-struct Tile {
-    std::string type;
-    int playerId;
 };
 
 class GameState {
@@ -37,14 +41,17 @@ public:
     void removePlayer(int id);
     bool handleAction(int playerId, const GameAction& action);
     nlohmann::json getState() const;
-    void initializeBoard();
 
 private:
-    std::map<int, std::shared_ptr<Player>> m_players;
-    int m_next_id;
-    Board m_board;
-    std::vector<Tile> m_availableTiles;
-
-    bool placeTile(int playerId, const std::string& cityName, int slotIndex, const std::string& tileType);
+    void initializeBoard();
+    bool placeTile(int playerId, UNUSED const std::string& cityName, UNUSED int slotIndex, UNUSED const std::string& tileType);
     void generateAvailableTiles();
+    void calculateLinkPoints(UNUSED const std::string& cityName);
+
+    int m_next_id;
+    std::map<int, std::shared_ptr<Player>> m_players;
+    GameBoard m_board;
+    std::vector<Tile> m_availableTiles;
 };
+
+#endif // GAMESTATE_HPP
