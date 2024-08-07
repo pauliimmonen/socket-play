@@ -138,19 +138,48 @@ void GameState::initializeBoard() {
 
 
 bool GameState::placeTile(int playerId, const std::string& cityName, int slotIndex, const std::string& tileType) {
-    // Silence unused parameter warnings
-    (void)cityName;
-    (void)slotIndex;
-    (void)tileType;
-
     auto playerIt = m_players.find(playerId);
     if (playerIt == m_players.end()) {
         return false;  // Player not found
     }
+    auto& player = playerIt->second;
 
-    // TODO: Implement actual tile placement logic using cityName, slotIndex, and tileType
-    // For now, we'll just return true to indicate success
-    return true;
+    auto cityIt = m_board.cities.find(cityName);
+    if (cityIt == m_board.cities.end()) {
+        return false;  // City not found
+    }
+    auto& city = cityIt->second;
+
+    if (slotIndex < 0 || slotIndex >= static_cast<int>(city.slots.size())) {
+        return false;  // Invalid slot index
+    }
+    auto& slot = city.slots[slotIndex];
+
+    if (slot.placedTile) {
+        return false;  // Slot already occupied
+    }
+
+    if (std::find(slot.allowedTileTypes.begin(), slot.allowedTileTypes.end(), tileType) == slot.allowedTileTypes.end()) {
+        return false;  // Tile type not allowed in this slot
+    }
+
+    try {
+        Tile newTile = TileFactory::createTile(tileType, 1, player);
+        
+        if (player->money < newTile.cost_money) {
+            return false;  // Not enough money
+        }
+
+        slot.placedTile = std::make_shared<Tile>(newTile);
+        player->money -= newTile.cost_money;
+        player->score += newTile.victory_points;
+
+        calculateLinkPoints(cityName);
+
+        return true;
+    } catch (const std::runtime_error& e) {
+        return false;  // Invalid tile type
+    }
 }
 
 void GameState::generateAvailableTiles() {

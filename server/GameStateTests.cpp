@@ -1,5 +1,6 @@
 #include "GameState.hpp"
 #include "Tile.hpp"
+#include "TileFactory.hpp"
 #include <gtest/gtest.h>
 
 class GameStateTest : public ::testing::Test {
@@ -111,13 +112,13 @@ TEST_F(GameStateTest, TileProperties) {
     EXPECT_EQ(placedTile["owner"], player->id);
     EXPECT_EQ(placedTile["level"], 1);
     EXPECT_FALSE(placedTile["flipped"]);
-    EXPECT_EQ(placedTile["income"], 1);
+    EXPECT_EQ(placedTile["income"], 4);
     EXPECT_EQ(placedTile["victory_points"], 1);
-    EXPECT_EQ(placedTile["link_points"], 0);
+    EXPECT_EQ(placedTile["link_points"], 2);
     EXPECT_EQ(placedTile["cost_money"], 5);
     EXPECT_EQ(placedTile["cost_coal"], 0);
     EXPECT_EQ(placedTile["cost_iron"], 0);
-    EXPECT_EQ(placedTile["resource_coal"], 2);
+    EXPECT_EQ(placedTile["resource_coal"], 0);
     EXPECT_EQ(placedTile["resource_iron"], 0);
     EXPECT_EQ(placedTile["initial_resource_amount"], 2);
 }
@@ -130,13 +131,13 @@ TEST_F(GameStateTest, InitialResourceAmount) {
     auto coalTile = std::find_if(state["availableTiles"].begin(), state["availableTiles"].end(),
                                  [](const auto& tile) { return tile["type"] == "Coal"; });
     ASSERT_NE(coalTile, state["availableTiles"].end());
-    EXPECT_EQ((*coalTile)["initial_resource_amount"], 1);
+    EXPECT_EQ((*coalTile)["initial_resource_amount"], 2);
 
     // Check Iron tile
     auto ironTile = std::find_if(state["availableTiles"].begin(), state["availableTiles"].end(),
                                  [](const auto& tile) { return tile["type"] == "Iron"; });
     ASSERT_NE(ironTile, state["availableTiles"].end());
-    EXPECT_EQ((*ironTile)["initial_resource_amount"], 1);
+    EXPECT_EQ((*ironTile)["initial_resource_amount"], 2);
 
     // Check Cotton tile
     auto cottonTile = std::find_if(state["availableTiles"].begin(), state["availableTiles"].end(),
