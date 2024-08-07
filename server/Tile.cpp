@@ -1,10 +1,10 @@
 #include "Tile.hpp"
 
 Tile::Tile(std::string t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
-           int cm, int cc, int ci, int rc, int ri, int ira)
+           int cm, int cc, int ci, int rc, int ri, int ira, int sbc)
     : type(t), owner(o), level(l), flipped(f), income(i), victory_points(vp), link_points(lp),
       cost_money(cm), cost_coal(cc), cost_iron(ci), resource_coal(rc), resource_iron(ri),
-      initial_resource_amount(ira) {}
+      initial_resource_amount(ira), sell_beer_cost(sbc) {}
 
 Tile::Builder Tile::create(std::string type) {
     return Builder(type);
@@ -24,6 +24,7 @@ Tile::Builder::Builder(std::string type) {
     tile.resource_coal = 0;
     tile.resource_iron = 0;
     tile.initial_resource_amount = 0;
+    tile.sell_beer_cost = 0;
 }
 
 Tile::Builder& Tile::Builder::owner(std::shared_ptr<Player> o) { tile.owner = o; return *this; }
@@ -38,5 +39,6 @@ Tile::Builder& Tile::Builder::costIron(int ci) { tile.cost_iron = ci; return *th
 Tile::Builder& Tile::Builder::resourceCoal(int rc) { tile.resource_coal = rc; return *this; }
 Tile::Builder& Tile::Builder::resourceIron(int ri) { tile.resource_iron = ri; return *this; }
 Tile::Builder& Tile::Builder::initialResourceAmount(int ira) { tile.initial_resource_amount = ira; return *this; }
+Tile::Builder& Tile::Builder::sellBeerCost(int sbc) { tile.sell_beer_cost = sbc; return *this; }
 
 Tile Tile::Builder::build() { return tile; }

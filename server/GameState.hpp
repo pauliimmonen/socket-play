@@ -44,7 +44,7 @@ public:
 
 private:
     void initializeBoard();
-    bool placeTile(int playerId, UNUSED const std::string& cityName, UNUSED int slotIndex, UNUSED const std::string& tileType);
+    bool placeTile(int playerId, UNUSED const std::string& cityName, UNUSED int slotIndex, UNUSED const Tile& tile);
     void generateAvailableTiles();
     void calculateLinkPoints(UNUSED const std::string& cityName);
 

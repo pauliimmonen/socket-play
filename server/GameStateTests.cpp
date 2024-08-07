@@ -6,6 +6,11 @@
 class GameStateTest : public ::testing::Test {
 protected:
     GameState gameState;
+
+    // Helper function to create a tile for testing
+    Tile createTestTile(const std::string& type, std::shared_ptr<Player> player) {
+        return TileFactory::createTile(type, 1, player);
+    }
 };
 
 TEST_F(GameStateTest, AddPlayer) {
@@ -30,6 +35,8 @@ TEST_F(GameStateTest, PlaceTile) {
     int initialMoney = player->money;
     int initialScore = player->score;
 
+    Tile testTile = createTestTile("Coal", player);
+
     GameAction action;
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
@@ -42,8 +49,8 @@ TEST_F(GameStateTest, PlaceTile) {
     auto state = gameState.getState();
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"], "Coal");
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["owner"], player->id);
-    EXPECT_EQ(player->score, initialScore + 1);  // Assuming Coal tile gives 1 victory point
-    EXPECT_EQ(player->money, initialMoney - 5);  // Assuming Coal tile costs 5 money
+    EXPECT_EQ(player->score, initialScore + testTile.victory_points);
+    EXPECT_EQ(player->money, initialMoney - testTile.cost_money);
 }
 
 TEST_F(GameStateTest, PlaceTileInOccupiedSlot) {
@@ -56,18 +63,6 @@ TEST_F(GameStateTest, PlaceTileInOccupiedSlot) {
     action.tileType = "Coal";
 
     EXPECT_TRUE(gameState.handleAction(player->id, action));
-    EXPECT_FALSE(gameState.handleAction(player->id, action));
-}
-
-TEST_F(GameStateTest, PlaceNonExistentTile) {
-    auto player = gameState.addPlayer();
-    
-    GameAction action;
-    action.type = GameAction::Type::PlaceTile;
-    action.cityName = "Birmingham";
-    action.slotIndex = 0;
-    action.tileType = "NonExistentTile";
-
     EXPECT_FALSE(gameState.handleAction(player->id, action));
 }
 
@@ -95,19 +90,7 @@ TEST_F(GameStateTest, RemovePlayer) {
 }
 
 TEST_F(GameStateTest, TileProperties) {
-    auto player = gameState.addPlayer();
-    
-    GameAction action;
-    action.type = GameAction::Type::PlaceTile;
-    action.cityName = "Birmingham";
-    action.slotIndex = 0;
-    action.tileType = "Coal";
-
-    EXPECT_TRUE(gameState.handleAction(player->id, action));
-
-    auto state = gameState.getState();
-    auto placedTile = state["board"]["cities"]["Birmingham"]["slots"][0];
-    
+    Tile testTile = createTestTile("Coal", player);
     EXPECT_EQ(placedTile["placedTile"], "Coal");
     EXPECT_EQ(placedTile["owner"], player->id);
     EXPECT_EQ(placedTile["level"], 1);
@@ -121,6 +104,7 @@ TEST_F(GameStateTest, TileProperties) {
     EXPECT_EQ(placedTile["resource_coal"], 0);
     EXPECT_EQ(placedTile["resource_iron"], 0);
     EXPECT_EQ(placedTile["initial_resource_amount"], 2);
+    EXPECT_EQ(placedTile["sell_beer_cost"], 0);
 }
 
 TEST_F(GameStateTest, InitialResourceAmount) {

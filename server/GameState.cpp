@@ -23,8 +23,20 @@ void GameState::removePlayer(int id) {
 
 bool GameState::handleAction(int playerId, const GameAction& action) {
     switch (action.type) {
-        case GameAction::Type::PlaceTile:
-            return placeTile(playerId, action.cityName, action.slotIndex, action.tileType);
+        case GameAction::Type::PlaceTile: {
+            auto playerIt = m_players.find(playerId);
+            if (playerIt == m_players.end()) {
+                return false;  // Player not found
+            }
+            auto& player = playerIt->second;
+
+            try {
+                Tile newTile = TileFactory::createTile(action.tileType, 1, player);
+                return placeTile(playerId, action.cityName, action.slotIndex, newTile);
+            } catch (const std::runtime_error& e) {
+                return false;  // Invalid tile type
+            }
+        }
         default:
             return false;
     }
@@ -57,15 +69,18 @@ nlohmann::json GameState::getState() const {
                 {"owner", slot.placedTile && slot.placedTile->owner ? slot.placedTile->owner->id : -1},
                 {"level", slot.placedTile ? slot.placedTile->level : 0},
                 {"flipped", slot.placedTile ? slot.placedTile->flipped : false},
+                /* 
+                 * Information is covered with level and type
                 {"income", slot.placedTile ? slot.placedTile->income : 0},
                 {"victory_points", slot.placedTile ? slot.placedTile->victory_points : 0},
                 {"link_points", slot.placedTile ? slot.placedTile->link_points : 0},
                 {"cost_money", slot.placedTile ? slot.placedTile->cost_money : 0},
                 {"cost_coal", slot.placedTile ? slot.placedTile->cost_coal : 0},
                 {"cost_iron", slot.placedTile ? slot.placedTile->cost_iron : 0},
+                {"initial_resource_amount", slot.placedTile ? slot.placedTile->initial_resource_amount : 0}
+                */
                 {"resource_coal", slot.placedTile ? slot.placedTile->resource_coal : 0},
                 {"resource_iron", slot.placedTile ? slot.placedTile->resource_iron : 0},
-                {"initial_resource_amount", slot.placedTile ? slot.placedTile->initial_resource_amount : 0}
             });
         }
         state["board"]["cities"][city.name] = cityJson;
@@ -137,7 +152,7 @@ void GameState::initializeBoard() {
 }
 
 
-bool GameState::placeTile(int playerId, const std::string& cityName, int slotIndex, const std::string& tileType) {
+bool GameState::placeTile(int playerId, const std::string& cityName, int slotIndex, const Tile& tile) {
     auto playerIt = m_players.find(playerId);
     if (playerIt == m_players.end()) {
         return false;  // Player not found
@@ -159,27 +174,21 @@ bool GameState::placeTile(int playerId, const std::string& cityName, int slotInd
         return false;  // Slot already occupied
     }
 
-    if (std::find(slot.allowedTileTypes.begin(), slot.allowedTileTypes.end(), tileType) == slot.allowedTileTypes.end()) {
+    if (std::find(slot.allowedTileTypes.begin(), slot.allowedTileTypes.end(), tile.type) == slot.allowedTileTypes.end()) {
         return false;  // Tile type not allowed in this slot
     }
 
-    try {
-        Tile newTile = TileFactory::createTile(tileType, 1, player);
-        
-        if (player->money < newTile.cost_money) {
-            return false;  // Not enough money
-        }
-
-        slot.placedTile = std::make_shared<Tile>(newTile);
-        player->money -= newTile.cost_money;
-        player->score += newTile.victory_points;
-
-        calculateLinkPoints(cityName);
-
-        return true;
-    } catch (const std::runtime_error& e) {
-        return false;  // Invalid tile type
+    if (player->money < tile.cost_money) {
+        return false;  // Not enough money
     }
+
+    slot.placedTile = std::make_shared<Tile>(tile);
+    player->money -= tile.cost_money;
+    player->score += tile.victory_points;
+
+    calculateLinkPoints(cityName);
+
+    return true;
 }
 
 void GameState::generateAvailableTiles() {
