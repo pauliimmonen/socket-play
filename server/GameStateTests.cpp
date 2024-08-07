@@ -90,21 +90,39 @@ TEST_F(GameStateTest, RemovePlayer) {
 }
 
 TEST_F(GameStateTest, TileProperties) {
+    auto player = gameState.addPlayer();
+    
     Tile testTile = createTestTile("Coal", player);
+
+    GameAction action;
+    action.type = GameAction::Type::PlaceTile;
+    action.cityName = "Birmingham";
+    action.slotIndex = 0;
+    action.tileType = "Coal";
+
+    EXPECT_TRUE(gameState.handleAction(player->id, action));
+
+    // Verify tile properties
+    EXPECT_EQ(testTile.type, "Coal");
+    EXPECT_EQ(testTile.owner, player);
+    EXPECT_EQ(testTile.level, 1);
+    EXPECT_FALSE(testTile.flipped);
+    EXPECT_EQ(testTile.income, 4);
+    EXPECT_EQ(testTile.victory_points, 1);
+    EXPECT_EQ(testTile.link_points, 2);
+    EXPECT_EQ(testTile.cost_money, 5);
+    EXPECT_EQ(testTile.cost_coal, 0);
+    EXPECT_EQ(testTile.cost_iron, 0);
+    EXPECT_EQ(testTile.resource_coal, 0);
+    EXPECT_EQ(testTile.resource_iron, 0);
+    EXPECT_EQ(testTile.initial_resource_amount, 2);
+    EXPECT_EQ(testTile.sell_beer_cost, 0);
+
+    // Verify essential game state information
+    auto state = gameState.getState();
+    auto placedTile = state["board"]["cities"]["Birmingham"]["slots"][0];
     EXPECT_EQ(placedTile["placedTile"], "Coal");
     EXPECT_EQ(placedTile["owner"], player->id);
-    EXPECT_EQ(placedTile["level"], 1);
-    EXPECT_FALSE(placedTile["flipped"]);
-    EXPECT_EQ(placedTile["income"], 4);
-    EXPECT_EQ(placedTile["victory_points"], 1);
-    EXPECT_EQ(placedTile["link_points"], 2);
-    EXPECT_EQ(placedTile["cost_money"], 5);
-    EXPECT_EQ(placedTile["cost_coal"], 0);
-    EXPECT_EQ(placedTile["cost_iron"], 0);
-    EXPECT_EQ(placedTile["resource_coal"], 0);
-    EXPECT_EQ(placedTile["resource_iron"], 0);
-    EXPECT_EQ(placedTile["initial_resource_amount"], 2);
-    EXPECT_EQ(placedTile["sell_beer_cost"], 0);
 }
 
 TEST_F(GameStateTest, InitialResourceAmount) {
