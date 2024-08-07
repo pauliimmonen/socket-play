@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <random>
 #include <stdexcept>
+#include <unordered_map>
 
 GameState::GameState() : m_next_id(1) {
     initializeBoard();
@@ -33,7 +34,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
             try {
                 Tile newTile = TileFactory::createTile(action.tileType, 1, player);
                 return placeTile(playerId, action.cityName, action.slotIndex, newTile);
-            } catch (const std::runtime_error& e) {
+            } catch (const std::invalid_argument& e) {
                 return false;  // Invalid tile type
             }
         }
@@ -65,7 +66,7 @@ nlohmann::json GameState::getState() const {
         for (const auto& slot : city.slots) {
             cityJson["slots"].push_back({
                 {"allowedTileTypes", slot.allowedTileTypes},
-                {"placedTile", slot.placedTile ? slot.placedTile->type : ""},
+                {"placedTile", slot.placedTile ? slot.placedTile->type : TileType::NullTile},
                 {"owner", slot.placedTile && slot.placedTile->owner ? slot.placedTile->owner->id : -1},
                 {"level", slot.placedTile ? slot.placedTile->level : 0},
                 {"flipped", slot.placedTile ? slot.placedTile->flipped : false},
@@ -115,38 +116,38 @@ void GameState::initializeBoard() {
         "Birmingham", 0, 0,
         {"Coventry", "Worcester"},
         {
-            {{"Coal", "Iron"}, nullptr},
-            {{"Cotton", "Manufacturer"}, nullptr},
-            {{"Coal", "Iron", "Cotton", "Manufacturer"}, nullptr},
-            {{"Coal", "Iron", "Cotton", "Manufacturer"}, nullptr}
+            {{TileType::Coal, TileType::Iron}, nullptr},
+            {{TileType::Cotton, TileType::Manufacturer}, nullptr},
+            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr},
+            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
         }
     };
     m_board.cities["Coventry"] = {
         "Coventry", 1, 0,
         {"Birmingham", "Oxford"},
         {
-            {{"Coal", "Iron"}, nullptr},
-            {{"Cotton", "Manufacturer"}, nullptr},
-            {{"Coal", "Iron", "Cotton", "Manufacturer"}, nullptr}
+            {{TileType::Coal, TileType::Iron}, nullptr},
+            {{TileType::Cotton, TileType::Manufacturer}, nullptr},
+            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
         }
     };
     m_board.cities["Worcester"] = {
         "Worcester", 0, 1,
         {"Birmingham", "Oxford"},
         {
-            {{"Coal", "Cotton"}, nullptr},
-            {{"Iron", "Manufacturer"}, nullptr},
-            {{"Coal", "Iron", "Cotton", "Manufacturer"}, nullptr}
+            {{TileType::Coal, TileType::Cotton}, nullptr},
+            {{TileType::Iron, TileType::Manufacturer}, nullptr},
+            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
         }
     };
     m_board.cities["Oxford"] = {
         "Oxford", 1, 1,
         {"Coventry", "Worcester"},
         {
-            {{"Coal", "Cotton"}, nullptr},
-            {{"Iron", "Manufacturer"}, nullptr},
-            {{"Coal", "Iron", "Cotton", "Manufacturer"}, nullptr},
-            {{"Coal", "Iron", "Cotton", "Manufacturer"}, nullptr}
+            {{TileType::Coal, TileType::Cotton}, nullptr},
+            {{TileType::Iron, TileType::Manufacturer}, nullptr},
+            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr},
+            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
         }
     };
 }
@@ -193,7 +194,7 @@ bool GameState::placeTile(int playerId, const std::string& cityName, int slotInd
 
 void GameState::generateAvailableTiles() {
     m_availableTiles.clear();
-    std::vector<std::string> tileTypes = {"Coal", "Iron", "Cotton", "Manufacturer"};
+    std::vector<TileType> tileTypes = {TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer};
     for (const auto& player : m_players) {
         for (const auto& tileType : tileTypes) {
             m_availableTiles.push_back(TileFactory::createTile(tileType, 1, player.second));

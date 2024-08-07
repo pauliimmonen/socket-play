@@ -1,16 +1,17 @@
 #include "Tile.hpp"
+#include <stdexcept>
 
-Tile::Tile(std::string t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
+Tile::Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
            int cm, int cc, int ci, int rc, int ri, int ira, int sbc)
     : type(t), owner(o), level(l), flipped(f), income(i), victory_points(vp), link_points(lp),
       cost_money(cm), cost_coal(cc), cost_iron(ci), resource_coal(rc), resource_iron(ri),
       initial_resource_amount(ira), sell_beer_cost(sbc) {}
 
-Tile::Builder Tile::create(std::string type) {
+Tile::Builder Tile::create(TileType type) {
     return Builder(type);
 }
 
-Tile::Builder::Builder(std::string type) {
+Tile::Builder::Builder(TileType type) {
     tile.type = type;
     tile.owner = nullptr;
     tile.level = 1;
@@ -42,3 +43,14 @@ Tile::Builder& Tile::Builder::initialResourceAmount(int ira) { tile.initial_reso
 Tile::Builder& Tile::Builder::sellBeerCost(int sbc) { tile.sell_beer_cost = sbc; return *this; }
 
 Tile Tile::Builder::build() { return tile; }
+
+TileType Tile::stringToTileType(const std::string& typeStr) {
+    if (typeStr == "Coal") return TileType::Coal;
+    if (typeStr == "Iron") return TileType::Iron;
+    if (typeStr == "Cotton") return TileType::Cotton;
+    if (typeStr == "Manufacturer") return TileType::Manufacturer;
+    if (typeStr == "Pottery") return TileType::Pottery;
+    if (typeStr == "Brewery") return TileType::Brewery;
+    if (typeStr == "Null") return TileType::NullTile;
+    throw std::invalid_argument("Invalid tile type string");
+}

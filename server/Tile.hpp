@@ -5,11 +5,22 @@
 #include <memory>
 #include "Player.hpp"
 
+enum class TileType {
+    Coal,
+    Iron,
+    Cotton,
+    Manufacturer,
+    Pottery,
+    Brewery,
+    NullTile
+    // Add other tile types as needed
+};
+
 class Tile {
 public:
     class Builder;
 
-    std::string type;
+    TileType type;
     std::shared_ptr<Player> owner;
     int level;
     bool flipped;
@@ -24,14 +35,16 @@ public:
     int initial_resource_amount;
     int sell_beer_cost;
 
-    Tile(std::string t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
+    Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
          int cm, int cc, int ci, int rc, int ri, int ira, int sbc);
+
+    static TileType stringToTileType(const std::string& typeStr);
 
 private:
     Tile() = default;
 
 public:
-    static Builder create(std::string type);
+    static Builder create(TileType type);
 };
 
 class Tile::Builder {
@@ -39,7 +52,7 @@ private:
     Tile tile;
 
 public:
-    Builder(std::string type);
+    Builder(TileType type);
     Builder& owner(std::shared_ptr<Player> o);
     Builder& level(int l);
     Builder& flipped(bool f);

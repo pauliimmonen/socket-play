@@ -8,7 +8,7 @@ protected:
     GameState gameState;
 
     // Helper function to create a tile for testing
-    Tile createTestTile(const std::string& type, std::shared_ptr<Player> player) {
+    Tile createTestTile(TileType type, std::shared_ptr<Player> player) {
         return TileFactory::createTile(type, 1, player);
     }
 };
@@ -35,19 +35,19 @@ TEST_F(GameStateTest, PlaceTile) {
     int initialMoney = player->money;
     int initialScore = player->score;
 
-    Tile testTile = createTestTile("Coal", player);
+    Tile testTile = createTestTile(TileType::Coal, player);
 
     GameAction action;
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
     action.slotIndex = 0;
-    action.tileType = "Coal";
+    action.tileType = TileType::Coal;
 
     bool result = gameState.handleAction(player->id, action);
     EXPECT_TRUE(result);
 
     auto state = gameState.getState();
-    EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"], "Coal");
+    EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"], TileType::Coal);
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["owner"], player->id);
     EXPECT_EQ(player->score, initialScore + testTile.victory_points);
     EXPECT_EQ(player->money, initialMoney - testTile.cost_money);
@@ -60,7 +60,7 @@ TEST_F(GameStateTest, PlaceTileInOccupiedSlot) {
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
     action.slotIndex = 0;
-    action.tileType = "Coal";
+    action.tileType = TileType::Coal;
 
     EXPECT_TRUE(gameState.handleAction(player->id, action));
     EXPECT_FALSE(gameState.handleAction(player->id, action));
@@ -73,7 +73,7 @@ TEST_F(GameStateTest, PlaceTileInInvalidSlot) {
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
     action.slotIndex = 10;  // Invalid slot index
-    action.tileType = "Coal";
+    action.tileType = TileType::Coal;
 
     EXPECT_FALSE(gameState.handleAction(player->id, action));
 }
@@ -92,18 +92,18 @@ TEST_F(GameStateTest, RemovePlayer) {
 TEST_F(GameStateTest, TileProperties) {
     auto player = gameState.addPlayer();
     
-    Tile testTile = createTestTile("Coal", player);
+    Tile testTile = createTestTile(TileType::Coal, player);
 
     GameAction action;
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
     action.slotIndex = 0;
-    action.tileType = "Coal";
+    action.tileType = TileType::Coal;
 
     EXPECT_TRUE(gameState.handleAction(player->id, action));
 
     // Verify tile properties
-    EXPECT_EQ(testTile.type, "Coal");
+    EXPECT_EQ(testTile.type, TileType::Coal);
     EXPECT_EQ(testTile.owner, player);
     EXPECT_EQ(testTile.level, 1);
     EXPECT_FALSE(testTile.flipped);
@@ -121,7 +121,7 @@ TEST_F(GameStateTest, TileProperties) {
     // Verify essential game state information
     auto state = gameState.getState();
     auto placedTile = state["board"]["cities"]["Birmingham"]["slots"][0];
-    EXPECT_EQ(placedTile["placedTile"], "Coal");
+    EXPECT_EQ(placedTile["placedTile"], TileType::Coal);
     EXPECT_EQ(placedTile["owner"], player->id);
 }
 
@@ -130,26 +130,18 @@ TEST_F(GameStateTest, InitialResourceAmount) {
     auto state = gameState.getState();
 
     // Check Coal tile
-    auto coalTile = std::find_if(state["availableTiles"].begin(), state["availableTiles"].end(),
-                                 [](const auto& tile) { return tile["type"] == "Coal"; });
     ASSERT_NE(coalTile, state["availableTiles"].end());
     EXPECT_EQ((*coalTile)["initial_resource_amount"], 2);
 
     // Check Iron tile
-    auto ironTile = std::find_if(state["availableTiles"].begin(), state["availableTiles"].end(),
-                                 [](const auto& tile) { return tile["type"] == "Iron"; });
     ASSERT_NE(ironTile, state["availableTiles"].end());
     EXPECT_EQ((*ironTile)["initial_resource_amount"], 2);
 
     // Check Cotton tile
-    auto cottonTile = std::find_if(state["availableTiles"].begin(), state["availableTiles"].end(),
-                                   [](const auto& tile) { return tile["type"] == "Cotton"; });
     ASSERT_NE(cottonTile, state["availableTiles"].end());
     EXPECT_EQ((*cottonTile)["initial_resource_amount"], 0);
 
     // Check Manufacturer tile
-    auto manufacturerTile = std::find_if(state["availableTiles"].begin(), state["availableTiles"].end(),
-                                         [](const auto& tile) { return tile["type"] == "Manufacturer"; });
     ASSERT_NE(manufacturerTile, state["availableTiles"].end());
     EXPECT_EQ((*manufacturerTile)["initial_resource_amount"], 0);
 }

@@ -18,7 +18,7 @@
 #endif
 
 struct CitySlot {
-    std::vector<std::string> allowedTileTypes;
+    std::vector<TileType> allowedTileTypes;
     std::shared_ptr<Tile> placedTile;
 };
 
@@ -44,9 +44,9 @@ public:
 
 private:
     void initializeBoard();
-    bool placeTile(int playerId, UNUSED const std::string& cityName, UNUSED int slotIndex, UNUSED const Tile& tile);
+    bool placeTile(int playerId, const std::string& cityName, int slotIndex, const Tile& tile);
     void generateAvailableTiles();
-    void calculateLinkPoints(UNUSED const std::string& cityName);
+    void calculateLinkPoints(const std::string& cityName);
 
     int m_next_id;
     std::map<int, std::shared_ptr<Player>> m_players;

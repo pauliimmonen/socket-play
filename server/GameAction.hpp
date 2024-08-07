@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Tile.hpp"
 
 struct GameAction {
     enum class Type {
@@ -9,7 +10,7 @@ struct GameAction {
 
     Type type;
     std::string cityName;
-    std::string tileType;
+    TileType tileType;
     int slotIndex;
 
     GameAction() : type(Type::Unknown), slotIndex(-1) {}

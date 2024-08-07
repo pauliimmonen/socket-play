@@ -6,7 +6,7 @@
 
 class TileFactory {
 public:
-    static Tile createTile(const std::string& type, int level, std::shared_ptr<Player> owner);
+    static Tile createTile(TileType type, int level, std::shared_ptr<Player> owner);
 };
 
 #endif // TILEFACTORY_HPP
