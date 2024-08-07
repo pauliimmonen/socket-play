@@ -7,54 +7,244 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
 
     switch (type) {
         case TileType::Coal:
-            builder.income(4)
-                   .victoryPoints(1)
-                   .linkPoints(2)
-                   .costMoney(5)
-                   .costCoal(0)
-                   .costIron(0)
-                   .initialResourceAmount(2);
+            switch (level) {
+                case 1:
+                    builder.income(4)
+                           .victoryPoints(1)
+                           .costMoney(5)
+                           .linkPoints(2)
+                           .initialResourceAmount(2);
+                    break;
+                case 2:
+                    builder.income(7)
+                           .victoryPoints(2)
+                           .costMoney(7)
+                           .linkPoints(1)
+                           .initialResourceAmount(3);
+                    break;
+                case 3:
+                    builder.income(6)
+                           .victoryPoints(3)
+                           .costMoney(8)
+                           .costIron(1)
+                           .linkPoints(1)
+                           .initialResourceAmount(4);
+                    break;
+                case 4:
+                    builder.income(5)
+                           .victoryPoints(4)
+                           .costMoney(10)
+                           .costIron(1)
+                           .linkPoints(1)
+                           .initialResourceAmount(4);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid Coal tile level");
+            }
             break;
         case TileType::Iron:
-            builder.income(4)
-                   .victoryPoints(1)
-                   .linkPoints(2)
-                   .costMoney(5)
-                   .costCoal(0)
-                   .costIron(0)
-                   .initialResourceAmount(2);
+            switch (level) {
+                case 1:
+                    builder.income(3)
+                           .victoryPoints(3)
+                           .costMoney(5)
+                           .costIron(1)
+                           .linkPoints(1)
+                           .initialResourceAmount(4);
+                    break;
+                case 2:
+                    builder.income(3)
+                           .victoryPoints(5)
+                           .costMoney(7)
+                           .costIron(1)
+                           .linkPoints(1)
+                           .initialResourceAmount(4);
+                    break;
+                case 3:
+                    builder.income(2)
+                           .victoryPoints(7)
+                           .costMoney(9)
+                           .costIron(1)
+                           .linkPoints(1)
+                           .initialResourceAmount(5);
+                    break;
+                case 4:
+                    builder.income(1)
+                           .victoryPoints(9)
+                           .costMoney(12)
+                           .costIron(1)
+                           .linkPoints(1)
+                           .initialResourceAmount(6);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid Iron tile level");
+            }
             break;
         case TileType::Cotton:
-            builder.income(5)
-                   .victoryPoints(2)
-                   .linkPoints(0)
-                   .costMoney(10)
-                   .costCoal(1)
-                   .costIron(0);
+            builder.linkPoints(1).beerDemand(1);
+            switch (level) {
+                case 1:
+                    builder.income(5)
+                           .victoryPoints(5)
+                           .costMoney(12);
+                    break;
+                case 2:
+                    builder.income(4)
+                           .victoryPoints(5)
+                           .costMoney(14)
+                           .costCoal(1)
+                           .linkPoints(2);
+                    break;
+                case 3:
+                    builder.income(3)
+                           .victoryPoints(9)
+                           .costMoney(16)
+                           .costCoal(1)
+                           .costIron(1);
+                    break;
+                case 4:
+                    builder.income(2)
+                           .victoryPoints(12)
+                           .costMoney(18)
+                           .costCoal(1)
+                           .costIron(1);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid Cotton tile level");
+            }
             break;
         case TileType::Manufacturer:
-            builder.income(5)
-                   .victoryPoints(2)
-                   .linkPoints(0)
-                   .costMoney(10)
-                   .costCoal(1)
-                   .costIron(1);
+            builder.linkPoints(1).beerDemand(1);
+            switch (level) {
+                case 1:
+                    builder.income(5)
+                           .victoryPoints(3)
+                           .costMoney(8)
+                           .costCoal(1)
+                           .linkPoints(2);
+                    break;
+                case 2:
+                    builder.income(1)
+                           .victoryPoints(5)
+                           .costMoney(10)
+                           .costIron(1);
+                    break;
+                case 3:
+                    builder.income(4)
+                           .victoryPoints(4)
+                           .costMoney(12)
+                           .costCoal(2)
+                           .linkPoints(0)
+                           .beerDemand(0);
+                    break;
+                case 4:
+                    builder.income(8)
+                           .victoryPoints(3)
+                           .costMoney(8)
+                           .costIron(1);
+                    break;
+                case 5:
+                    builder.income(2)
+                           .victoryPoints(8)
+                           .costMoney(16)
+                           .costCoal(1)
+                           .linkPoints(2);
+                    break;
+                case 6:
+                    builder.income(6)
+                           .victoryPoints(7)
+                           .costMoney(20);
+                    break;
+                case 7:
+                    builder.income(4)
+                           .victoryPoints(9)
+                           .costMoney(16)
+                           .costCoal(1)
+                           .costIron(1)
+                           .linkPoints(0)
+                           .beerDemand(0);
+                    break;
+                case 8:
+                    builder.income(1)
+                           .victoryPoints(11)
+                           .costMoney(20)
+                           .costIron(2)
+                           .linkPoints(1);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid Manufactor tile level");
+            }
+            builder.linkPoints(0);
             break;
         case TileType::Pottery:
-            builder.income(3)
-                   .victoryPoints(2)
-                   .linkPoints(1)
-                   .costMoney(10)
-                   .costCoal(2)
-                   .costIron(0);
+            switch (level) {
+                case 1:
+                    builder.income(5)
+                           .victoryPoints(10)
+                           .costMoney(17)
+                           .costIron(1)
+                           .beerDemand(1);
+                    break;
+                case 2:
+                    builder.income(1)
+                           .victoryPoints(1)
+                           .costMoney(0)
+                           .costIron(1)
+                           .beerDemand(1);
+                    break;
+                case 3:
+                    builder.income(5)
+                           .victoryPoints(11)
+                           .costMoney(22)
+                           .costCoal(2)
+                           .beerDemand(2);
+                    break;
+                case 4:
+                    builder.income(22)
+                           .victoryPoints(1)
+                           .costMoney(0)
+                           .costCoal(1)
+                           .beerDemand(1);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid Pottery tile level");
+            }
+            builder.linkPoints(1);
             break;
         case TileType::Brewery:
-            builder.income(5)
-                   .victoryPoints(2)
-                   .linkPoints(0)
-                   .costMoney(15)
-                   .costCoal(1)
-                   .costIron(1);
+            builder.linkPoints(1);
+            switch (level) {
+                case 1:
+                    builder.income(5)
+                           .victoryPoints(10)
+                           .costMoney(17)
+                           .costIron(1);
+                    break;
+                case 2:
+                    builder.income(7)
+                           .victoryPoints(3)
+                           .costMoney(20)
+                           .costCoal(2)
+                           .costIron(2);
+                    break;
+                case 3:
+                    builder.income(9)
+                           .victoryPoints(4)
+                           .costMoney(25)
+                           .costCoal(3)
+                           .costIron(3);
+                    break;
+                case 4:
+                    builder.income(11)
+                           .victoryPoints(5)
+                           .costMoney(30)
+                           .costCoal(4)
+                           .costIron(4);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid tile level");
+            }
+            builder.linkPoints(0);
             break;
         default:
             throw std::invalid_argument("Invalid tile type");
