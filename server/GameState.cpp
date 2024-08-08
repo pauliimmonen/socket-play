@@ -1,13 +1,13 @@
 #include "GameState.hpp"
 #include "Tile.hpp"
 #include "TileFactory.hpp"
+#include "GameBoard.hpp"
 #include <algorithm>
 #include <random>
 #include <stdexcept>
-#include <unordered_map>
 
 GameState::GameState() : m_next_id(1) {
-    initializeBoard();
+    m_board.initializeBrassBirminghamMap();
 }
 
 std::shared_ptr<Player> GameState::addPlayer() {
@@ -53,7 +53,7 @@ nlohmann::json GameState::getState() const {
     }
 
     state["board"] = nlohmann::json::object();
-    for (const auto& pair : m_board.cities) {
+    for (const auto& pair : m_board.getCities()) {
         const auto& city = pair.second;
         nlohmann::json cityJson = {
             {"x", city.x},
@@ -89,49 +89,6 @@ nlohmann::json GameState::getState() const {
     // ... (keep existing implementation)
 }
 
-void GameState::initializeBoard() {
-    // Create a simple board with a few cities and connections
-    m_board.cities["Birmingham"] = {
-        "Birmingham", 0, 0,
-        {"Coventry", "Worcester"},
-        {
-            {{TileType::Coal, TileType::Iron}, nullptr},
-            {{TileType::Cotton, TileType::Manufacturer}, nullptr},
-            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr},
-            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
-        }
-    };
-    m_board.cities["Coventry"] = {
-        "Coventry", 1, 0,
-        {"Birmingham", "Oxford"},
-        {
-            {{TileType::Coal, TileType::Iron}, nullptr},
-            {{TileType::Cotton, TileType::Manufacturer}, nullptr},
-            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
-        }
-    };
-    m_board.cities["Worcester"] = {
-        "Worcester", 0, 1,
-        {"Birmingham", "Oxford"},
-        {
-            {{TileType::Coal, TileType::Cotton}, nullptr},
-            {{TileType::Iron, TileType::Manufacturer}, nullptr},
-            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
-        }
-    };
-    m_board.cities["Oxford"] = {
-        "Oxford", 1, 1,
-        {"Coventry", "Worcester"},
-        {
-            {{TileType::Coal, TileType::Cotton}, nullptr},
-            {{TileType::Iron, TileType::Manufacturer}, nullptr},
-            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr},
-            {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr}
-        }
-    };
-}
-
-
 bool GameState::placeTile(int playerId, const std::string& cityName, int slotIndex, const Tile& tile) {
     auto playerIt = m_players.find(playerId);
     if (playerIt == m_players.end()) {
@@ -139,16 +96,17 @@ bool GameState::placeTile(int playerId, const std::string& cityName, int slotInd
     }
     auto& player = playerIt->second;
 
-    auto cityIt = m_board.cities.find(cityName);
-    if (cityIt == m_board.cities.end()) {
+    const auto& cities = m_board.getCities();
+    auto cityIt = cities.find(cityName);
+    if (cityIt == cities.end()) {
         return false;  // City not found
     }
-    auto& city = cityIt->second;
+    const auto& city = cityIt->second;
 
     if (slotIndex < 0 || slotIndex >= static_cast<int>(city.slots.size())) {
         return false;  // Invalid slot index
     }
-    auto& slot = city.slots[slotIndex];
+    auto& slot = const_cast<Slot&>(city.slots[slotIndex]);
 
     if (slot.placedTile) {
         return false;  // Slot already occupied

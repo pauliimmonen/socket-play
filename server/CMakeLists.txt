@@ -30,6 +30,7 @@ include_directories(${WEBSOCKETPP_INCLUDE_DIR})
 set(SOURCES
     WebSocketServer.cpp
     GameState.cpp
+    GameBoard.cpp
     Tile.cpp
     TileFactory.cpp
 )
@@ -38,6 +39,7 @@ set(SOURCES
 set(HEADERS
     WebSocketServer.hpp
     GameState.hpp
+    GameBoard.hpp
     Player.hpp
     GameAction.hpp
     Tile.hpp
