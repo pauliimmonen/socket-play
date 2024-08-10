@@ -1,6 +1,8 @@
 #include "GameBoard.hpp"
 #include "Tile.hpp"
 #include <algorithm>
+#include <queue>
+#include <set>
 
 void GameBoard::addCity(const std::string& name, int x, int y) {
     cities[name] = City{name, x, y, {}};
@@ -105,4 +107,42 @@ bool GameBoard::placeLink(const std::string& city1, const std::string& city2, Pl
         return true;
     }
     return false;
+}
+
+std::vector<std::string> GameBoard::getConnectedCities(const std::string& startCity) const {
+    std::vector<std::string> connectedCities;
+    std::set<std::string> visited;
+    std::queue<std::string> queue;
+
+    visited.insert(startCity);
+    queue.push(startCity);
+
+    while (!queue.empty()) {
+        std::string currentCity = queue.front();
+        queue.pop();
+        connectedCities.push_back(currentCity);
+
+        for (const auto& connection : connections) {
+            if (connection.linkOwner == nullptr) continue;  // Skip if no link is placed
+
+            std::string nextCity;
+            if (connection.city1 == currentCity) {
+                nextCity = connection.city2;
+            } else if (connection.city2 == currentCity) {
+                nextCity = connection.city1;
+            } else {
+                continue;  // This connection doesn't involve the current city
+            }
+
+            if (visited.find(nextCity) == visited.end()) {
+                visited.insert(nextCity);
+                queue.push(nextCity);
+            }
+        }
+    }
+
+    // Remove the start city from the result
+    connectedCities.erase(connectedCities.begin());
+
+    return connectedCities;
 }

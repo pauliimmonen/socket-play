@@ -53,3 +53,52 @@ TEST_F(GameBoardTest, InitializedMapConnections) {
     }
 }
 
+TEST_F(GameBoardTest, GetConnectedCities) {
+    // Set up a simple game board
+    board.addCity("CityA", 0, 0);
+    board.addCity("CityB", 1, 0);
+    board.addCity("CityC", 2, 0);
+    board.addCity("CityD", 1, 1);
+    board.addCity("CityE", 2, 1);
+
+    // Add connections
+    board.addConnection("CityA", "CityB");
+    board.addConnection("CityB", "CityC");
+    board.addConnection("CityB", "CityD");
+    board.addConnection("CityC", "CityE");
+    board.addConnection("CityD", "CityE");
+
+    // Place links
+    ASSERT_TRUE(board.placeLink("CityA", "CityB", &player1));
+    ASSERT_TRUE(board.placeLink("CityB", "CityC", &player2));
+    ASSERT_TRUE(board.placeLink("CityB", "CityD", &player1));
+
+    // Test connected cities from CityA
+    std::vector<std::string> connectedCities = board.getConnectedCities("CityA");
+    ASSERT_EQ(connectedCities.size(), 3);
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityB") != connectedCities.end());
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityC") != connectedCities.end());
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityD") != connectedCities.end());
+
+    // CityE should not be in the list as there's no link to it
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityE") == connectedCities.end());
+
+    // Test connected cities from CityD
+    connectedCities = board.getConnectedCities("CityD");
+    ASSERT_EQ(connectedCities.size(), 3);
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityA") != connectedCities.end());
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityB") != connectedCities.end());
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityC") != connectedCities.end());
+
+    // Place the last link
+    ASSERT_TRUE(board.placeLink("CityC", "CityE", &player2));
+
+    // Test connected cities from CityA again
+    connectedCities = board.getConnectedCities("CityA");
+    ASSERT_EQ(connectedCities.size(), 4);
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityB") != connectedCities.end());
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityC") != connectedCities.end());
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityD") != connectedCities.end());
+    EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityE") != connectedCities.end());
+}
+

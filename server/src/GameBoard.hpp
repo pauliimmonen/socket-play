@@ -46,6 +46,7 @@ public:
     void initializeBrassBirminghamMap();
     bool placeLink(const std::string& city1, const std::string& city2, Player* player);
     std::vector<Connection> getPlacedConnections() const;
+    std::vector<std::string> getConnectedCities(const std::string& startCity) const;
 };
 
 #endif // GAMEBOARD_HPP
