@@ -87,9 +87,22 @@ void GameBoard::initializeBrassBirminghamMap() {
 
     // Add slots for other cities...
 }
+
 std::vector<Connection> GameBoard::getPlacedConnections() const {
     std::vector<Connection> placedConnections;
     std::copy_if(connections.begin(), connections.end(), std::back_inserter(placedConnections),
                  [](const Connection& connection) { return connection.linkOwner != nullptr; });
     return placedConnections;
+}
+
+bool GameBoard::placeLink(const std::string& city1, const std::string& city2, Player* player) {
+    auto it = connections.find(Connection(city1, city2));
+    if (it != connections.end() && it->linkOwner == nullptr) {
+        Connection updatedConnection = *it;
+        updatedConnection.linkOwner = player;
+        connections.erase(it);
+        connections.insert(std::move(updatedConnection));
+        return true;
+    }
+    return false;
 }

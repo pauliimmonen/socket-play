@@ -125,7 +125,3 @@ TEST_F(GameStateTest, TileProperties) {
     EXPECT_EQ(placedTile["owner"], player->id);
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

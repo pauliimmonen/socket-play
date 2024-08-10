@@ -50,7 +50,13 @@ set(HEADERS
 add_executable(server main.cpp ${SOURCES} ${HEADERS})
 
 # Add the test executable
-add_executable(server_tests GameStateTests.cpp ${SOURCES} ${HEADERS})
+add_executable(server_tests
+    GameStateTests.cpp
+    GameBoardTest.cpp
+    test_main.cpp
+    ${SOURCES}
+    ${HEADERS}
+)
 
 # Link against required libraries for main executable
 target_link_libraries(server PRIVATE Threads::Threads nlohmann_json::nlohmann_json)
