@@ -26,34 +26,38 @@ FetchContent_MakeAvailable(googletest)
 set(WEBSOCKETPP_INCLUDE_DIR "/usr/include" CACHE PATH "WebSocket++ include directory")
 include_directories(${WEBSOCKETPP_INCLUDE_DIR})
 
+# Add include directories for src and tests
+include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/tests)
+
 # Add all source files
 set(SOURCES
-    WebSocketServer.cpp
-    GameState.cpp
-    GameBoard.cpp
-    Tile.cpp
-    TileFactory.cpp
+    src/WebSocketServer.cpp
+    src/GameState.cpp
+    src/GameBoard.cpp
+    src/Tile.cpp
+    src/TileFactory.cpp
 )
 
 # Add all header files
 set(HEADERS
-    WebSocketServer.hpp
-    GameState.hpp
-    GameBoard.hpp
-    Player.hpp
-    GameAction.hpp
-    Tile.hpp
-    TileFactory.hpp
+    src/WebSocketServer.hpp
+    src/GameState.hpp
+    src/GameBoard.hpp
+    src/Player.hpp
+    src/GameAction.hpp
+    src/Tile.hpp
+    src/TileFactory.hpp
 )
 
 # Add the main executable
-add_executable(server main.cpp ${SOURCES} ${HEADERS})
+add_executable(server src/main.cpp ${SOURCES} ${HEADERS})
 
 # Add the test executable
 add_executable(server_tests
-    GameStateTests.cpp
-    GameBoardTest.cpp
-    test_main.cpp
+    tests/GameStateTests.cpp
+    tests/GameBoardTest.cpp
+    tests/test_main.cpp
     ${SOURCES}
     ${HEADERS}
 )
