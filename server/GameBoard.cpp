@@ -1,13 +1,13 @@
 #include "GameBoard.hpp"
 #include "Tile.hpp"
+#include <algorithm>
 
 void GameBoard::addCity(const std::string& name, int x, int y) {
-    cities[name] = City{name, {}, x, y, {}};
+    cities[name] = City{name, x, y, {}};
 }
 
 void GameBoard::addConnection(const std::string& city1, const std::string& city2) {
-    cities[city1].connections.push_back(city2);
-    cities[city2].connections.push_back(city1);
+    connections.insert(Connection(city1, city2));
 }
 
 void GameBoard::addSlot(const std::string& cityName, const Slot& slot) {
@@ -16,6 +16,18 @@ void GameBoard::addSlot(const std::string& cityName, const Slot& slot) {
 
 const std::unordered_map<std::string, City>& GameBoard::getCities() const {
     return cities;
+}
+
+std::vector<std::string> GameBoard::getConnections(const std::string& cityName) const {
+    std::vector<std::string> connectedCities;
+    for (const auto& connection : connections) {
+        if (connection.city1 == cityName) {
+            connectedCities.push_back(connection.city2);
+        } else if (connection.city2 == cityName) {
+            connectedCities.push_back(connection.city1);
+        }
+    }
+    return connectedCities;
 }
 
 void GameBoard::initializeBrassBirminghamMap() {
@@ -74,4 +86,10 @@ void GameBoard::initializeBrassBirminghamMap() {
     addSlot("Coventry", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
 
     // Add slots for other cities...
+}
+std::vector<Connection> GameBoard::getPlacedConnections() const {
+    std::vector<Connection> placedConnections;
+    std::copy_if(connections.begin(), connections.end(), std::back_inserter(placedConnections),
+                 [](const Connection& connection) { return connection.linkOwner != nullptr; });
+    return placedConnections;
 }

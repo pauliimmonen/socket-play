@@ -58,7 +58,6 @@ nlohmann::json GameState::getState() const {
         nlohmann::json cityJson = {
             {"x", city.x},
             {"y", city.y},
-            {"connections", city.connections},
             {"slots", nlohmann::json::array()}
         };
         for (const auto& slot : city.slots) {
@@ -68,16 +67,6 @@ nlohmann::json GameState::getState() const {
                 {"owner", slot.placedTile && slot.placedTile->owner ? slot.placedTile->owner->id : -1},
                 {"level", slot.placedTile ? slot.placedTile->level : 0},
                 {"flipped", slot.placedTile ? slot.placedTile->flipped : false},
-                /* 
-                 * Information is covered with level and type
-                {"income", slot.placedTile ? slot.placedTile->income : 0},
-                {"victory_points", slot.placedTile ? slot.placedTile->victory_points : 0},
-                {"link_points", slot.placedTile ? slot.placedTile->link_points : 0},
-                {"cost_money", slot.placedTile ? slot.placedTile->cost_money : 0},
-                {"cost_coal", slot.placedTile ? slot.placedTile->cost_coal : 0},
-                {"cost_iron", slot.placedTile ? slot.placedTile->cost_iron : 0},
-                {"initial_resource_amount", slot.placedTile ? slot.placedTile->initial_resource_amount : 0}
-                */
                 {"resource_coal", slot.placedTile ? slot.placedTile->resource_coal : 0},
                 {"resource_iron", slot.placedTile ? slot.placedTile->resource_iron : 0},
             });
@@ -85,8 +74,16 @@ nlohmann::json GameState::getState() const {
         state["board"]["cities"][city.name] = cityJson;
     }
 
+    state["connections"] = nlohmann::json::array();
+    for (const auto& connection : m_board.getPlacedConnections()) {
+        state["connections"].push_back({
+            {"city1", connection.city1},
+            {"city2", connection.city2},
+            {"owner", connection.linkOwner ? connection.linkOwner->id : -1}
+        });
+    }
+
     return state;
-    // ... (keep existing implementation)
 }
 
 bool GameState::placeTile(int playerId, const std::string& cityName, int slotIndex, const Tile& tile) {
