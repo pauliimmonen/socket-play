@@ -102,3 +102,45 @@ TEST_F(GameBoardTest, GetConnectedCities) {
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityE") != connectedCities.end());
 }
 
+TEST_F(GameBoardTest, GetTotalResourceCoal) {
+    // Set up a simple game board
+    board.addCity("CityA", 0, 0);
+    board.addCity("CityB", 1, 0);
+    board.addCity("CityC", 2, 0);
+    board.addCity("CityD", 1, 1);
+
+    // Add connections
+    board.addConnection("CityA", "CityB");
+    board.addConnection("CityB", "CityC");
+    board.addConnection("CityB", "CityD");
+
+    // Place links
+    ASSERT_TRUE(board.placeLink("CityA", "CityB", &player1));
+    ASSERT_TRUE(board.placeLink("CityB", "CityC", &player2));
+    ASSERT_TRUE(board.placeLink("CityB", "CityD", &player1));
+
+    // Add tiles with resource_coal to cities
+    auto tileA = Tile::create(TileType::Coal).resourceCoal(3).build();
+    auto tileB = Tile::create(TileType::Iron).resourceCoal(0).build();
+    auto tileC = Tile::create(TileType::Coal).resourceCoal(2).build();
+    auto tileD = Tile::create(TileType::Manufacturer).resourceCoal(1).build();
+
+    board.getCities().at("CityA").slots[0].placedTile = std::make_shared<Tile>(tileA);
+    board.getCities().at("CityB").slots[0].placedTile = std::make_shared<Tile>(tileB);
+    board.getCities().at("CityC").slots[0].placedTile = std::make_shared<Tile>(tileC);
+    board.getCities().at("CityD").slots[0].placedTile = std::make_shared<Tile>(tileD);
+
+    // Test total resource_coal from CityA
+    int totalCoal = board.getTotalResourceCoal("CityA");
+    ASSERT_EQ(totalCoal, 6); // 3 from CityA + 0 from CityB + 2 from CityC + 1 from CityD
+
+    // Test total resource_coal from CityC
+    totalCoal = board.getTotalResourceCoal("CityC");
+    ASSERT_EQ(totalCoal, 6); // Same result, as all cities are connected
+
+    // Remove a link and test again
+    //board.removeLink("CityB", "CityD");
+    //totalCoal = board.getTotalResourceCoal("CityA");
+    //ASSERT_EQ(totalCoal, 5); // 3 from CityA + 0 from CityB + 2 from CityC, CityD is now disconnected
+}
+
