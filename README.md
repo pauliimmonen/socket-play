@@ -4,11 +4,9 @@ This project is a simple multiplayer game implemented using WebSocket for real-t
 
 ## Prerequisites
 
-- C++ compiler with C++11 support
-- CMake (version 3.10 or higher)
-- websocketpp library
-- Boost library
-- A modern web browser
+- gcc 
+- cmake 
+- websocketpp 
 
 ## Building and Running
 
@@ -16,13 +14,13 @@ This project is a simple multiplayer game implemented using WebSocket for real-t
 
 1. Navigate to the server directory:
    ```
-   cd server
+   cd server/build
    ```
 
 
 2. Run CMake and build the project:
    ```
-   cmake .
+   cmake ..
    make
    ```
 
