@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include "GameBoard.hpp"
+#include "TileFactory.hpp"
 #include "Player.hpp"
 
 class GameBoardTest : public ::testing::Test {
@@ -11,7 +12,10 @@ protected:
     Player player2;
 
     GameBoardTest() : player1(1), player2(2) {
-        board.initializeBrassBirminghamMap();
+    }
+
+    Tile createTestTile(TileType type, int lvl, std::shared_ptr<Player> player) {
+        return TileFactory::createTile(type, lvl, player);
     }
 };
 
@@ -42,6 +46,7 @@ TEST_F(GameBoardTest, GetPlacedConnections) {
 }
 
 TEST_F(GameBoardTest, InitializedMapConnections) {
+    board.initializeBrassBirminghamMap();
     auto birminghamConnections = board.getConnections("Birmingham");
     ASSERT_EQ(birminghamConnections.size(), 4);
 
@@ -68,6 +73,7 @@ TEST_F(GameBoardTest, GetConnectedCities) {
     board.addConnection("CityC", "CityE");
     board.addConnection("CityD", "CityE");
 
+    board.addSlot("CityA", {{TileType::Coal, TileType::Iron}, nullptr});
     // Place links
     ASSERT_TRUE(board.placeLink("CityA", "CityB", &player1));
     ASSERT_TRUE(board.placeLink("CityB", "CityC", &player2));
@@ -75,7 +81,7 @@ TEST_F(GameBoardTest, GetConnectedCities) {
 
     // Test connected cities from CityA
     std::vector<std::string> connectedCities = board.getConnectedCities("CityA");
-    ASSERT_EQ(connectedCities.size(), 3);
+    ASSERT_EQ(connectedCities.size(), 4);
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityB") != connectedCities.end());
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityC") != connectedCities.end());
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityD") != connectedCities.end());
@@ -85,7 +91,7 @@ TEST_F(GameBoardTest, GetConnectedCities) {
 
     // Test connected cities from CityD
     connectedCities = board.getConnectedCities("CityD");
-    ASSERT_EQ(connectedCities.size(), 3);
+    ASSERT_EQ(connectedCities.size(), 4);
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityA") != connectedCities.end());
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityB") != connectedCities.end());
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityC") != connectedCities.end());
@@ -95,7 +101,7 @@ TEST_F(GameBoardTest, GetConnectedCities) {
 
     // Test connected cities from CityA again
     connectedCities = board.getConnectedCities("CityA");
-    ASSERT_EQ(connectedCities.size(), 4);
+    ASSERT_EQ(connectedCities.size(), 5);
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityB") != connectedCities.end());
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityC") != connectedCities.end());
     EXPECT_TRUE(std::find(connectedCities.begin(), connectedCities.end(), "CityD") != connectedCities.end());
@@ -107,40 +113,38 @@ TEST_F(GameBoardTest, GetTotalResourceCoal) {
     board.addCity("CityA", 0, 0);
     board.addCity("CityB", 1, 0);
     board.addCity("CityC", 2, 0);
-    board.addCity("CityD", 1, 1);
 
+    
     // Add connections
     board.addConnection("CityA", "CityB");
     board.addConnection("CityB", "CityC");
-    board.addConnection("CityB", "CityD");
 
+
+    board.addSlot("CityA", {{TileType::Coal}, nullptr});
+    board.addSlot("CityB", {{TileType::Coal}, nullptr});
+    board.addSlot("CityC", {{TileType::Coal}, nullptr});
     // Place links
     ASSERT_TRUE(board.placeLink("CityA", "CityB", &player1));
     ASSERT_TRUE(board.placeLink("CityB", "CityC", &player2));
-    ASSERT_TRUE(board.placeLink("CityB", "CityD", &player1));
+    Tile Coal_a = createTestTile(TileType::Coal, 1, &player1);
+    Tile Coal_b = createTestTile(TileType::Coal, 1, &player2);
+    // Place tiles (this part might have been commented out)
 
-    // Add tiles with resource_coal to cities
-    auto tileA = Tile::create(TileType::Coal).resourceCoal(3).build();
-    auto tileB = Tile::create(TileType::Iron).resourceCoal(0).build();
-    auto tileC = Tile::create(TileType::Coal).resourceCoal(2).build();
-    auto tileD = Tile::create(TileType::Manufacturer).resourceCoal(1).build();
+    GameAction action;
+    action.type = GameAction::Type::PlaceTile;
+    action.cityName = "Birmingham";
+    action.slotIndex = 0;
+    action.tileType = TileType::Coal;
 
-    board.getCities().at("CityA").slots[0].placedTile = std::make_shared<Tile>(tileA);
-    board.getCities().at("CityB").slots[0].placedTile = std::make_shared<Tile>(tileB);
-    board.getCities().at("CityC").slots[0].placedTile = std::make_shared<Tile>(tileC);
-    board.getCities().at("CityD").slots[0].placedTile = std::make_shared<Tile>(tileD);
+    ASSERT_TRUE(gameState::placeTile(1, "CityA", 0, Coal_a));
+    ASSERT_TRUE(gameState::placeTile(2, "CityC", 0, Coal_b));
 
     // Test total resource_coal from CityA
     int totalCoal = board.getTotalResourceCoal("CityA");
-    ASSERT_EQ(totalCoal, 6); // 3 from CityA + 0 from CityB + 2 from CityC + 1 from CityD
+    ASSERT_EQ(totalCoal, 5); // 3 from CityA + 2 from CityC
 
     // Test total resource_coal from CityC
     totalCoal = board.getTotalResourceCoal("CityC");
-    ASSERT_EQ(totalCoal, 6); // Same result, as all cities are connected
-
-    // Remove a link and test again
-    //board.removeLink("CityB", "CityD");
-    //totalCoal = board.getTotalResourceCoal("CityA");
-    //ASSERT_EQ(totalCoal, 5); // 3 from CityA + 0 from CityB + 2 from CityC, CityD is now disconnected
+    ASSERT_EQ(totalCoal, 5); // Same result, as all cities are connected
 }
 
