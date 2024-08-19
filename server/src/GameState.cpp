@@ -40,6 +40,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
             return false;
     }
 }
+
 nlohmann::json GameState::getState() const {
     nlohmann::json state;
     state["players"] = nlohmann::json::array();
@@ -125,7 +126,6 @@ bool GameState::placeTile(int playerId, const std::string& cityName, int slotInd
 
     return true;
 }
-
 
 void GameState::calculateLinkPoints(const std::string& cityName) {
     // TODO: Implement link points calculation logic

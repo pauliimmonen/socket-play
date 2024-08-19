@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <queue>
 #include <set>
+#include <memory>
 
 void GameBoard::addCity(const std::string& name, int x, int y) {
     cities[name] = City{name, x, y, {}};
@@ -16,9 +17,7 @@ void GameBoard::addSlot(const std::string& cityName, const Slot& slot) {
     cities[cityName].slots.push_back(slot);
 }
 
-const std::unordered_map<std::string, City>& GameBoard::getCities() const {
-    return cities;
-}
+// getCities() is now defined inline in the header file
 
 std::vector<std::string> GameBoard::getConnections(const std::string& cityName) const {
     std::vector<std::string> connectedCities;
@@ -97,7 +96,7 @@ std::vector<Connection> GameBoard::getPlacedConnections() const {
     return placedConnections;
 }
 
-bool GameBoard::placeLink(const std::string& city1, const std::string& city2, Player* player) {
+bool GameBoard::placeLink(const std::string& city1, const std::string& city2, std::shared_ptr<Player> player) {
     auto it = connections.find(Connection(city1, city2));
     if (it != connections.end() && it->linkOwner == nullptr) {
         Connection updatedConnection = *it;
@@ -141,8 +140,21 @@ std::vector<std::string> GameBoard::getConnectedCities(const std::string& startC
         }
     }
 
-    // Remove the start city from the result
-    connectedCities.erase(connectedCities.begin());
-
     return connectedCities;
+}
+
+int GameBoard::getTotalResourceCoal(const std::string& startCity) const {
+    int totalCoal = 0;
+    std::vector<std::string> connectedCities = getConnectedCities(startCity);
+
+    for (const auto& cityName : connectedCities) {
+        const auto& city = cities.at(cityName);
+        for (const auto& slot : city.slots) {
+            if (slot.placedTile && slot.placedTile->type == TileType::Coal) {
+                totalCoal += slot.placedTile->resource_coal;
+            }
+        }
+    }
+
+    return totalCoal;
 }
