@@ -31,7 +31,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
 
             try {
                 Tile newTile = TileFactory::createTile(action.tileType, 1, player);
-                return placeTile(playerId, action.cityName, action.slotIndex, newTile);
+                return m_board.placeTile(player, action.cityName, action.slotIndex, newTile);
             } catch (const std::invalid_argument& e) {
                 return false;  // Invalid tile type
             }
@@ -87,49 +87,3 @@ nlohmann::json GameState::getState() const {
     return state;
 }
 
-bool GameState::placeTile(int playerId, const std::string& cityName, int slotIndex, const Tile& tile) {
-    auto playerIt = m_players.find(playerId);
-    if (playerIt == m_players.end()) {
-        return false;  // Player not found
-    }
-    auto& player = playerIt->second;
-
-    const auto& cities = m_board.getCities();
-    auto cityIt = cities.find(cityName);
-    if (cityIt == cities.end()) {
-        return false;  // City not found
-    }
-    const auto& city = cityIt->second;
-
-    if (slotIndex < 0 || slotIndex >= static_cast<int>(city.slots.size())) {
-        return false;  // Invalid slot index
-    }
-    auto& slot = const_cast<Slot&>(city.slots[slotIndex]);
-
-    if (slot.placedTile) {
-        return false;  // Slot already occupied
-    }
-
-    if (std::find(slot.allowedTileTypes.begin(), slot.allowedTileTypes.end(), tile.type) == slot.allowedTileTypes.end()) {
-        return false;  // Tile type not allowed in this slot
-    }
-
-    if (player->money < tile.cost_money) {
-        return false;  // Not enough money
-    }
-
-    slot.placedTile = std::make_shared<Tile>(tile);
-    player->money -= tile.cost_money;
-    player->score += tile.victory_points;
-
-    calculateLinkPoints(cityName);
-
-    return true;
-}
-
-void GameState::calculateLinkPoints(const std::string& cityName) {
-    // TODO: Implement link points calculation logic
-    // This function should update the link_points for tiles in the given city
-    // and potentially in connected cities based on the game rules
-    (void)cityName; // Silence unused parameter warning
-}

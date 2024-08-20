@@ -56,7 +56,7 @@ add_executable(server src/main.cpp ${SOURCES} ${HEADERS})
 # Add the test executable
 add_executable(server_tests
     tests/GameStateTests.cpp
-    tests/GameBoardTest.cpp
+    tests/GameBoardTests.cpp
     tests/test_main.cpp
     ${SOURCES}
     ${HEADERS}

@@ -38,6 +38,8 @@ private:
     std::unordered_map<std::string, City> cities;
     std::set<Connection> connections;
 
+    void calculateLinkPoints(const std::string& cityName);
+
 public:
     void addCity(const std::string& name, int x, int y);
     void addConnection(const std::string& city1, const std::string& city2);
@@ -50,6 +52,7 @@ public:
     std::vector<Connection> getPlacedConnections() const;
     std::vector<std::string> getConnectedCities(const std::string& startCity) const;
     int getTotalResourceCoal(const std::string& startCity) const;
+    bool placeTile(std::shared_ptr<Player> player, const std::string& cityName, int slotIndex, const Tile& tile);
 };
 
 #endif // GAMEBOARD_HPP

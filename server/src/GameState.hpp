@@ -23,8 +23,6 @@ public:
     nlohmann::json getState() const;
 
 private:
-    bool placeTile(int playerId, const std::string& cityName, int slotIndex, const Tile& tile);
-    void calculateLinkPoints(const std::string& cityName);
 };
 
 #endif // GAMESTATE_HPP

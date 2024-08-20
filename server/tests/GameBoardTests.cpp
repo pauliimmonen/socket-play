@@ -10,13 +10,13 @@
 class GameBoardTest : public ::testing::Test {
 protected:
     GameBoard board;
-    GameState gameState;
     std::shared_ptr<Player> player1;
     std::shared_ptr<Player> player2;
 
     GameBoardTest() {
         player1 = std::make_shared<Player>(1);
         player2 = std::make_shared<Player>(2);
+        board.initializeBrassBirminghamMap();
     }
 
     Tile createTestTile(TileType type, int lvl, std::shared_ptr<Player> player) {
@@ -119,32 +119,31 @@ TEST_F(GameBoardTest, GetTotalResourceCoal) {
     board.addCity("CityB", 1, 0);
     board.addCity("CityC", 2, 0);
 
-    
     // Add connections
     board.addConnection("CityA", "CityB");
     board.addConnection("CityB", "CityC");
 
-
     board.addSlot("CityA", {{TileType::Coal}, nullptr});
     board.addSlot("CityB", {{TileType::Coal}, nullptr});
     board.addSlot("CityC", {{TileType::Coal}, nullptr});
+
     // Place links
     ASSERT_TRUE(board.placeLink("CityA", "CityB", player1));
     ASSERT_TRUE(board.placeLink("CityB", "CityC", player2));
+
     Tile Coal_a = createTestTile(TileType::Coal, 1, player1);
     Tile Coal_b = createTestTile(TileType::Coal, 1, player2);
-    // Place tiles (this part might have been commented out)
 
-
-    ASSERT_TRUE(gameState.placeTile(1, "CityA", 0, Coal_a));
-    ASSERT_TRUE(gameState.placeTile(2, "CityC", 0, Coal_b));
+    // Place tiles
+    ASSERT_TRUE(board.placeTile(player1, "CityA", 0, Coal_a));
+    ASSERT_TRUE(board.placeTile(player2, "CityC", 0, Coal_b));
 
     // Test total resource_coal from CityA
     int totalCoal = board.getTotalResourceCoal("CityA");
-    ASSERT_EQ(totalCoal, 0); // 0 as no tiles are actually placed in this test
+    ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
 
     // Test total resource_coal from CityC
     totalCoal = board.getTotalResourceCoal("CityC");
-    ASSERT_EQ(totalCoal, 0); // 0 as no tiles are actually placed in this test
+    ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
 }
 

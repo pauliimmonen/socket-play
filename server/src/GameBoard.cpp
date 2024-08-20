@@ -1,9 +1,11 @@
 #include "GameBoard.hpp"
 #include "Tile.hpp"
+#include "Player.hpp"
 #include <algorithm>
 #include <queue>
 #include <set>
 #include <memory>
+#include <stdexcept>
 
 void GameBoard::addCity(const std::string& name, int x, int y) {
     cities[name] = City{name, x, y, {}};
@@ -157,4 +159,45 @@ int GameBoard::getTotalResourceCoal(const std::string& startCity) const {
     }
 
     return totalCoal;
+}
+
+bool GameBoard::placeTile(std::shared_ptr<Player> player, const std::string& cityName, int slotIndex, const Tile& tile) {
+    auto cityIt = cities.find(cityName);
+    if (cityIt == cities.end()) {
+        return false;  // City not found
+    }
+    auto& city = cityIt->second;
+
+    if (slotIndex < 0 || slotIndex >= static_cast<int>(city.slots.size())) {
+        return false;  // Invalid slot index
+    }
+    auto& slot = city.slots[slotIndex];
+
+    if (slot.placedTile) {
+        return false;  // Slot already occupied
+    }
+
+    if (std::find(slot.allowedTileTypes.begin(), slot.allowedTileTypes.end(), tile.type) == slot.allowedTileTypes.end()) {
+        return false;  // Tile type not allowed in this slot
+    }
+
+    if (player->money < tile.cost_money) {
+        return false;  // Not enough money
+    }
+
+    slot.placedTile = std::make_shared<Tile>(tile);
+    slot.placedTile->owner = player;  // Set the owner of the placed tile
+    player->money -= tile.cost_money;
+    player->score += tile.victory_points;
+
+    calculateLinkPoints(cityName);
+
+    return true;
+}
+
+void GameBoard::calculateLinkPoints(const std::string& cityName) {
+    // TODO: Implement link points calculation logic
+    // This function should update the link_points for tiles in the given city
+    // and potentially in connected cities based on the game rules
+    (void)cityName; // Silence unused parameter warning
 }
