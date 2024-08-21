@@ -12,8 +12,17 @@ enum class TileType {
     Manufacturer,
     Pottery,
     Brewery,
+    Market,
     NullTile
     // Add other tile types as needed
+};
+
+enum class MarketType {
+    Pottery,
+    Manufacturer,
+    Cotton,
+    Any,
+    Empty
 };
 
 class Tile {
@@ -34,11 +43,14 @@ public:
     int resource_iron;
     int initial_resource_amount;
     int beer_demand;
+    MarketType marketType;
 
     Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
-         int cm, int cc, int ci, int rc, int ri, int ira, int bd);
+         int cm, int cc, int ci, int rc, int ri, int ira, int bd, MarketType mt = MarketType::Empty);
+    Tile(MarketType mt);  // Constructor for MarketTile
 
     static TileType stringToTileType(const std::string& typeStr);
+    static MarketType stringToMarketType(const std::string& typeStr);
 
 private:
     Tile() = default;
@@ -66,8 +78,10 @@ public:
     Builder& resourceIron(int ri);
     Builder& initialResourceAmount(int ira);
     Builder& beerDemand(int bd);
+    Builder& marketType(MarketType mt);
 
     Tile build();
+    static Builder createMarket(MarketType mt);
 };
 
 #endif // TILE_HPP

@@ -6,6 +6,7 @@
 #include <set>
 #include <memory>
 #include <stdexcept>
+#include <iostream>
 
 void GameBoard::addCity(const std::string& name, int x, int y) {
     cities[name] = City{name, x, y, {}};
@@ -83,12 +84,41 @@ void GameBoard::initializeBrassBirminghamMap() {
     addSlot("Birmingham", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
+    addSlot("Birmingham", {{TileType::Market}, nullptr});
 
     addSlot("Coventry", {{TileType::Coal, TileType::Iron}, nullptr});
     addSlot("Coventry", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Coventry", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
+    addSlot("Coventry", {{TileType::Market}, nullptr});
 
     // Add slots for other cities...
+
+    // Add a market slot to Birmingham (if it doesn't already exist)
+    addSlot("Birmingham", {{TileType::Market}, nullptr});
+
+    
+    try {
+        auto birminghamIt = cities.find("Birmingham");
+        if (birminghamIt == cities.end()) {
+            throw std::runtime_error("Birmingham city not found");
+        }
+
+        if (birminghamIt->second.slots.size() < 5) {
+            throw std::runtime_error("Birmingham doesn't have enough slots for market tile");
+        }
+
+        // Create a market tile
+        Tile marketTile = Tile::Builder::createMarket(MarketType::Cotton).build();
+
+        // Place the market tile in Birmingham
+        if (!placeTile(nullptr, "Birmingham", 4, marketTile)) {
+            throw std::runtime_error("Failed to place market tile in Birmingham");
+        }
+    } catch (const std::exception& e) {
+        // Log the error or handle it appropriately
+        std::cerr << "Error in initializeBrassBirminghamMap: " << e.what() << std::endl;
+    }
+   
 }
 
 std::vector<Connection> GameBoard::getPlacedConnections() const {
@@ -181,14 +211,19 @@ bool GameBoard::placeTile(std::shared_ptr<Player> player, const std::string& cit
         return false;  // Tile type not allowed in this slot
     }
 
-    if (player->money < tile.cost_money) {
-        return false;  // Not enough money
+    // For market tiles or other special cases, player can be nullptr
+    if (player) {
+        if (player->money < tile.cost_money) {
+            return false;  // Not enough money
+        }
+        player->money -= tile.cost_money;
+        player->score += tile.victory_points;
     }
 
     slot.placedTile = std::make_shared<Tile>(tile);
-    slot.placedTile->owner = player;  // Set the owner of the placed tile
-    player->money -= tile.cost_money;
-    player->score += tile.victory_points;
+    if (player) {
+        slot.placedTile->owner = player;  // Set the owner of the placed tile
+    }
 
     calculateLinkPoints(cityName);
 
@@ -201,3 +236,4 @@ void GameBoard::calculateLinkPoints(const std::string& cityName) {
     // and potentially in connected cities based on the game rules
     (void)cityName; // Silence unused parameter warning
 }
+

@@ -6,6 +6,7 @@
 #include "GameState.hpp"
 #include "TileFactory.hpp"
 #include "Player.hpp"
+#include "Tile.hpp"
 
 class GameBoardTest : public ::testing::Test {
 protected:
@@ -145,5 +146,32 @@ TEST_F(GameBoardTest, GetTotalResourceCoal) {
     // Test total resource_coal from CityC
     totalCoal = board.getTotalResourceCoal("CityC");
     ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
+}
+
+TEST_F(GameBoardTest, PlaceMarketTile) {
+    // Add a new city
+    board.addCity("CityA", 0, 0);
+    
+    // Add a slot that allows market tiles
+    board.addSlot("CityA", {{TileType::Market}, nullptr});
+
+    // Create a market tile
+    Tile marketTile = Tile::Builder::createMarket(MarketType::Cotton).build();
+
+    // Place the market tile in CityA
+    ASSERT_TRUE(board.placeTile(nullptr, "CityA", 0, marketTile));
+
+    // Verify that the tile was placed correctly
+    const auto& cities = board.getCities();
+    auto cityIt = cities.find("CityA");
+    ASSERT_NE(cityIt, cities.end());
+    const auto& city = cityIt->second;
+    
+    ASSERT_EQ(city.slots.size(), 1);
+    const auto& placedTile = city.slots[0].placedTile;
+    ASSERT_NE(placedTile, nullptr);
+    ASSERT_EQ(placedTile->type, TileType::Market);
+    ASSERT_EQ(placedTile->marketType, MarketType::Cotton);
+    ASSERT_EQ(placedTile->owner, nullptr);
 }
 

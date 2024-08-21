@@ -2,10 +2,27 @@
 #include <stdexcept>
 
 Tile::Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
-           int cm, int cc, int ci, int rc, int ri, int ira, int bd)
+           int cm, int cc, int ci, int rc, int ri, int ira, int bd, MarketType mt)
     : type(t), owner(o), level(l), flipped(f), income(i), victory_points(vp), link_points(lp),
       cost_money(cm), cost_coal(cc), cost_iron(ci), resource_coal(rc), resource_iron(ri),
-      initial_resource_amount(ira), beer_demand(bd) {}
+      initial_resource_amount(ira), beer_demand(bd), marketType(mt) {}
+
+Tile::Tile(MarketType mt) : type(TileType::Market), marketType(mt) {
+    // Initialize other properties with default values
+    owner = nullptr;
+    level = 1;
+    flipped = false;
+    income = 0;
+    victory_points = 0;
+    link_points = 0;
+    cost_money = 0;
+    cost_coal = 0;
+    cost_iron = 0;
+    resource_coal = 0;
+    resource_iron = 0;
+    initial_resource_amount = 0;
+    beer_demand = 0;
+}
 
 Tile::Builder Tile::create(TileType type) {
     return Builder(type);
@@ -43,6 +60,12 @@ Tile::Builder& Tile::Builder::initialResourceAmount(int ira) { tile.initial_reso
 Tile::Builder& Tile::Builder::beerDemand(int bd) { tile.beer_demand = bd; return *this; }
 
 Tile Tile::Builder::build() { return tile; }
+
+Tile::Builder Tile::Builder::createMarket(MarketType mt) {
+    Builder builder(TileType::Market);
+    builder.tile.marketType = mt;
+    return builder;
+}
 
 TileType Tile::stringToTileType(const std::string& typeStr) {
     if (typeStr == "Coal") return TileType::Coal;
