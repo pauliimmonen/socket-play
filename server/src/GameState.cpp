@@ -57,8 +57,6 @@ nlohmann::json GameState::getState() const {
     for (const auto& pair : m_board.getCities()) {
         const auto& city = pair.second;
         nlohmann::json cityJson = {
-            {"x", city.x},
-            {"y", city.y},
             {"slots", nlohmann::json::array()}
         };
         for (const auto& slot : city.slots) {

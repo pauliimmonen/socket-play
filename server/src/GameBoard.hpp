@@ -16,7 +16,7 @@ struct Slot {
 
 struct City {
     std::string name;
-    int x, y;
+    bool has_coal_market;
     std::vector<Slot> slots;
 };
 
@@ -41,7 +41,7 @@ private:
     void calculateLinkPoints(const std::string& cityName);
 
 public:
-    void addCity(const std::string& name, int x, int y);
+    void addCity(const std::string& name);
     void addConnection(const std::string& city1, const std::string& city2);
     void addSlot(const std::string& cityName, const Slot& slot);
     std::unordered_map<std::string, City>& getCities() { return cities; }

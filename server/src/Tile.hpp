@@ -41,9 +41,12 @@ public:
     int cost_iron;
     int resource_coal;
     int resource_iron;
+    int resource_beer;
     int initial_resource_amount;
     int beer_demand;
+    //only used in market type
     MarketType marketType;
+
 
     Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
          int cm, int cc, int ci, int rc, int ri, int ira, int bd, MarketType mt = MarketType::Empty);

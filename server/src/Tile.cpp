@@ -41,6 +41,7 @@ Tile::Builder::Builder(TileType type) {
     tile.cost_iron = 0;
     tile.resource_coal = 0;
     tile.resource_iron = 0;
+    tile.resource_beer = 0;
     tile.initial_resource_amount = 0;
     tile.beer_demand = 0;
 }
@@ -64,6 +65,9 @@ Tile Tile::Builder::build() { return tile; }
 Tile::Builder Tile::Builder::createMarket(MarketType mt) {
     Builder builder(TileType::Market);
     builder.tile.marketType = mt;
+    if (mt != MarketType::Empty){
+        builder.tile.resource_beer=1;
+    }
     return builder;
 }
 

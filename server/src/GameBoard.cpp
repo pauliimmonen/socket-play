@@ -8,8 +8,8 @@
 #include <stdexcept>
 #include <iostream>
 
-void GameBoard::addCity(const std::string& name, int x, int y) {
-    cities[name] = City{name, x, y, {}};
+void GameBoard::addCity(const std::string& name) {
+    cities[name] = City{name, 0, {}};
 }
 
 void GameBoard::addConnection(const std::string& city1, const std::string& city2) {
@@ -36,25 +36,25 @@ std::vector<std::string> GameBoard::getConnections(const std::string& cityName) 
 
 void GameBoard::initializeBrassBirminghamMap() {
     // Add all cities
-    addCity("Birmingham", 0, 0);
-    addCity("Dudley", -1, 0);
-    addCity("Walsall", 0, -1);
-    addCity("Wolverhampton", -1, -1);
-    addCity("Coalbrookdale", -2, 1);
-    addCity("Kidderminster", -1, 2);
-    addCity("Worcester", 0, 3);
-    addCity("Redditch", 1, 2);
-    addCity("Gloucester", 0, 4);
-    addCity("Oxford", 2, 4);
-    addCity("Coventry", 2, 0);
-    addCity("Nuneaton", 2, -1);
-    addCity("Tamworth", 1, -2);
-    addCity("Burton on Trent", 0, -3);
-    addCity("Derby", 1, -4);
-    addCity("Stoke on Trent", -1, -4);
-    addCity("Stone", -1, -3);
-    addCity("Stafford", -2, -2);
-    addCity("Cannock", -1, -2);
+    addCity("Birmingham");
+    addCity("Dudley");
+    addCity("Walsall");
+    addCity("Wolverhampton");
+    addCity("Coalbrookdale");
+    addCity("Kidderminster");
+    addCity("Worcester");
+    addCity("Redditch");
+    addCity("Gloucester");
+    addCity("Oxford");
+    addCity("Coventry");
+    addCity("Nuneaton");
+    addCity("Tamworth");
+    addCity("Burton on Trent");
+    addCity("Derby");
+    addCity("Stoke on Trent");
+    addCity("Stone");
+    addCity("Stafford");
+    addCity("Cannock");
 
     // Add connections
     addConnection("Birmingham", "Dudley");
@@ -224,9 +224,6 @@ bool GameBoard::placeTile(std::shared_ptr<Player> player, const std::string& cit
     if (player) {
         slot.placedTile->owner = player;  // Set the owner of the placed tile
     }
-
-    calculateLinkPoints(cityName);
-
     return true;
 }
 
@@ -234,6 +231,6 @@ void GameBoard::calculateLinkPoints(const std::string& cityName) {
     // TODO: Implement link points calculation logic
     // This function should update the link_points for tiles in the given city
     // and potentially in connected cities based on the game rules
-    (void)cityName; // Silence unused parameter warning
+    (void)cityName;
 }
 
