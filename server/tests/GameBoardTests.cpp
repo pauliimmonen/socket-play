@@ -136,8 +136,8 @@ TEST_F(GameBoardTest, GetTotalResourceCoal) {
     Tile Coal_b = createTestTile(TileType::Coal, 1, player2);
 
     // Place tiles
-    ASSERT_TRUE(board.placeTile(player1, "CityA", 0, Coal_a));
-    ASSERT_TRUE(board.placeTile(player2, "CityC", 0, Coal_b));
+    ASSERT_TRUE(board.placeTile("CityA", 0, Coal_a));
+    ASSERT_TRUE(board.placeTile("CityC", 0, Coal_b));
 
     // Test total resource_coal from CityA
     int totalCoal = board.getTotalResourceCoal("CityA");
@@ -160,7 +160,7 @@ TEST_F(GameBoardTest, PlaceMarketTile) {
     Tile marketTile = Tile::Builder::createMarket(MarketType::Cotton).build();
 
     // Place the market tile in CityA
-    ASSERT_TRUE(board.placeTile(nullptr, "CityA", 0, marketTile));
+    ASSERT_TRUE(board.placeTile("CityA", 0, marketTile));
 
     // Verify that the tile was placed correctly
     const auto& cities = board.getCities();

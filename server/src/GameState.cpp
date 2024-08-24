@@ -29,16 +29,35 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
             }
             auto& player = playerIt->second;
 
-            try {
-                Tile newTile = TileFactory::createTile(action.tileType, 1, player);
-                return m_board.placeTile(player, action.cityName, action.slotIndex, newTile);
-            } catch (const std::invalid_argument& e) {
-                return false;  // Invalid tile type
-            }
+            Tile newTile = TileFactory::createTile(action.tileType, 1, player);
+            return handleTilePlacement(playerId, action.cityName, action.slotIndex, newTile);
         }
+        // Add other action types here as needed
         default:
             return false;
     }
+}
+
+bool GameState::handleTilePlacement(int playerId, const std::string& cityName, int slotIndex, const Tile& tile) {
+    auto playerIt = m_players.find(playerId);
+    if (playerIt == m_players.end()) return false;
+    auto& player = playerIt->second;
+
+    // Check if player has enough money
+    if (player->money < tile.cost_money) return false;
+
+    // Check if the tile can be placed on the board
+    if (!m_board.canPlaceTile(cityName, slotIndex, tile)) return false;
+
+    // If all checks pass, place the tile and update player state
+    if (m_board.placeTile(cityName, slotIndex, tile)) {
+        player->money -= tile.cost_money;
+        player->score += tile.victory_points;
+        // Handle any other game state changes
+        return true;
+    }
+
+    return false;
 }
 
 nlohmann::json GameState::getState() const {
@@ -84,4 +103,3 @@ nlohmann::json GameState::getState() const {
 
     return state;
 }
-
