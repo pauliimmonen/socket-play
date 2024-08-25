@@ -33,13 +33,13 @@ struct City {
 
 
 struct MerchantCity : public City {
-
     MerchantBonus merchant_bonus;
     MerchantCity(const std::string& cityName, MerchantBonus mb)
         : City{cityName, {}}
     {
         merchant_bonus = mb;
     }
+
 };
 
 struct Connection {
@@ -57,16 +57,15 @@ struct Connection {
 
 class GameBoard {
 private:
-    std::unordered_map<std::string, City> cities;
+    std::unordered_map<std::string, std::unique_ptr<City>> cities;
     std::set<Connection> connections;
 
 public:
-    City& addCity(const std::string& name);
-    MerchantCity& addMerchantCity(const std::string& name, MerchantBonus mb);
+    City* addCity(const std::string& name);
+    MerchantCity* addMerchantCity(const std::string& name, MerchantBonus mb);
     Connection& addConnection(const std::string& city1, const std::string& city2);
     void addSlot(const std::string& cityName, const Slot& slot);
-    std::unordered_map<std::string, City>& getCities() { return cities; }
-    const std::unordered_map<std::string, City>& getCities() const { return cities; }
+    const std::unordered_map<std::string, std::unique_ptr<City>>& getCities() const { return cities; }
     std::vector<std::string> getConnections(const std::string& cityName) const;
     void initializeBrassBirminghamMap();
     bool placeLink(const std::string& city1, const std::string& city2, std::shared_ptr<Player> player);
@@ -75,6 +74,7 @@ public:
     int getTotalResourceCoal(const std::string& startCity) const;
     bool canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const;
     bool placeTile(const std::string& cityName, int slotIndex, const Tile& tile);
+    const MerchantCity* getMerchantCity(const std::string& cityName) const;
 };
 
 #endif // GAMEBOARD_HPP

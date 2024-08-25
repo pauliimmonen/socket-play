@@ -148,28 +148,31 @@ TEST_F(GameBoardTest, GetTotalResourceCoal) {
     ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
 }
 
-TEST_F(GameBoardTest, PlaceMarketTile) {
+TEST_F(GameBoardTest, PlaceMerchantTile) {
     // Add a new city
-    board.addCity("CityA");
-    
-    // Add a slot that allows market tiles
-    board.addSlot("CityA", {{TileType::Market}, nullptr});
-    board.addSlot("CityA", {{TileType::Coal}, nullptr});
+    board.addMerchantCity("CityA", MerchantBonus::Points4);
+    board.addSlot("CityA", {{TileType::Merchant}, nullptr});
+    board.addSlot("CityA", {{TileType::Merchant}, nullptr});
 
-    // Create a market tile
-    Tile marketTile = Tile::Builder::createMarket(MarketType::Cotton).build();
+    // Create a MerchantTile
+    MerchantTile merchantTile(MerchantType::Cotton);
 
-    // Place the market tile in CityA
-    ASSERT_TRUE(board.placeTile("CityA", 0, marketTile));
+    // Place the merchant tile in CityA
+    ASSERT_TRUE(board.placeTile("CityA", 0, merchantTile));
 
     // Verify that the tile was placed correctly
     const auto& cities = board.getCities();
     auto cityIt = cities.find("CityA");
+    ASSERT_NE(cityIt, cities.end());
     const auto& city = cityIt->second;
     
-    const auto& placedTile = city.slots[0].placedTile;
-    ASSERT_EQ(placedTile->type, TileType::Market);
-    ASSERT_EQ(placedTile->marketType, MarketType::Cotton);
-    ASSERT_EQ(placedTile->owner, nullptr);
+    const auto& placedTile = city->slots[0].placedTile;
+    ASSERT_NE(placedTile, nullptr);
+    ASSERT_EQ(placedTile->type, TileType::Merchant);
+
+    // Cast the placedTile to MerchantTile and check its properties
+    const MerchantTile* merchantTilePtr = dynamic_cast<const MerchantTile*>(placedTile.get());
+    ASSERT_NE(merchantTilePtr, nullptr);
+    ASSERT_EQ(merchantTilePtr->merchantType, MerchantType::Cotton);
 }
 

@@ -74,11 +74,11 @@ nlohmann::json GameState::getState() const {
 
     state["board"] = nlohmann::json::object();
     for (const auto& pair : m_board.getCities()) {
-        const auto& city = pair.second;
+        const auto& cityPtr = pair.second;
         nlohmann::json cityJson = {
             {"slots", nlohmann::json::array()}
         };
-        for (const auto& slot : city.slots) {
+        for (const auto& slot : cityPtr->slots) {
             cityJson["slots"].push_back({
                 {"allowedTileTypes", slot.allowedTileTypes},
                 {"placedTile", slot.placedTile ? slot.placedTile->type : TileType::NullTile},
@@ -89,7 +89,7 @@ nlohmann::json GameState::getState() const {
                 {"resource_iron", slot.placedTile ? slot.placedTile->resource_iron : 0},
             });
         }
-        state["board"]["cities"][city.name] = cityJson;
+        state["board"]["cities"][cityPtr->name] = cityJson;
     }
 
     state["connections"] = nlohmann::json::array();

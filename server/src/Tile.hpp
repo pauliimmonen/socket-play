@@ -56,6 +56,9 @@ public:
          int cm, int cc, int ci, int rc, int ri, int ira, int bd);
 
     virtual ~Tile() = default;
+    virtual std::shared_ptr<Tile> clone() const {
+        return std::make_shared<Tile>(*this);
+    }
 
     static TileType stringToTileType(const std::string& typeStr);
 
@@ -73,6 +76,10 @@ public:
     MerchantTile(MerchantType mt);
 
     static MerchantTile create(MerchantType mt);
+
+    std::shared_ptr<Tile> clone() const override {
+        return std::make_shared<MerchantTile>(*this);
+    }
 };
 
 class Tile::Builder {

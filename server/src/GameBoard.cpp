@@ -8,14 +8,19 @@
 #include <stdexcept>
 #include <iostream>
 
-City& GameBoard::addCity(const std::string& name) {
-    cities[name] = City{name, {}};
-    return cities[name];
+City* GameBoard::addCity(const std::string& name) {
+    auto city = std::make_unique<City>();
+    city->name = name;
+    auto* cityPtr = city.get();
+    cities[name] = std::move(city);
+    return cityPtr;
 }
 
-MerchantCity& GameBoard::addMerchantCity(const std::string& name ,MerchantBonus mb) {
-    cities[name] = MerchantCity{name, mb};
-    return static_cast<MerchantCity&>(cities[name]);
+MerchantCity* GameBoard::addMerchantCity(const std::string& name, MerchantBonus mb) {
+    auto city = std::make_unique<MerchantCity>(name, mb);
+    auto* cityPtr = city.get();
+    cities[name] = std::move(city);
+    return cityPtr;
 }
 
 Connection& GameBoard::addConnection(const std::string& city1, const std::string& city2) {
@@ -24,7 +29,7 @@ Connection& GameBoard::addConnection(const std::string& city1, const std::string
 }
 
 void GameBoard::addSlot(const std::string& cityName, const Slot& slot) {
-    cities[cityName].slots.push_back(slot);
+    cities[cityName]->slots.push_back(slot);
 }
 
 std::vector<std::string> GameBoard::getConnections(const std::string& cityName) const {
@@ -108,7 +113,7 @@ void GameBoard::initializeBrassBirminghamMap() {
         throw std::runtime_error("Birmingham city not found");
     }
 
-    if (birminghamIt->second.slots.size() < 5) {
+    if (birminghamIt->second->slots.size() < 5) {
         throw std::runtime_error("Birmingham doesn't have enough slots for market tile");
     }
 
@@ -182,7 +187,7 @@ int GameBoard::getTotalResourceCoal(const std::string& startCity) const {
 
     for (const auto& cityName : connectedCities) {
         const auto& city = cities.at(cityName);
-        for (const auto& slot : city.slots) {
+        for (const auto& slot : city->slots) {
             if (slot.placedTile && slot.placedTile->type == TileType::Coal) {
                 totalCoal += slot.placedTile->resource_coal;
             }
@@ -195,15 +200,15 @@ bool GameBoard::canPlaceTile(const std::string& cityName, int slotIndex, const T
     auto cityIt = cities.find(cityName);
     if (cityIt == cities.end()) return false;
     const auto& city = cityIt->second;
-    if (slotIndex < 0 || slotIndex >= static_cast<int>(city.slots.size())) return false;
-    const auto& slot = city.slots[slotIndex];
+    if (slotIndex < 0 || slotIndex >= static_cast<int>(city->slots.size())) return false;
+    const auto& slot = city->slots[slotIndex];
     if (slot.placedTile) return false;
     return std::find(slot.allowedTileTypes.begin(), slot.allowedTileTypes.end(), tile.type) != slot.allowedTileTypes.end();
 }
 
 bool GameBoard::placeTile(const std::string& cityName, int slotIndex, const Tile& tile) {
     if (!canPlaceTile(cityName, slotIndex, tile)) return false;
-    auto& slot = cities[cityName].slots[slotIndex];
-    slot.placedTile = std::make_shared<Tile>(tile);
+    auto& slot = cities[cityName]->slots[slotIndex];
+    slot.placedTile = tile.clone();  // Use the clone method instead of direct copying
     return true;
 }
