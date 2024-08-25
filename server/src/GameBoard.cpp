@@ -13,6 +13,11 @@ City& GameBoard::addCity(const std::string& name) {
     return cities[name];
 }
 
+MerchantCity& GameBoard::addMerchantCity(const std::string& name ,MerchantBonus mb) {
+    cities[name] = MerchantCity{name, mb};
+    return static_cast<MerchantCity&>(cities[name]);
+}
+
 Connection& GameBoard::addConnection(const std::string& city1, const std::string& city2) {
     auto conn = connections.insert(Connection(city1, city2));
     return const_cast<Connection&>(*conn.first);
@@ -84,17 +89,19 @@ void GameBoard::initializeBrassBirminghamMap() {
     addSlot("Birmingham", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
-    addSlot("Birmingham", {{TileType::Market}, nullptr});
+    addSlot("Birmingham", {{TileType::Merchant}, nullptr});
 
     addSlot("Coventry", {{TileType::Coal, TileType::Iron}, nullptr});
     addSlot("Coventry", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Coventry", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
-    addSlot("Coventry", {{TileType::Market}, nullptr});
+    addSlot("Coventry", {{TileType::Merchant}, nullptr});
 
     // Add slots for other cities...
 
     // Add a market slot to Birmingham (if it doesn't already exist)
-    addSlot("Birmingham", {{TileType::Market}, nullptr});
+    addMerchantCity("Oxford", MerchantBonus::Income2);
+    addSlot("Oxford", {{TileType::Merchant}, nullptr});
+    addSlot("Oxford", {{TileType::Merchant}, nullptr});
 
     auto birminghamIt = cities.find("Birmingham");
     if (birminghamIt == cities.end()) {
@@ -106,10 +113,10 @@ void GameBoard::initializeBrassBirminghamMap() {
     }
 
     // Create a market tile
-    MarketTile marketTile = MarketTile(MarketType::Cotton);
+    MerchantTile merchantTile = MerchantTile(MerchantType::Cotton);
 
     // Place the market tile in Birmingham
-    if (!placeTile("Birmingham", 4, marketTile)) {
+    if (!placeTile("Birmingham", 4, merchantTile)) {
         throw std::runtime_error("Failed to place market tile in Birmingham");
     }
 

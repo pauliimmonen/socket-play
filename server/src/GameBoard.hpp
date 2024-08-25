@@ -9,14 +9,37 @@
 #include "Tile.hpp"
 #include "Player.hpp"
 
+enum class MerchantBonus {
+    Income2,
+    Develop,
+    Money5,
+    Points4,
+    Points3,
+};
+
 struct Slot {
     std::vector<TileType> allowedTileTypes;
     std::shared_ptr<Tile> placedTile;
 };
 
+struct MerchantSlot : public Slot {
+    int resource_beer;
+};
+
 struct City {
     std::string name;
     std::vector<Slot> slots;
+};
+
+
+struct MerchantCity : public City {
+
+    MerchantBonus merchant_bonus;
+    MerchantCity(const std::string& cityName, MerchantBonus mb)
+        : City{cityName, {}}
+    {
+        merchant_bonus = mb;
+    }
 };
 
 struct Connection {
@@ -39,6 +62,7 @@ private:
 
 public:
     City& addCity(const std::string& name);
+    MerchantCity& addMerchantCity(const std::string& name, MerchantBonus mb);
     Connection& addConnection(const std::string& city1, const std::string& city2);
     void addSlot(const std::string& cityName, const Slot& slot);
     std::unordered_map<std::string, City>& getCities() { return cities; }
