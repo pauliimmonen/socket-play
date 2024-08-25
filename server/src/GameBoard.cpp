@@ -93,12 +93,10 @@ void GameBoard::initializeBrassBirminghamMap() {
     addSlot("Birmingham", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
-    addSlot("Birmingham", {{TileType::Merchant}, nullptr});
 
     addSlot("Coventry", {{TileType::Coal, TileType::Iron}, nullptr});
     addSlot("Coventry", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
     addSlot("Coventry", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
-    addSlot("Coventry", {{TileType::Merchant}, nullptr});
 
     // Add slots for other cities...
 
@@ -106,24 +104,6 @@ void GameBoard::initializeBrassBirminghamMap() {
     addMerchantCity("Oxford", MerchantBonus::Income2);
     addSlot("Oxford", {{TileType::Merchant}, nullptr});
     addSlot("Oxford", {{TileType::Merchant}, nullptr});
-
-    auto birminghamIt = cities.find("Birmingham");
-    if (birminghamIt == cities.end()) {
-        throw std::runtime_error("Birmingham city not found");
-    }
-
-    if (birminghamIt->second->slots.size() < 5) {
-        throw std::runtime_error("Birmingham doesn't have enough slots for market tile");
-    }
-
-    // Create a market tile
-    MerchantTile merchantTile = MerchantTile(MerchantType::Cotton);
-
-    // Place the market tile in Birmingham
-    if (!placeTile("Birmingham", 4, merchantTile)) {
-        throw std::runtime_error("Failed to place market tile in Birmingham");
-    }
-
 }
 
 std::vector<Connection> GameBoard::getPlacedConnections() const {
