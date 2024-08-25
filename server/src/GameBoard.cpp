@@ -225,3 +225,21 @@ std::vector<const MerchantCity*> GameBoard::getConnectedMerchantCities(const std
     }
     return connectedMerchantCities;
 }
+
+std::set<MerchantType> GameBoard::getConnectedMerchantTypes(const std::string& cityName) const {
+    std::set<MerchantType> merchantTypes;
+    std::vector<const MerchantCity*> connectedMerchantCities = getConnectedMerchantCities(cityName);
+
+    for (const auto* merchantCity : connectedMerchantCities) {
+        for (const auto& slot : merchantCity->slots) {
+            if (slot.placedTile && slot.placedTile->type == TileType::Merchant) {
+                const MerchantTile* merchantTile = dynamic_cast<const MerchantTile*>(slot.placedTile.get());
+                if (merchantTile) {
+                    merchantTypes.insert(merchantTile->merchantType);
+                }
+            }
+        }
+    }
+
+    return merchantTypes;
+}

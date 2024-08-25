@@ -20,6 +20,7 @@ protected:
         board.initializeBrassBirminghamMap();
     }
 
+
     Tile createTestTile(TileType type, int lvl, std::shared_ptr<Player> player) {
         return TileFactory::createTile(type, lvl, player);
     }
@@ -252,5 +253,54 @@ TEST_F(GameBoardTest, IsConnectedToMerchantCity) {
 
     // Test with a non-existent city (should return false)
     EXPECT_FALSE(board.isConnectedToMerchantCity("NonExistentCity"));
+}
+
+TEST_F(GameBoardTest, GetConnectedMerchantTypes) {
+    // Set up a simple game board
+    board.addCity("CityA");
+    board.addMerchantCity("CityB", MerchantBonus::Points4);
+    board.addCity("CityC");
+    board.addMerchantCity("CityD", MerchantBonus::Income2);
+    board.addCity("CityE");
+
+    // Add connections
+    board.addConnection("CityA", "CityB");
+    board.addConnection("CityB", "CityC");
+    board.addConnection("CityC", "CityD");
+    board.addConnection("CityD", "CityE");
+
+    // Place links
+    ASSERT_TRUE(board.placeLink("CityA", "CityB", player1));
+    ASSERT_TRUE(board.placeLink("CityB", "CityC", player2));
+    ASSERT_TRUE(board.placeLink("CityC", "CityD", player1));
+
+    // Add slots to merchant cities
+    board.addSlot("CityB", {{TileType::Merchant}, nullptr});
+    board.addSlot("CityD", {{TileType::Merchant}, nullptr});
+
+    // Create merchant tiles
+    MerchantTile cottonMerchant(MerchantType::Cotton);
+    MerchantTile potteryMerchant(MerchantType::Pottery);
+
+    // Place merchant tiles
+    ASSERT_TRUE(board.placeTile("CityB", 0, cottonMerchant));
+    ASSERT_TRUE(board.placeTile("CityD", 0, potteryMerchant));
+
+    // Test connected merchant types from CityA
+    std::set<MerchantType> connectedMerchantTypes = board.getConnectedMerchantTypes("CityA");
+    ASSERT_EQ(connectedMerchantTypes.size(), 2);
+    EXPECT_TRUE(connectedMerchantTypes.find(MerchantType::Cotton) != connectedMerchantTypes.end());
+    EXPECT_TRUE(connectedMerchantTypes.find(MerchantType::Pottery) != connectedMerchantTypes.end());
+
+    // Test connected merchant types from CityE (should be empty)
+    connectedMerchantTypes = board.getConnectedMerchantTypes("CityE");
+    ASSERT_EQ(connectedMerchantTypes.size(), 0);
+
+    // Connect CityE and test again
+    ASSERT_TRUE(board.placeLink("CityD", "CityE", player2));
+    connectedMerchantTypes = board.getConnectedMerchantTypes("CityE");
+    ASSERT_EQ(connectedMerchantTypes.size(), 2);
+    EXPECT_TRUE(connectedMerchantTypes.find(MerchantType::Cotton) != connectedMerchantTypes.end());
+    EXPECT_TRUE(connectedMerchantTypes.find(MerchantType::Pottery) != connectedMerchantTypes.end());
 }
 

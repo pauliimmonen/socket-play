@@ -79,6 +79,7 @@ public:
     const MerchantCity* getMerchantCity(const std::string& cityName) const;
     bool isConnectedToMerchantCity(const std::string& cityName) const;
     std::vector<const MerchantCity*> getConnectedMerchantCities(const std::string& cityName) const;
+    std::set<MerchantType> getConnectedMerchantTypes(const std::string& cityName) const;
 };
 
 #endif // GAMEBOARD_HPP
