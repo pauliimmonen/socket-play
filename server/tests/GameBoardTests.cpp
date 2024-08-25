@@ -176,3 +176,81 @@ TEST_F(GameBoardTest, PlaceMerchantTile) {
     ASSERT_EQ(merchantTilePtr->merchantType, MerchantType::Cotton);
 }
 
+TEST_F(GameBoardTest, GetConnectedMerchantCities) {
+    // Set up a simple game board
+    board.addCity("CityA");
+    board.addMerchantCity("CityB", MerchantBonus::Points4);
+    board.addCity("CityC");
+    board.addMerchantCity("CityD", MerchantBonus::Income2);
+    board.addCity("CityE");
+
+    // Add connections
+    board.addConnection("CityA", "CityB");
+    board.addConnection("CityB", "CityC");
+    board.addConnection("CityC", "CityD");
+    board.addConnection("CityD", "CityE");
+
+    // Place links
+    ASSERT_TRUE(board.placeLink("CityA", "CityB", player1));
+    ASSERT_TRUE(board.placeLink("CityB", "CityC", player2));
+    ASSERT_TRUE(board.placeLink("CityC", "CityD", player1));
+
+    // Test connected merchant cities from CityA
+    std::vector<const MerchantCity*> connectedMerchantCities = board.getConnectedMerchantCities("CityA");
+    ASSERT_EQ(connectedMerchantCities.size(), 2);
+    EXPECT_EQ(connectedMerchantCities[0]->name, "CityB");
+    EXPECT_EQ(connectedMerchantCities[0]->merchant_bonus, MerchantBonus::Points4);
+    EXPECT_EQ(connectedMerchantCities[1]->name, "CityD");
+    EXPECT_EQ(connectedMerchantCities[1]->merchant_bonus, MerchantBonus::Income2);
+
+    // Test connected merchant cities from CityE
+    connectedMerchantCities = board.getConnectedMerchantCities("CityE");
+    ASSERT_EQ(connectedMerchantCities.size(), 0);
+
+    // Test a city with no connected merchant cities
+    ASSERT_TRUE(board.placeLink("CityD", "CityE", player2));
+    connectedMerchantCities = board.getConnectedMerchantCities("CityE");
+    ASSERT_EQ(connectedMerchantCities.size(), 2);
+    EXPECT_EQ(connectedMerchantCities[0]->name, "CityD");
+    EXPECT_EQ(connectedMerchantCities[1]->name, "CityB");
+}
+
+TEST_F(GameBoardTest, IsConnectedToMerchantCity) {
+    // Set up a simple game board
+    board.addCity("CityA");
+    board.addMerchantCity("CityB", MerchantBonus::Points4);
+    board.addCity("CityC");
+    board.addMerchantCity("CityD", MerchantBonus::Income2);
+    board.addCity("CityE");
+
+    // Add connections
+    board.addConnection("CityA", "CityB");
+    board.addConnection("CityB", "CityC");
+    board.addConnection("CityC", "CityD");
+    board.addConnection("CityD", "CityE");
+
+    // Place links
+    ASSERT_TRUE(board.placeLink("CityA", "CityB", player1));
+    ASSERT_TRUE(board.placeLink("CityB", "CityC", player2));
+    ASSERT_TRUE(board.placeLink("CityC", "CityD", player1));
+
+    // Test city directly connected to a merchant city
+    EXPECT_TRUE(board.isConnectedToMerchantCity("CityA"));
+
+    // Test city indirectly connected to a merchant city
+    EXPECT_TRUE(board.isConnectedToMerchantCity("CityC"));
+
+    // Test city not connected to any merchant city
+    EXPECT_FALSE(board.isConnectedToMerchantCity("CityE"));
+
+    // Connect CityE and test again
+    ASSERT_TRUE(board.placeLink("CityD", "CityE", player2));
+    EXPECT_TRUE(board.isConnectedToMerchantCity("CityE"));
+
+    // Test a merchant city itself
+    EXPECT_TRUE(board.isConnectedToMerchantCity("CityB"));
+
+    // Test with a non-existent city (should return false)
+    EXPECT_FALSE(board.isConnectedToMerchantCity("NonExistentCity"));
+}
+

@@ -29,17 +29,19 @@ struct MerchantSlot : public Slot {
 struct City {
     std::string name;
     std::vector<Slot> slots;
+    
+    City(const std::string& cityName) : name(cityName) {}
+    virtual ~City() = default;
 };
 
 
 struct MerchantCity : public City {
     MerchantBonus merchant_bonus;
+    
     MerchantCity(const std::string& cityName, MerchantBonus mb)
-        : City{cityName, {}}
-    {
-        merchant_bonus = mb;
-    }
-
+        : City(cityName), merchant_bonus(mb) {}
+    
+    ~MerchantCity() override = default;
 };
 
 struct Connection {
@@ -75,6 +77,8 @@ public:
     bool canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const;
     bool placeTile(const std::string& cityName, int slotIndex, const Tile& tile);
     const MerchantCity* getMerchantCity(const std::string& cityName) const;
+    bool isConnectedToMerchantCity(const std::string& cityName) const;
+    std::vector<const MerchantCity*> getConnectedMerchantCities(const std::string& cityName) const;
 };
 
 #endif // GAMEBOARD_HPP

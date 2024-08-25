@@ -9,8 +9,7 @@
 #include <iostream>
 
 City* GameBoard::addCity(const std::string& name) {
-    auto city = std::make_unique<City>();
-    city->name = name;
+    auto city = std::make_unique<City>(name);
     auto* cityPtr = city.get();
     cities[name] = std::move(city);
     return cityPtr;
@@ -211,4 +210,38 @@ bool GameBoard::placeTile(const std::string& cityName, int slotIndex, const Tile
     auto& slot = cities[cityName]->slots[slotIndex];
     slot.placedTile = tile.clone();  // Use the clone method instead of direct copying
     return true;
+}
+
+const MerchantCity* GameBoard::getMerchantCity(const std::string& cityName) const {
+    auto it = cities.find(cityName);
+    if (it != cities.end()) {
+        const auto& city = it->second;
+        return dynamic_cast<const MerchantCity*>(city.get());
+    }
+    return nullptr;
+}
+
+bool GameBoard::isConnectedToMerchantCity(const std::string& cityName) const {
+    std::vector<std::string> connectedCities = getConnectedCities(cityName);
+    
+    for (const auto& connectedCity : connectedCities) {
+        if (getMerchantCity(connectedCity) != nullptr) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+std::vector<const MerchantCity*> GameBoard::getConnectedMerchantCities(const std::string& cityName) const {
+    std::vector<const MerchantCity*> connectedMerchantCities;
+    std::vector<std::string> connectedCities = getConnectedCities(cityName);
+
+    for (const auto& connectedCity : connectedCities) {
+        const MerchantCity* merchantCity = getMerchantCity(connectedCity);
+        if (merchantCity != nullptr) {
+            connectedMerchantCities.push_back(merchantCity);
+        }
+    }
+    return connectedMerchantCities;
 }
