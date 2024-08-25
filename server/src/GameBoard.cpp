@@ -8,12 +8,14 @@
 #include <stdexcept>
 #include <iostream>
 
-void GameBoard::addCity(const std::string& name) {
-    cities[name] = City{name, 0, {}};
+City& GameBoard::addCity(const std::string& name) {
+    cities[name] = City{name, {}};
+    return cities[name];
 }
 
-void GameBoard::addConnection(const std::string& city1, const std::string& city2) {
-    connections.insert(Connection(city1, city2));
+Connection& GameBoard::addConnection(const std::string& city1, const std::string& city2) {
+    auto conn = connections.insert(Connection(city1, city2));
+    return const_cast<Connection&>(*conn.first);
 }
 
 void GameBoard::addSlot(const std::string& cityName, const Slot& slot) {
@@ -104,7 +106,7 @@ void GameBoard::initializeBrassBirminghamMap() {
     }
 
     // Create a market tile
-    Tile marketTile = Tile::Builder::createMarket(MarketType::Cotton).build();
+    MarketTile marketTile = MarketTile(MarketType::Cotton);
 
     // Place the market tile in Birmingham
     if (!placeTile("Birmingham", 4, marketTile)) {
