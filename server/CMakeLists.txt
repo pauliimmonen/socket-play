@@ -35,6 +35,7 @@ set(SOURCES
     src/WebSocketServer.cpp
     src/GameState.cpp
     src/GameBoard.cpp
+    src/Market.cpp
     src/Tile.cpp
     src/TileFactory.cpp
 )
@@ -45,6 +46,7 @@ set(HEADERS
     src/GameState.hpp
     src/GameBoard.hpp
     src/Player.hpp
+    src/Market.hpp
     src/GameAction.hpp
     src/Tile.hpp
     src/TileFactory.hpp
@@ -58,6 +60,7 @@ add_executable(server_tests
     tests/GameStateTests.cpp
     tests/GameBoardTests.cpp
     tests/test_main.cpp
+    tests/MarketTests.cpp
     ${SOURCES}
     ${HEADERS}
 )

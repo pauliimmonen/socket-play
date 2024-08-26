@@ -1,0 +1,72 @@
+#include <gtest/gtest.h>
+#include "../src/Market.hpp"
+#include <iostream>
+
+class MarketTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // This will be called before each test
+        market = new Market(7, 2);
+    }
+
+    void TearDown() override {
+        // This will be called after each test
+        delete market;
+    }
+
+    Market* market;
+};
+
+TEST_F(MarketTest, InitialState) {
+    EXPECT_EQ(market->getCurrentPrice(), 1);
+}
+
+TEST_F(MarketTest, BuyOneItem) {
+    std::cout << market->getCurrentPrice() << std::endl;
+    int cost = market->buy(1);
+    EXPECT_EQ(cost, 1);
+    EXPECT_EQ(market->getCurrentPrice(), 1);
+}
+
+TEST_F(MarketTest, BuyMultipleItems) {
+    int cost = market->buy(5);
+    EXPECT_EQ(cost, 9);  // 1 + 2 + 3
+    EXPECT_EQ(market->getCurrentPrice(), 3);
+}
+
+TEST_F(MarketTest, SellOneItem) {
+    market->buy(7);  // Move the current price up
+    auto result = market->sell(1);
+    EXPECT_EQ(result.first, 1);  // 1 item sold
+    EXPECT_EQ(result.second, 4); // Revenue of 6
+}
+
+TEST_F(MarketTest, SellMultipleItems) {
+    market->buy(7);  // Move the current price up
+    auto result = market->sell(3);
+    EXPECT_EQ(result.first, 3);  // 3 items sold
+    EXPECT_EQ(result.second, 4+3+3); // Revenue of 6 + 7 + 5
+}
+
+TEST_F(MarketTest, SellOverMarketCapacity) {
+    market->buy(3);  // Move the current price up
+    auto result = market->sell(5);
+    EXPECT_EQ(result.first, 3);  // 3 items sold
+    EXPECT_EQ(result.second, 4); // Revenue of 6 + 7 + 5
+}
+
+
+TEST_F(MarketTest, BuyWhenEmpty) {
+    market->buy(13);
+    EXPECT_EQ(market->getCurrentPrice(), 7);  // Market almost empty
+    int cost = market->buy(3);
+    EXPECT_EQ(cost, 7+8+8);  // Sum of 1 to 8
+    EXPECT_EQ(market->getCurrentPrice(), 8);  // Market is empty
+}
+
+TEST_F(MarketTest, SellPartially) {
+    market->buy(20);  // Empty the market first
+    auto result = market->sell(30);  // Try to sell more than capacity
+    EXPECT_EQ(result.first, 14);  // Only 14 items should be sold (2 per price)
+    EXPECT_EQ(result.second, 2*(1+2+3+4+5+6+7));
+}
