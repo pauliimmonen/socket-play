@@ -9,6 +9,27 @@ Market::Market(int maxPrice, int slotsPerPrice) : maxPrice(maxPrice) {
     }
 }
 
+int Market::getPrice(int quantity) const {
+    int totalCost = 0;
+    int remainingQuantity = quantity;
+    std::vector<int> tempCubesAtPrice = cubesAtPrice;  // Create a temporary copy
+
+    for (int i = 0; i < maxPrice && remainingQuantity > 0; ++i) {
+        while (tempCubesAtPrice[i] > 0 && remainingQuantity > 0) {
+            totalCost += priceTrack[i];
+            tempCubesAtPrice[i]--;
+            remainingQuantity--;
+        }
+    }
+
+    // If there are not enough cubes in the market, use the highest price for the remaining quantity
+    if (remainingQuantity > 0) {
+        totalCost += remainingQuantity * (maxPrice + 1);
+    }
+
+    return totalCost;
+}
+
 int Market::buy(int quantity) {
     int totalCost = 0;
     for (int i = 0; i < quantity; ++i) {

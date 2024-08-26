@@ -70,3 +70,25 @@ TEST_F(MarketTest, SellPartially) {
     EXPECT_EQ(result.first, 14);  // Only 14 items should be sold (2 per price)
     EXPECT_EQ(result.second, 2*(1+2+3+4+5+6+7));
 }
+
+TEST_F(MarketTest, GetPriceSmallQuantity) {
+    int price = market->getPrice(3);
+    EXPECT_EQ(price, 4);
+    EXPECT_EQ(market->getCurrentPrice(), 1);
+}
+
+TEST_F(MarketTest, GetPriceLargeQuantity) {
+    market->buy(4);
+    int price = market->getPrice(8);
+    EXPECT_EQ(price, 3+3+4+4+5+5+6+6);
+    EXPECT_EQ(market->getCurrentPrice(), 3);
+}
+
+TEST_F(MarketTest, GetPriceExceedingCapacity) {
+    market->buy(11);
+    int price = market->getPrice(4);
+    EXPECT_EQ(price, 6+7+7+8);
+    
+    // Verify that the market state hasn't changed
+    EXPECT_EQ(market->getCurrentPrice(), 6);
+}

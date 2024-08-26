@@ -17,6 +17,7 @@ public:
     Market(int maxPrice, int slotsPerPrice);
     int getCurrentPrice() const;
     int getHighestEmptySlot() const;
+    int getPrice(int quantity) const;
     int buy(int quantity);
     std::pair<int, int> sell(int quantity);
     void printMarketState() const;
