@@ -22,7 +22,6 @@ TEST_F(MarketTest, InitialState) {
 }
 
 TEST_F(MarketTest, BuyOneItem) {
-    std::cout << market->getCurrentPrice() << std::endl;
     int cost = market->buy(1);
     EXPECT_EQ(cost, 1);
     EXPECT_EQ(market->getCurrentPrice(), 1);
