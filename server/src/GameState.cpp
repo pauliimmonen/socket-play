@@ -79,15 +79,22 @@ nlohmann::json GameState::getState() const {
             {"slots", nlohmann::json::array()}
         };
         for (const auto& slot : cityPtr->slots) {
-            cityJson["slots"].push_back({
-                {"allowedTileTypes", slot.allowedTileTypes},
-                {"placedTile", slot.placedTile ? slot.placedTile->type : TileType::NullTile},
-                {"owner", slot.placedTile && slot.placedTile->owner ? slot.placedTile->owner->id : -1},
-                {"level", slot.placedTile ? slot.placedTile->level : 0},
-                {"flipped", slot.placedTile ? slot.placedTile->flipped : false},
-                {"resource_coal", slot.placedTile ? slot.placedTile->resource_coal : 0},
-                {"resource_iron", slot.placedTile ? slot.placedTile->resource_iron : 0},
-            });
+            nlohmann::json slotJson;
+            if (slot.placedTile) {
+                // Nested structure if placedTile exists
+                slotJson["placedTile"] = {
+                    {"type", slot.placedTile->type},
+                    {"owner", slot.placedTile->owner ? slot.placedTile->owner->id : -1},
+                    {"level", slot.placedTile->level},
+                    {"flipped", slot.placedTile->flipped},
+                    {"resource_coal", slot.placedTile->resource_coal},
+                    {"resource_iron", slot.placedTile->resource_iron},
+                };
+            } else {
+                // No placedTile
+                slotJson["placedTile"] = nullptr;
+            }
+            cityJson["slots"].push_back(slotJson);
         }
         state["board"]["cities"][cityPtr->name] = cityJson;
     }
