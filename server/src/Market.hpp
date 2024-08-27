@@ -10,13 +10,13 @@ private:
     std::vector<int> cubesAtPrice;
     int maxPrice;
 
+    int getCurrentPrice() const;
+    int getHighestEmptySlot() const;
     void removeCube(int price);
     void addCube(int price);
 
 public:
     Market(int maxPrice, int slotsPerPrice);
-    int getCurrentPrice() const;
-    int getHighestEmptySlot() const;
     int getPrice(int quantity) const;
     int buy(int quantity);
     std::pair<int, int> sell(int quantity);
