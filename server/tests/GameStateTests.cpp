@@ -34,7 +34,6 @@ TEST_F(GameStateTest, BoardInitialization) {
 TEST_F(GameStateTest, PlaceTile) {
     auto player = gameState.addPlayer();
     int initialMoney = player->money;
-    int initialScore = player->score;
 
     Tile testTile = createTestTile(TileType::Coal, player);
 
@@ -51,7 +50,6 @@ TEST_F(GameStateTest, PlaceTile) {
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"]["type"], TileType::Coal);
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"]["owner"], player->id);
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][1]["placedTile"], nullptr);
-    EXPECT_EQ(player->score, initialScore + testTile.victory_points);
     EXPECT_EQ(player->money, initialMoney - testTile.cost_money);
 }
 

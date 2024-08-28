@@ -175,6 +175,18 @@ int GameBoard::getTotalResourceCoal(const std::string& startCity) const {
     return totalCoal;
 }
 
+int GameBoard::getTotalResourceIron() const {
+    int totalIron = 0;
+    for (const auto& [cityName, city] : cities) {
+        for (const auto& slot : city->slots) {
+            if (slot.placedTile && slot.placedTile->type == TileType::Iron) {
+                totalIron += slot.placedTile->resource_iron;
+            }
+        }
+    }
+    return totalIron;
+}
+
 bool GameBoard::canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const {
     auto cityIt = cities.find(cityName);
     if (cityIt == cities.end()) return false;

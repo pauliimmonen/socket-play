@@ -4,9 +4,8 @@
 #include "GameBoard.hpp"
 #include <algorithm>
 #include <random>
-#include <stdexcept>
 
-GameState::GameState() : m_next_id(1) {
+GameState::GameState(){
     m_board.initializeBrassBirminghamMap();
 }
 
@@ -38,21 +37,39 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
     }
 }
 
+int GameState::getTilePrice(const std::string& cityName, const Tile& tile){
+    int total_cost = tile.cost_money;
+    int cost_coal = tile.cost_coal;
+    if (cost_coal> 0){
+        cost_coal= cost_coal- m_board.getTotalResourceCoal(cityName);
+    }
+    if (cost_coal> 0){
+        total_cost += coal_market.getPrice(cost_coal);
+    }
+    int cost_iron = tile.cost_iron;
+    if (cost_iron> 0){
+        cost_iron = cost_iron - m_board.getTotalResourceIron();
+    }
+    if (cost_iron> 0){
+        total_cost += coal_market.getPrice(cost_coal);
+    }
+    return total_cost;
+}
+
 bool GameState::handleTilePlacement(int playerId, const std::string& cityName, int slotIndex, const Tile& tile) {
     auto playerIt = m_players.find(playerId);
     if (playerIt == m_players.end()) return false;
     auto& player = playerIt->second;
 
-    // Check if player has enough money
-    if (player->money < tile.cost_money) return false;
-
     // Check if the tile can be placed on the board
     if (!m_board.canPlaceTile(cityName, slotIndex, tile)) return false;
 
+    // Check if player has enough money
+    if (player->money < getTilePrice(cityName, tile)) return false;
+
     // If all checks pass, place the tile and update player state
     if (m_board.placeTile(cityName, slotIndex, tile)) {
-        player->money -= tile.cost_money;
-        player->score += tile.victory_points;
+        player->money -= getTilePrice(cityName, tile);
         // Handle any other game state changes
         return true;
     }

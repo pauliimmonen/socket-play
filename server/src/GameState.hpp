@@ -9,12 +9,17 @@
 #include "Player.hpp"
 #include "GameAction.hpp"
 #include "Tile.hpp"
+#include "Market.hpp"
+
 
 class GameState {
 private:
     std::unordered_map<int, std::shared_ptr<Player>> m_players;
     GameBoard m_board;
-    int m_next_id;
+    int m_next_id = 1;
+    Market coal_market{2,7};
+    Market iron_market{2,5};
+
 
 public:
     GameState();
@@ -25,6 +30,7 @@ public:
     nlohmann::json getState() const;
 
 private:
+    int getTilePrice(const std::string& cityName, const Tile& tile);
     // Add any private helper methods here if needed
 };
 

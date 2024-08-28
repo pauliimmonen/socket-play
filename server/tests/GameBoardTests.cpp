@@ -20,9 +20,47 @@ protected:
         board.initializeBrassBirminghamMap();
     }
 
-
     Tile createTestTile(TileType type, int lvl, std::shared_ptr<Player> player) {
         return TileFactory::createTile(type, lvl, player);
+    }
+
+    void setupSimpleGameBoard() {
+        board.addCity("CityA");
+        board.addCity("CityB");
+        board.addCity("CityC");
+        board.addCity("CityD");
+        board.addCity("CityE");
+
+        board.addConnection("CityA", "CityB");
+        board.addConnection("CityA", "CityC");
+        board.addConnection("CityB", "CityC");
+        board.addConnection("CityB", "CityD");
+        board.addConnection("CityC", "CityE");
+        board.addConnection("CityD", "CityE");
+
+
+        board.placeLink("CityA", "CityB", player1);
+        board.placeLink("CityB", "CityC", player2);
+        board.placeLink("CityB", "CityD", player1);
+    }
+
+    void placeLinks(const std::vector<std::tuple<std::string, std::string, std::shared_ptr<Player>>>& links) {
+        for (const auto& [city1, city2, player] : links) {
+            ASSERT_TRUE(board.placeLink(city1, city2, player));
+        }
+    }
+
+    void addSlots(const std::vector<std::tuple<std::string, TileType>>& slots) {
+        for (const auto& [city, tileType] : slots) {
+            board.addSlot(city, {{tileType}, nullptr});
+        }
+    }
+
+    void placeMerchantTiles(const std::vector<std::tuple<std::string, int, MerchantType>>& merchantTiles) {
+        for (const auto& [city, slotIndex, merchantType] : merchantTiles) {
+            MerchantTile merchantTile(merchantType);
+            ASSERT_TRUE(board.placeTile(city, slotIndex, merchantTile));
+        }
     }
 };
 
@@ -66,25 +104,9 @@ TEST_F(GameBoardTest, InitializedMapConnections) {
 }
 
 TEST_F(GameBoardTest, GetConnectedCities) {
-    // Set up a simple game board
-    board.addCity("CityA");
-    board.addCity("CityB");
-    board.addCity("CityC");
-    board.addCity("CityD");
-    board.addCity("CityE");
-
-    // Add connections
-    board.addConnection("CityA", "CityB");
-    board.addConnection("CityB", "CityC");
-    board.addConnection("CityB", "CityD");
-    board.addConnection("CityC", "CityE");
-    board.addConnection("CityD", "CityE");
-
+    setupSimpleGameBoard();
     board.addSlot("CityA", {{TileType::Coal, TileType::Iron}, nullptr});
     // Place links
-    ASSERT_TRUE(board.placeLink("CityA", "CityB", player1));
-    ASSERT_TRUE(board.placeLink("CityB", "CityC", player2));
-    ASSERT_TRUE(board.placeLink("CityB", "CityD", player1));
 
     // Test connected cities from CityA
     std::vector<std::string> connectedCities = board.getConnectedCities("CityA");
@@ -116,37 +138,24 @@ TEST_F(GameBoardTest, GetConnectedCities) {
 }
 
 TEST_F(GameBoardTest, GetTotalResourceCoal) {
-    // Set up a simple game board
-    board.addCity("CityA");
-    board.addCity("CityB");
-    board.addCity("CityC");
-
-    // Add connections
-    board.addConnection("CityA", "CityB");
-    board.addConnection("CityB", "CityC");
-
+    setupSimpleGameBoard();
     board.addSlot("CityA", {{TileType::Coal}, nullptr});
     board.addSlot("CityB", {{TileType::Coal}, nullptr});
     board.addSlot("CityC", {{TileType::Coal}, nullptr});
 
-    // Place links
-    ASSERT_TRUE(board.placeLink("CityA", "CityB", player1));
-    ASSERT_TRUE(board.placeLink("CityB", "CityC", player2));
-
     Tile Coal_a = createTestTile(TileType::Coal, 1, player1);
     Tile Coal_b = createTestTile(TileType::Coal, 1, player2);
 
-    // Place tiles
     ASSERT_TRUE(board.placeTile("CityA", 0, Coal_a));
     ASSERT_TRUE(board.placeTile("CityC", 0, Coal_b));
 
-    // Test total resource_coal from CityA
     int totalCoal = board.getTotalResourceCoal("CityA");
     ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
 
-    // Test total resource_coal from CityC
     totalCoal = board.getTotalResourceCoal("CityC");
     ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
+    totalCoal = board.getTotalResourceCoal("CityE");
+    ASSERT_EQ(totalCoal, 0);
 }
 
 TEST_F(GameBoardTest, PlaceMerchantTile) {
@@ -196,7 +205,6 @@ TEST_F(GameBoardTest, GetConnectedMerchantCities) {
     ASSERT_TRUE(board.placeLink("CityB", "CityC", player2));
     ASSERT_TRUE(board.placeLink("CityC", "CityD", player1));
 
-    // Test connected merchant cities from CityA
     std::vector<const MerchantCity*> connectedMerchantCities = board.getConnectedMerchantCities("CityA");
     ASSERT_EQ(connectedMerchantCities.size(), 2);
     EXPECT_EQ(connectedMerchantCities[0]->name, "CityB");
@@ -204,11 +212,9 @@ TEST_F(GameBoardTest, GetConnectedMerchantCities) {
     EXPECT_EQ(connectedMerchantCities[1]->name, "CityD");
     EXPECT_EQ(connectedMerchantCities[1]->merchant_bonus, MerchantBonus::Income2);
 
-    // Test connected merchant cities from CityE
     connectedMerchantCities = board.getConnectedMerchantCities("CityE");
     ASSERT_EQ(connectedMerchantCities.size(), 0);
 
-    // Test a city with no connected merchant cities
     ASSERT_TRUE(board.placeLink("CityD", "CityE", player2));
     connectedMerchantCities = board.getConnectedMerchantCities("CityE");
     ASSERT_EQ(connectedMerchantCities.size(), 2);
@@ -302,5 +308,44 @@ TEST_F(GameBoardTest, GetConnectedMerchantTypes) {
     ASSERT_EQ(connectedMerchantTypes.size(), 2);
     EXPECT_TRUE(connectedMerchantTypes.find(MerchantType::Cotton) != connectedMerchantTypes.end());
     EXPECT_TRUE(connectedMerchantTypes.find(MerchantType::Pottery) != connectedMerchantTypes.end());
+}
+
+TEST_F(GameBoardTest, GetTotalResourceIron) {
+    // Set up a simple game board
+    board.addCity("CityA");
+    board.addCity("CityB");
+    board.addCity("CityC");
+
+    // Add slots that allow Iron tiles
+    board.addSlot("CityA", {{TileType::Iron}, nullptr});
+    board.addSlot("CityB", {{TileType::Coal}, nullptr});
+    board.addSlot("CityB", {{TileType::Iron}, nullptr});
+    board.addSlot("CityC", {{TileType::Iron}, nullptr});
+    board.addSlot("CityC", {{TileType::Iron}, nullptr});
+
+    // Create Iron tiles with different resource amounts
+    Tile ironTile1 = createTestTile(TileType::Iron, 1, player1);
+    Tile ironTile2 = createTestTile(TileType::Iron, 2, player2);
+    Tile ironTile3 = createTestTile(TileType::Iron, 3, player1);
+
+    // Place the tiles
+    ASSERT_TRUE(board.placeTile("CityA", 0, ironTile1));
+    ASSERT_TRUE(board.placeTile("CityB", 1, ironTile2));
+    ASSERT_TRUE(board.placeTile("CityC", 0, ironTile3));
+
+    // Calculate expected total iron
+    int expectedTotalIron = ironTile1.resource_iron + ironTile2.resource_iron + ironTile3.resource_iron;
+
+    // Test the getTotalResourceIron function
+    int totalIron = board.getTotalResourceIron();
+    ASSERT_EQ(totalIron, expectedTotalIron);
+
+    // Add another iron tile and test again
+    Tile ironTile4 = createTestTile(TileType::Iron, 2, player2);
+    ASSERT_TRUE(board.placeTile("CityC", 1, ironTile4));
+
+    expectedTotalIron += ironTile4.resource_iron;
+    totalIron = board.getTotalResourceIron();
+    ASSERT_EQ(totalIron, expectedTotalIron);
 }
 

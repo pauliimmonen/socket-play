@@ -74,6 +74,8 @@ public:
     std::vector<Connection> getPlacedConnections() const;
     std::vector<std::string> getConnectedCities(const std::string& startCity) const;
     int getTotalResourceCoal(const std::string& startCity) const;
+    int getTotalResourceIron(const std::string& startCity) const;
+    int getTotalResourceIron() const;
     bool canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const;
     bool placeTile(const std::string& cityName, int slotIndex, const Tile& tile);
     const MerchantCity* getMerchantCity(const std::string& cityName) const;
