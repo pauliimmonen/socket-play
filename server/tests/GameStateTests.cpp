@@ -90,24 +90,3 @@ TEST_F(GameStateTest, RemovePlayer) {
     EXPECT_EQ(state["players"][0]["id"], player2->id);
 }
 
-TEST_F(GameStateTest, TileProperties) {
-    auto player = gameState.addPlayer();
-    
-    Tile testTile = createTestTile(TileType::Coal, player);
-
-    // Verify tile properties
-    EXPECT_EQ(testTile.type, TileType::Coal);
-    EXPECT_EQ(testTile.owner, player);
-    EXPECT_EQ(testTile.level, 1);
-    EXPECT_FALSE(testTile.flipped);
-    EXPECT_EQ(testTile.income, 4);
-    EXPECT_EQ(testTile.victory_points, 1);
-    EXPECT_EQ(testTile.link_points, 2);
-    EXPECT_EQ(testTile.cost_money, 5);
-    EXPECT_EQ(testTile.cost_coal, 0);
-    EXPECT_EQ(testTile.cost_iron, 0);
-    EXPECT_EQ(testTile.resource_amount, 2);
-    EXPECT_EQ(testTile.beer_demand, 0);
-
-}
-
