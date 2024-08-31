@@ -13,14 +13,14 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                            .victoryPoints(1)
                            .costMoney(5)
                            .linkPoints(2)
-                           .initialResourceAmount(2);
+                           .resourceAmount(2);
                     break;
                 case 2:
                     builder.income(7)
                            .victoryPoints(2)
                            .costMoney(7)
                            .linkPoints(1)
-                           .initialResourceAmount(3);
+                           .resourceAmount(3);
                     break;
                 case 3:
                     builder.income(6)
@@ -28,7 +28,7 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                            .costMoney(8)
                            .costIron(1)
                            .linkPoints(1)
-                           .initialResourceAmount(4);
+                           .resourceAmount(4);
                     break;
                 case 4:
                     builder.income(5)
@@ -36,7 +36,7 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                            .costMoney(10)
                            .costIron(1)
                            .linkPoints(1)
-                           .initialResourceAmount(4);
+                           .resourceAmount(4);
                     break;
                 default:
                     throw std::invalid_argument("Invalid Coal tile level");
@@ -50,7 +50,7 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                            .costMoney(5)
                            .costIron(1)
                            .linkPoints(1)
-                           .initialResourceAmount(4);
+                           .resourceAmount(4);
                     break;
                 case 2:
                     builder.income(3)
@@ -58,7 +58,7 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                            .costMoney(7)
                            .costIron(1)
                            .linkPoints(1)
-                           .initialResourceAmount(4);
+                           .resourceAmount(4);
                     break;
                 case 3:
                     builder.income(2)
@@ -66,7 +66,7 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                            .costMoney(9)
                            .costIron(1)
                            .linkPoints(1)
-                           .initialResourceAmount(5);
+                           .resourceAmount(5);
                     break;
                 case 4:
                     builder.income(1)
@@ -74,7 +74,7 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                            .costMoney(12)
                            .costIron(1)
                            .linkPoints(1)
-                           .initialResourceAmount(6);
+                           .resourceAmount(6);
                     break;
                 default:
                     throw std::invalid_argument("Invalid Iron tile level");

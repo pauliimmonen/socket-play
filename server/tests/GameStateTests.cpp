@@ -106,9 +106,7 @@ TEST_F(GameStateTest, TileProperties) {
     EXPECT_EQ(testTile.cost_money, 5);
     EXPECT_EQ(testTile.cost_coal, 0);
     EXPECT_EQ(testTile.cost_iron, 0);
-    EXPECT_EQ(testTile.resource_coal, 0);
-    EXPECT_EQ(testTile.resource_iron, 0);
-    EXPECT_EQ(testTile.initial_resource_amount, 2);
+    EXPECT_EQ(testTile.resource_amount, 2);
     EXPECT_EQ(testTile.beer_demand, 0);
 
 }

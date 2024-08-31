@@ -64,7 +64,7 @@ private:
 
 public:
     City* addCity(const std::string& name);
-    MerchantCity* addMerchantCity(const std::string& name, MerchantBonus mb);
+    const City* getCity(const std::string& cityName) const;
     Connection& addConnection(const std::string& city1, const std::string& city2);
     void addSlot(const std::string& cityName, const Slot& slot);
     const std::unordered_map<std::string, std::unique_ptr<City>>& getCities() const { return cities; }
@@ -74,11 +74,11 @@ public:
     std::vector<Connection> getPlacedConnections() const;
     std::vector<std::string> getConnectedCities(const std::string& startCity) const;
     int getTotalResourceCoal(const std::string& startCity) const;
-    int getTotalResourceIron(const std::string& startCity) const;
     int getTotalResourceIron() const;
     bool canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const;
     bool placeTile(const std::string& cityName, int slotIndex, const Tile& tile);
     const MerchantCity* getMerchantCity(const std::string& cityName) const;
+    MerchantCity* addMerchantCity(const std::string& name, MerchantBonus mb);
     bool isConnectedToMerchantCity(const std::string& cityName) const;
     std::vector<const MerchantCity*> getConnectedMerchantCities(const std::string& cityName) const;
     std::set<MerchantType> getConnectedMerchantTypes(const std::string& cityName) const;

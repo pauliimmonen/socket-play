@@ -168,7 +168,7 @@ int GameBoard::getTotalResourceCoal(const std::string& startCity) const {
         const auto& city = cities.at(cityName);
         for (const auto& slot : city->slots) {
             if (slot.placedTile && slot.placedTile->type == TileType::Coal) {
-                totalCoal += slot.placedTile->resource_coal;
+                totalCoal += slot.placedTile->resource_amount;
             }
         }
     }
@@ -180,7 +180,7 @@ int GameBoard::getTotalResourceIron() const {
     for (const auto& [cityName, city] : cities) {
         for (const auto& slot : city->slots) {
             if (slot.placedTile && slot.placedTile->type == TileType::Iron) {
-                totalIron += slot.placedTile->resource_iron;
+                totalIron += slot.placedTile->resource_amount;
             }
         }
     }
@@ -254,4 +254,12 @@ std::set<MerchantType> GameBoard::getConnectedMerchantTypes(const std::string& c
     }
 
     return merchantTypes;
+}
+
+const City* GameBoard::getCity(const std::string& cityName) const {
+    auto it = cities.find(cityName);
+    if (it != cities.end()) {
+        return it->second.get();
+    }
+    return nullptr;
 }

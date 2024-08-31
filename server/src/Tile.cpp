@@ -2,10 +2,20 @@
 #include <stdexcept>
 
 Tile::Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
-           int cm, int cc, int ci, int rc, int ri, int ira, int bd)
+           int cm, int cc, int ci, int ra, int bd)
     : type(t), owner(o), level(l), flipped(f), income(i), victory_points(vp), link_points(lp),
-      cost_money(cm), cost_coal(cc), cost_iron(ci), resource_coal(rc), resource_iron(ri),
-      initial_resource_amount(ira), beer_demand(bd) {}
+      cost_money(cm), cost_coal(cc), cost_iron(ci), resource_amount(ra),beer_demand(bd) {}
+    
+int Tile::consumeResources(int amount){
+    if (amount>=resource_amount){
+        amount=-resource_amount;
+        resource_amount=0;
+        flipped=true;
+        return amount;
+    }
+    resource_amount=-amount;
+    return 0;
+}
 
 Tile::Builder Tile::create(TileType type) {
     return Builder(type);
@@ -22,10 +32,7 @@ Tile::Builder::Builder(TileType type) {
     tile.cost_money = 0;
     tile.cost_coal = 0;
     tile.cost_iron = 0;
-    tile.resource_coal = 0;
-    tile.resource_iron = 0;
-    tile.resource_beer = 0;
-    tile.initial_resource_amount = 0;
+    tile.resource_amount = 0;
     tile.beer_demand = 0;
 }
 
@@ -38,9 +45,7 @@ Tile::Builder& Tile::Builder::linkPoints(int lp) { tile.link_points = lp; return
 Tile::Builder& Tile::Builder::costMoney(int cm) { tile.cost_money = cm; return *this; }
 Tile::Builder& Tile::Builder::costCoal(int cc) { tile.cost_coal = cc; return *this; }
 Tile::Builder& Tile::Builder::costIron(int ci) { tile.cost_iron = ci; return *this; }
-Tile::Builder& Tile::Builder::resourceCoal(int rc) { tile.resource_coal = rc; return *this; }
-Tile::Builder& Tile::Builder::resourceIron(int ri) { tile.resource_iron = ri; return *this; }
-Tile::Builder& Tile::Builder::initialResourceAmount(int ira) { tile.initial_resource_amount = ira; return *this; }
+Tile::Builder& Tile::Builder::resourceAmount(int ra) { tile.resource_amount = ra; return *this; }
 Tile::Builder& Tile::Builder::beerDemand(int bd) { tile.beer_demand = bd; return *this; }
 
 Tile Tile::Builder::build() { return tile; }

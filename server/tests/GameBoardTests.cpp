@@ -150,10 +150,10 @@ TEST_F(GameBoardTest, GetTotalResourceCoal) {
     ASSERT_TRUE(board.placeTile("CityC", 0, Coal_b));
 
     int totalCoal = board.getTotalResourceCoal("CityA");
-    ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
+    ASSERT_EQ(totalCoal, Coal_a.resource_amount + Coal_b.resource_amount);
 
     totalCoal = board.getTotalResourceCoal("CityC");
-    ASSERT_EQ(totalCoal, Coal_a.resource_coal + Coal_b.resource_coal);
+    ASSERT_EQ(totalCoal, Coal_a.resource_amount + Coal_b.resource_amount);
     totalCoal = board.getTotalResourceCoal("CityE");
     ASSERT_EQ(totalCoal, 0);
 }
@@ -334,7 +334,7 @@ TEST_F(GameBoardTest, GetTotalResourceIron) {
     ASSERT_TRUE(board.placeTile("CityC", 0, ironTile3));
 
     // Calculate expected total iron
-    int expectedTotalIron = ironTile1.resource_iron + ironTile2.resource_iron + ironTile3.resource_iron;
+    int expectedTotalIron = ironTile1.resource_amount + ironTile2.resource_amount + ironTile3.resource_amount;
 
     // Test the getTotalResourceIron function
     int totalIron = board.getTotalResourceIron();
@@ -344,7 +344,7 @@ TEST_F(GameBoardTest, GetTotalResourceIron) {
     Tile ironTile4 = createTestTile(TileType::Iron, 2, player2);
     ASSERT_TRUE(board.placeTile("CityC", 1, ironTile4));
 
-    expectedTotalIron += ironTile4.resource_iron;
+    expectedTotalIron += ironTile4.resource_amount;
     totalIron = board.getTotalResourceIron();
     ASSERT_EQ(totalIron, expectedTotalIron);
 }

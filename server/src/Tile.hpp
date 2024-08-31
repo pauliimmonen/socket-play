@@ -46,19 +46,17 @@ public:
     int cost_iron = 0;
 
     // Resources
-    int resource_coal = 0;
-    int resource_iron = 0;
-    int resource_beer = 0;
-    int initial_resource_amount = 0;
+    int resource_amount = 0;
     int beer_demand = 0;
 
     Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
-         int cm, int cc, int ci, int rc, int ri, int ira, int bd);
+         int cm, int cc, int ci, int ra, int bd);
 
     virtual ~Tile() = default;
     virtual std::shared_ptr<Tile> clone() const {
         return std::make_shared<Tile>(*this);
     }
+    int consumeResources(int amount);
 
     static TileType stringToTileType(const std::string& typeStr);
 
@@ -97,9 +95,7 @@ public:
     Builder& costMoney(int cm);
     Builder& costCoal(int cc);
     Builder& costIron(int ci);
-    Builder& resourceCoal(int rc);
-    Builder& resourceIron(int ri);
-    Builder& initialResourceAmount(int ira);
+    Builder& resourceAmount(int ira);
     Builder& beerDemand(int bd);
 
     Tile build();
