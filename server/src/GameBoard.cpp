@@ -278,6 +278,27 @@ std::vector<Connection> GameBoard::getPlayerPlacedLinks(const Player& player) co
     return playerLinks;
 }
 
+bool GameBoard::isCityInPlayerNetwork(const Player& player, const std::string& cityName) {
+    auto links = getPlayerPlacedLinks(player);
+    auto tiles = getPlayerPlacedTiles(player);
+
+    std::set<std::string> networkCities;
+
+    // Add cities from links
+    for (const auto& link : links) {
+        networkCities.insert(link.city1);
+        networkCities.insert(link.city2);
+    }
+
+    // Add cities from tiles
+    for (const auto& tile : tiles) {
+        networkCities.insert(tile);
+    }
+
+    // Check if the given cityName is in the network
+    return networkCities.find(cityName) != networkCities.end();
+}
+
 const City* GameBoard::getCity(const std::string& cityName) const {
     auto it = cities.find(cityName);
     if (it != cities.end()) {

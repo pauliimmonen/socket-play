@@ -382,3 +382,32 @@ TEST_F(GameBoardTest, GetTotalResourceIron) {
     ASSERT_EQ(totalIron, expectedTotalIron);
 }
 
+TEST_F(GameBoardTest, IsCityInPlayerNetwork) {
+    // Setup
+    setupSimpleGameBoard();
+    // Place links and tiles for players
+    // Place tiles (assuming a placeTile method exists)
+    board.addSlot("CityE",{{TileType::Coal}, nullptr}); 
+    board.addSlot("CityE",{{TileType::Coal}, nullptr}); 
+    Tile testTile = createTestTile(TileType::Coal, 1, player1);
+    ASSERT_TRUE(board.placeTile("CityE", 0, testTile));
+    // Test cases
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player1, "CityA"));
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player1, "CityB"));
+    EXPECT_FALSE(board.isCityInPlayerNetwork(*player1, "CityC"));
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player1, "CityE"));
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player1, "CityD"));
+    
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player2, "CityC"));
+    EXPECT_FALSE(board.isCityInPlayerNetwork(*player2, "CityD"));
+    EXPECT_FALSE(board.isCityInPlayerNetwork(*player2, "CityA"));
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player2, "CityB"));
+    EXPECT_FALSE(board.isCityInPlayerNetwork(*player2, "CityE"));
+
+    testTile = createTestTile(TileType::Coal, 1, player2);
+    ASSERT_TRUE(board.placeTile("CityE", 1, testTile));
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player2, "CityE"));
+
+
+}
+

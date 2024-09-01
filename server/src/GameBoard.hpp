@@ -64,6 +64,7 @@ private:
     std::vector<std::string> getPlayerPlacedTiles(const Player& player) const;
     std::vector<Connection> getPlayerPlacedLinks(const Player& player) const;
 public:
+
     City* addCity(const std::string& name);
     const City* getCity(const std::string& cityName) const;
     Connection& addConnection(const std::string& city1, const std::string& city2);
@@ -78,6 +79,7 @@ public:
     int getTotalResourceIron() const;
     bool canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const;
     bool placeTile(const std::string& cityName, int slotIndex, const Tile& tile);
+    bool isCityInPlayerNetwork(const Player& player, const std::string& cityName);
     const MerchantCity* getMerchantCity(const std::string& cityName) const;
     MerchantCity* addMerchantCity(const std::string& name, MerchantBonus mb);
     bool isConnectedToMerchantCity(const std::string& cityName) const;
