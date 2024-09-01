@@ -113,16 +113,12 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
         return amountNeeded; // Not resources available
     }
 
-    std::cout << "options_size: " << options.size() << std::endl;
-    std::cout << "amount_needed: " << amountNeeded << std::endl;
     // If only one option, use it automatically
     if (options.size() == 1)
     {
         auto city = m_board.getCity(options[0].cityName);
         auto tile = city->slots[options[0].slotIndex].placedTile;
         amountNeeded = tile->consumeResources(amountNeeded);
-        std::cout << "amount_needed: " << amountNeeded << std::endl;
-        std::cout << "tile_resources: " << tile->resource_amount << std::endl;
     } else {
         auto city = m_board.getCity(options[0].cityName);
         auto tile = city->slots[options[0].slotIndex].placedTile;
@@ -133,7 +129,6 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
         }
     }
 
-    std::cout << "amount_needed: " << amountNeeded << std::endl;
     return amountNeeded;
 }
 
@@ -146,7 +141,6 @@ bool GameState::handleTilePlacement(int playerId, const std::string& cityName, i
     if (!m_board.canPlaceTile(cityName, slotIndex, tile)) return false;
 
 
-    std::cout << "tile.cost" << getTilePrice(cityName,tile) << std::endl;
     // Check if player has enough money
     if (player->money < getTilePrice(cityName, tile)) return false;
 
@@ -155,7 +149,6 @@ bool GameState::handleTilePlacement(int playerId, const std::string& cityName, i
         /**/
         player->money -= getTilePrice(cityName, tile);
         int coal_amount = chooseAndConsumeResources(cityName, TileType::Coal, tile.cost_coal);
-        std::cout << "tile.cost_coal" << tile.cost_coal << std::endl;
         int iron_amount = chooseAndConsumeResources(cityName, TileType::Iron, tile.cost_iron);
         coal_market.buy(coal_amount);
         iron_market.buy(iron_amount);

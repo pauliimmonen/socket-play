@@ -11,6 +11,11 @@
 #include "Tile.hpp"
 #include "Market.hpp"
 
+enum class ERA{
+    Canal,
+    RailRoad
+};
+
 struct ResourceOption {
     std::string cityName;
     int slotIndex;
@@ -24,6 +29,7 @@ private:
     int m_next_id = 1;
     Market coal_market{2,7};
     Market iron_market{2,5};
+    ERA era = ERA::Canal;
 
 
 public:
