@@ -82,6 +82,21 @@ TEST_F(GameBoardTest, TileProperties) {
 
 }
 
+TEST_F(GameBoardTest, TileProperties2) {
+    Tile testTile = createTestTile(TileType::Pottery, 4, player1);
+    // Verify tile properties
+    EXPECT_EQ(testTile.type, TileType::Pottery);
+    EXPECT_EQ(testTile.owner, player1);
+    EXPECT_EQ(testTile.level, 4);
+    EXPECT_FALSE(testTile.flipped);
+    EXPECT_EQ(testTile.income, 1);
+    EXPECT_EQ(testTile.victory_points, 1);
+    EXPECT_EQ(testTile.link_points, 1);
+    EXPECT_EQ(testTile.cost_money, 0);
+    EXPECT_EQ(testTile.cost_coal, 1);
+
+}
+
 TEST_F(GameBoardTest, AddConnection) {
     board.addConnection("CityA", "CityB");
     auto connections = board.getConnections("CityA");

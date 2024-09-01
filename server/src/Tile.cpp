@@ -1,5 +1,6 @@
 #include "Tile.hpp"
 #include <stdexcept>
+#include <iostream>
 
 Tile::Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
            int cm, int cc, int ci, int ra, int bd)
@@ -8,12 +9,13 @@ Tile::Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, 
     
 int Tile::consumeResources(int amount){
     if (amount>=resource_amount){
-        amount=-resource_amount;
-        resource_amount=0;
-        flipped=true;
+        amount -= resource_amount;
+        resource_amount = 0;
+        flipped = true;
         return amount;
+    } else{
+        resource_amount -= amount;
     }
-    resource_amount=-amount;
     return 0;
 }
 

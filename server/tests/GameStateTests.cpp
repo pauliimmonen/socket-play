@@ -31,7 +31,7 @@ TEST_F(GameStateTest, BoardInitialization) {
     EXPECT_TRUE(state["board"]["cities"].contains("Oxford"));
 }
 
-TEST_F(GameStateTest, PlaceTile) {
+TEST_F(GameStateTest, PlaceSimpleTile) {
     auto player = gameState.addPlayer();
     int initialMoney = player->money;
 

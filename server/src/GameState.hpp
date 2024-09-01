@@ -36,6 +36,7 @@ public:
 
     std::vector<ResourceOption> findAvailableResources(const std::string& startCity, TileType resourceType, int amountNeeded);
     int chooseAndConsumeResources(const std::string& cityName, TileType resourceType, int amountNeeded);
+    void setupBoardForTesting(const GameBoard& board);
 
 private:
     int getTilePrice(const std::string& cityName, const Tile& tile);

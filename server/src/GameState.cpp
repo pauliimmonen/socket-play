@@ -113,12 +113,16 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
         return amountNeeded; // Not resources available
     }
 
+    std::cout << "options_size: " << options.size() << std::endl;
+    std::cout << "amount_needed: " << amountNeeded << std::endl;
     // If only one option, use it automatically
     if (options.size() == 1)
     {
         auto city = m_board.getCity(options[0].cityName);
         auto tile = city->slots[options[0].slotIndex].placedTile;
         amountNeeded = tile->consumeResources(amountNeeded);
+        std::cout << "amount_needed: " << amountNeeded << std::endl;
+        std::cout << "tile_resources: " << tile->resource_amount << std::endl;
     } else {
         auto city = m_board.getCity(options[0].cityName);
         auto tile = city->slots[options[0].slotIndex].placedTile;
@@ -128,6 +132,8 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
             
         }
     }
+
+    std::cout << "amount_needed: " << amountNeeded << std::endl;
     return amountNeeded;
 }
 
@@ -207,4 +213,28 @@ nlohmann::json GameState::getState() const {
     }
 
     return state;
+}
+
+void GameState::setupBoardForTesting(const GameBoard& board) {
+    // Clear existing board
+    m_board = GameBoard();
+
+    // Copy cities and their slots
+    for (const auto& [cityName, cityPtr] : board.getCities()) {
+        m_board.addCity(cityName);
+        for (const auto& slot : cityPtr->slots) {
+            m_board.addSlot(cityName, slot);
+            if (slot.placedTile) {
+                m_board.placeTile(cityName, m_board.getCity(cityName)->slots.size() - 1, *slot.placedTile);
+            }
+        }
+    }
+
+    // Copy connections
+    for (const auto& connection : board.getPlacedConnections()) {
+        m_board.addConnection(connection.city1, connection.city2);
+        if (connection.linkOwner) {
+            m_board.placeLink(connection.city1, connection.city2, connection.linkOwner);
+        }
+    }
 }

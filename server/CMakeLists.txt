@@ -61,6 +61,7 @@ add_executable(server_tests
     tests/GameBoardTests.cpp
     tests/test_main.cpp
     tests/MarketTests.cpp
+    tests/TilePlacementTests.cpp
     ${SOURCES}
     ${HEADERS}
 )
