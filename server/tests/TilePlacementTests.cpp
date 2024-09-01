@@ -16,6 +16,7 @@ protected:
         player1 = gameState.addPlayer();
         player2 = gameState.addPlayer();
         player1->money=30;
+        player2->money=30;
         setupTestBoard();
     }
 
@@ -27,6 +28,7 @@ protected:
         testBoard.addCity("CityB");
         testBoard.addCity("CityC");
         testBoard.addCity("CityD");
+        testBoard.addCity("CityE");
 
         // Add connections
         testBoard.addConnection("CityA", "CityB");
@@ -38,10 +40,10 @@ protected:
         testBoard.addSlot("CityA", {{TileType::Brewery}, nullptr});
         testBoard.addSlot("CityB", {{TileType::Manufacturer}, nullptr});
         testBoard.addSlot("CityB", {{TileType::Manufacturer}, nullptr});
-        testBoard.addSlot("CityB", {{TileType::Manufacturer}, nullptr});
         testBoard.addSlot("CityC", {{TileType::Coal}, nullptr});
         testBoard.addSlot("CityD", {{TileType::Coal}, nullptr});
         testBoard.addSlot("CityD", {{TileType::Iron}, nullptr});
+        testBoard.addSlot("CityE", {{TileType::Brewery}, nullptr});
 
         // Place resource tiles
         auto coalTileA = TileFactory::createTile(TileType::Coal, 1, player1);
@@ -61,7 +63,7 @@ protected:
     }
 };
 
-TEST_F(TilePlacementTest, PlacePotteryTileWithResourceConsumption) {
+TEST_F(TilePlacementTest, PlaceTileTestResourceConsumption) {
     GameAction placeAction;
     placeAction.type = GameAction::Type::PlaceTile;
     placeAction.cityName = "CityB";
@@ -73,7 +75,7 @@ TEST_F(TilePlacementTest, PlacePotteryTileWithResourceConsumption) {
     // Handle the action
 
     auto state = gameState.getState();
-    std::cout << state << std::endl;
+    //std::cout << state << std::endl;
     EXPECT_EQ(state["board"]["cities"]["CityA"]["slots"][0]["placedTile"]["resource_amount"], 2);
     bool result = gameState.handleAction(player1->id, placeAction);
     ASSERT_TRUE(result);
@@ -81,7 +83,29 @@ TEST_F(TilePlacementTest, PlacePotteryTileWithResourceConsumption) {
     state = gameState.getState();
     EXPECT_EQ(state["board"]["cities"]["CityA"]["slots"][0]["placedTile"]["resource_amount"], 1);
     EXPECT_EQ(state["board"]["cities"]["CityB"]["slots"][0]["placedTile"]["type"], TileType::Manufacturer);
-    EXPECT_EQ(state["board"]["cities"]["CityB"]["slots"][0]["placedTile"]["type"], TileType::Manufacturer);
+    placeAction.slotIndex=1;
+    result = gameState.handleAction(player2->id, placeAction);
+    
+    ASSERT_TRUE(result);
+    
+    state = gameState.getState();
+    EXPECT_EQ(state["board"]["cities"]["CityA"]["slots"][0]["placedTile"]["resource_amount"], 0);
+    EXPECT_EQ(state["board"]["cities"]["CityB"]["slots"][1]["placedTile"]["type"], TileType::Manufacturer);
+
+    placeAction.cityName = "CityA";
+    result = gameState.handleAction(player1->id, placeAction);
+    ASSERT_FALSE(result); //cant access to coal in slot D
+
+    placeAction.cityName = "CityE";
+    placeAction.slotIndex = 0;
+    placeAction.tileType=TileType::Brewery;
+    result = gameState.handleAction(player1->id, placeAction);
+    ASSERT_TRUE(result);
+
+    state = gameState.getState();
+    EXPECT_EQ(state["board"]["cities"]["CityE"]["slots"][0]["placedTile"]["type"], TileType::Brewery);
+    EXPECT_EQ(state["board"]["cities"]["CityD"]["slots"][1]["placedTile"]["resource_amount"], 3);//resource consumed
+
 
 }
 
