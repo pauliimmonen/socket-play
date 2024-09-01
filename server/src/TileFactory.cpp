@@ -174,9 +174,9 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                 default:
                     throw std::invalid_argument("Invalid Manufactor tile level");
             }
-            builder.linkPoints(0);
             break;
         case TileType::Pottery:
+            builder.linkPoints(1);
             switch (level) {
                 case 1:
                     builder.income(5)
@@ -216,7 +216,6 @@ Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> o
                 default:
                     throw std::invalid_argument("Invalid Pottery tile level");
             }
-            builder.linkPoints(1);
             break;
         case TileType::Brewery:
             builder.linkPoints(2).costIron(1);
