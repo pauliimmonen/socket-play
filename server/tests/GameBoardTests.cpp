@@ -126,9 +126,9 @@ TEST_F(GameBoardTest, GetPlacedConnections) {
 TEST_F(GameBoardTest, InitializedMapConnections) {
     board.initializeBrassBirminghamMap();
     auto birminghamConnections = board.getConnections("Birmingham");
-    ASSERT_EQ(birminghamConnections.size(), 4);
+    ASSERT_EQ(birminghamConnections.size(), 6);
 
-    std::vector<std::string> expectedConnections = {"Dudley", "Walsall", "Coventry", "Redditch"};
+    std::vector<std::string> expectedConnections = {"Dudley", "Walsall", "Coventry","Oxford", "Worcester", "Tamworth"};
     
     for (const auto& expectedCity : expectedConnections) {
         ASSERT_TRUE(std::find(birminghamConnections.begin(), birminghamConnections.end(), expectedCity) != birminghamConnections.end())

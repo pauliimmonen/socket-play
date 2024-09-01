@@ -35,19 +35,19 @@ TEST_F(GameStateTest, PlaceSimpleTile) {
     auto player = gameState.addPlayer();
     int initialMoney = player->money;
 
-    Tile testTile = createTestTile(TileType::Coal, player);
+    Tile testTile = createTestTile(TileType::Cotton, player);
 
     GameAction action;
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
     action.slotIndex = 0;
-    action.tileType = TileType::Coal;
+    action.tileType = TileType::Cotton;
 
     bool result = gameState.handleAction(player->id, action);
     EXPECT_TRUE(result);
 
     auto state = gameState.getState();
-    EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"]["type"], TileType::Coal);
+    EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"]["type"], TileType::Cotton);
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"]["owner"], player->id);
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][1]["placedTile"], nullptr);
     EXPECT_EQ(player->money, initialMoney - testTile.cost_money);
@@ -60,7 +60,7 @@ TEST_F(GameStateTest, PlaceTileInOccupiedSlot) {
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
     action.slotIndex = 0;
-    action.tileType = TileType::Coal;
+    action.tileType = TileType::Cotton;
 
     EXPECT_TRUE(gameState.handleAction(player->id, action));
     EXPECT_FALSE(gameState.handleAction(player->id, action));
@@ -72,10 +72,12 @@ TEST_F(GameStateTest, PlaceTileInInvalidSlot) {
     GameAction action;
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
-    action.slotIndex = 10;  // Invalid slot index
+    action.slotIndex = 1;  // coal not allowed
     action.tileType = TileType::Coal;
 
 
+    EXPECT_FALSE(gameState.handleAction(player->id, action));
+    action.slotIndex = 11;  // Invalid slot index
     EXPECT_FALSE(gameState.handleAction(player->id, action));
 }
 

@@ -46,64 +46,145 @@ std::vector<std::string> GameBoard::getConnections(const std::string& cityName) 
 void GameBoard::initializeBrassBirminghamMap() {
     // Add all cities
     addCity("Birmingham");
-    addCity("Dudley");
-    addCity("Walsall");
-    addCity("Wolverhampton");
-    addCity("Coalbrookdale");
-    addCity("Kidderminster");
-    addCity("Worcester");
-    addCity("Redditch");
-    addCity("Gloucester");
-    addCity("Oxford");
     addCity("Coventry");
     addCity("Nuneaton");
-    addCity("Tamworth");
-    addCity("Burton on Trent");
-    addCity("Derby");
-    addCity("Stoke on Trent");
-    addCity("Stone");
-    addCity("Stafford");
+    addCity("Redditch");
+    addCity("Dudley");
+    addCity("Coalbrookdale");
+    addCity("Wolverhampton");
+    addCity("Kidderminster");
+    addCity("Worcester");
+    addCity("Walsall");
     addCity("Cannock");
-
+    addCity("Tamworth");
+    addCity("Burton-on-Trent");
+    addCity("Stafford");
+    addCity("Stone");
+    addCity("Uttoxeter");
+    addCity("Stoke-on-Trent");
+    addCity("Leek");
+    addCity("Belper");
+    addCity("Derby");
+    addMerchantCity("Oxford", MerchantBonus::Income2);
+    addMerchantCity("Gloucester", MerchantBonus::Develop);
+    addMerchantCity("Shrewsbury", MerchantBonus::Points4);
+    addMerchantCity("Warrington", MerchantBonus::Money5);
+    addMerchantCity("Nottingham", MerchantBonus::Points3);
     // Add connections
     addConnection("Birmingham", "Dudley");
     addConnection("Birmingham", "Walsall");
     addConnection("Birmingham", "Coventry");
+    addConnection("Birmingham", "Oxford");
+    addConnection("Birmingham", "Tamworth");
+    addConnection("Birmingham", "Worcester");
+    addConnection("Redditch", "Oxford");
+    addConnection("Redditch", "Gloucester");
+    addConnection("Worcester", "Gloucester");
+    addConnection("Worcester", "Kidderminster");
+    addConnection("Kidderminster","Dudley");
+    addConnection("Kidderminster","Coalbrookdale");
+    addConnection("Coalbrookdale", "Wolverhampton");
+    addConnection("Coalbrookdale", "Sherewsbury");
     addConnection("Dudley", "Wolverhampton");
     addConnection("Walsall", "Wolverhampton");
-    addConnection("Wolverhampton", "Coalbrookdale");
-    addConnection("Coalbrookdale", "Kidderminster");
-    addConnection("Kidderminster", "Worcester");
-    addConnection("Worcester", "Gloucester");
-    addConnection("Birmingham", "Redditch");
-    addConnection("Redditch", "Worcester");
-    addConnection("Coventry", "Oxford");
-    addConnection("Coventry", "Nuneaton");
+    addConnection("Walsall", "Cannock");
+    addConnection("Walsall", "Burton-on-Trent");
     addConnection("Nuneaton", "Tamworth");
-    addConnection("Tamworth", "Burton on Trent");
-    addConnection("Burton on Trent", "Derby");
-    addConnection("Derby", "Stoke on Trent");
-    addConnection("Stoke on Trent", "Stone");
-    addConnection("Stone", "Stafford");
+    addConnection("Burton-on-Trent", "Tamworth");
+    addConnection("Burton-on-Trent", "Stone");
+    addConnection("Burton-on-Trent", "Derby");
     addConnection("Stafford", "Cannock");
-    addConnection("Cannock", "Wolverhampton");
+    addConnection("Stafford", "Stone");
+    addConnection("Stoke-on-Trent", "Stone");
+    addConnection("Stoke-on-Trent", "Leek");
+    addConnection("Stoke-on-Trent", "Warrington");
+    addConnection("Derby", "Belper");
+    addConnection("Derby", "Nottingham");
+    addConnection("Belper", "Leek");
 
-    // Add slots (simplified for brevity, add all slots for each city)
-    addSlot("Birmingham", {{TileType::Coal, TileType::Iron}, nullptr});
-    addSlot("Birmingham", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
-    addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
-    addSlot("Birmingham", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
 
-    addSlot("Coventry", {{TileType::Coal, TileType::Iron}, nullptr});
-    addSlot("Coventry", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
-    addSlot("Coventry", {{TileType::Coal, TileType::Iron, TileType::Cotton, TileType::Manufacturer}, nullptr});
+    // Add slots 
+    addSlot("Birmingham", {{TileType::Manufacturer, TileType::Cotton}, nullptr});
+    addSlot("Birmingham", {{TileType::Manufacturer}, nullptr});
+    addSlot("Birmingham", {{TileType::Iron}, nullptr});
+    addSlot("Birmingham", {{TileType::Manufacturer}, nullptr});
 
-    // Add slots for other cities...
+    addSlot("Coventry", {{TileType::Pottery}, nullptr});
+    addSlot("Coventry", {{TileType::Manufacturer, TileType::Coal}, nullptr});
+    addSlot("Coventry", {{TileType::Iron, TileType::Manufacturer}, nullptr});
 
-    // Add a market slot to Birmingham (if it doesn't already exist)
-    addMerchantCity("Oxford", MerchantBonus::Income2);
+    addSlot("Nuneaton", {{TileType::Coal, TileType::Cotton}, nullptr});
+    addSlot("Nuneaton", {{TileType::Manufacturer, TileType::Brewery}, nullptr});
+
+    addSlot("Redditch", {{TileType::Manufacturer, TileType::Coal}, nullptr});
+    addSlot("Redditch", {{TileType::Iron}, nullptr});
+
+    addSlot("Worcester", {{TileType::Cotton}, nullptr});
+    addSlot("Worcester", {{TileType::Cotton}, nullptr});
+
+    addSlot("Kidderminster", {{TileType::Cotton, TileType::Coal}, nullptr});
+    addSlot("Kidderminster", {{TileType::Cotton}, nullptr});
+
+    addSlot("Dudley", {{TileType::Coal}, nullptr});
+    addSlot("Dudley", {{TileType::Iron}, nullptr});
+
+    addSlot("Coalbrookdale", {{TileType::Iron, TileType::Brewery}, nullptr});
+    addSlot("Coalbrookdale", {{TileType::Iron}, nullptr});
+    addSlot("Coalbrookdale", {{TileType::Coal}, nullptr});
+
+    addSlot("Wolverhampton", {{TileType::Manufacturer}, nullptr});
+    addSlot("Wolverhampton", {{TileType::Manufacturer, TileType::Coal}, nullptr});
+
+    addSlot("Walsall", {{TileType::Iron, TileType::Manufacturer}, nullptr});
+    addSlot("Walsall", {{TileType::Manufacturer, TileType::Brewery}, nullptr});
+
+    addSlot("Tamworth", {{TileType::Cotton, TileType::Coal}, nullptr});
+    addSlot("Tamworth", {{TileType::Cotton, TileType::Coal}, nullptr});
+
+    addSlot("Cannock", {{TileType::Manufacturer, TileType::Coal}, nullptr});
+    addSlot("Cannock", {{TileType::Coal}, nullptr});
+
+    addSlot("Burton-on-Trent", {{TileType::Manufacturer, TileType::Brewery}, nullptr});
+    addSlot("Burton-on-Trent", {{TileType::Pottery}, nullptr});
+
+    addSlot("Stafford", {{TileType::Manufacturer, TileType::Coal}, nullptr});
+    addSlot("Stafford", {{TileType::Coal}, nullptr});
+
+    addSlot("Stone", {{TileType::Cotton, TileType::Brewery}, nullptr});
+    addSlot("Stone", {{TileType::Manufacturer, TileType::Coal}, nullptr});
+
+    addSlot("Uttoxeter", {{TileType::Manufacturer, TileType::Brewery}, nullptr});
+    addSlot("Uttoxeter", {{TileType::Cotton, TileType::Brewery}, nullptr});
+
+    addSlot("Stoke-on-Trent", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
+    addSlot("Stoke-on-Trent", {{TileType::Pottery, TileType::Iron}, nullptr});
+    addSlot("Stoke-on-Trent", {{TileType::Manufacturer}, nullptr});
+
+    addSlot("Leek", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
+    addSlot("Leek", {{TileType::Cotton, TileType::Coal}, nullptr});
+
+    addSlot("Derby", {{TileType::Cotton, TileType::Brewery}, nullptr});
+    addSlot("Derby", {{TileType::Cotton, TileType::Manufacturer}, nullptr});
+    addSlot("Derby", {{TileType::Iron}, nullptr});
+
+    addSlot("Belper", {{TileType::Cotton, TileType::Brewery}, nullptr});
+    addSlot("Belper", {{TileType::Coal}, nullptr});
+    addSlot("Belper", {{TileType::Pottery}, nullptr});
+
+    //Merhcant cities slots
     addSlot("Oxford", {{TileType::Merchant}, nullptr});
     addSlot("Oxford", {{TileType::Merchant}, nullptr});
+
+    addSlot("Gloucester", {{TileType::Merchant}, nullptr});
+    addSlot("Gloucester", {{TileType::Merchant}, nullptr});
+
+    addSlot("Shrewsbury", {{TileType::Merchant}, nullptr});
+
+    addSlot("Nottingham", {{TileType::Merchant}, nullptr});
+    addSlot("Nottingham", {{TileType::Merchant}, nullptr});
+
+    addSlot("Warrington", {{TileType::Merchant}, nullptr});
+    addSlot("Warrington", {{TileType::Merchant}, nullptr});
 }
 
 std::vector<Connection> GameBoard::getPlacedConnections() const {
