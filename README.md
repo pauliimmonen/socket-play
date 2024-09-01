@@ -1,6 +1,6 @@
 # Simple Network Game
 
-This project is a simple multiplayer game implemented using WebSocket for real-time communication between a C++ server and web-based clients.
+This project is a simple multiplayer game implemented using WebSocket for real-time communication between a C++ server and web-based clients. Working on to make it a game of Brass birgminghamn
 
 ## Prerequisites
 
@@ -31,7 +31,5 @@ This project is a simple multiplayer game implemented using WebSocket for real-t
 
 ### Client
 
-1. Open the `client/index.html` file in a web browser.
-
-2. Use the arrow keys to move your player.
+Client side is not up to date right now as working a lot with backend. Stay tuned.
 
