@@ -256,6 +256,28 @@ std::set<MerchantType> GameBoard::getConnectedMerchantTypes(const std::string& c
     return merchantTypes;
 }
 
+std::vector<std::string> GameBoard::getPlayerPlacedTiles(const Player& player) const {
+    std::vector<std::string> playerTiles;
+    for (const auto& [cityName, city] : cities) {
+        for (const auto& slot : city->slots) {
+            if (slot.placedTile && slot.placedTile->owner.get() == &player) {
+                playerTiles.push_back(cityName);
+            }
+        }
+    }
+    return playerTiles;
+}
+
+std::vector<Connection> GameBoard::getPlayerPlacedLinks(const Player& player) const {
+    std::vector<Connection> playerLinks;
+    for (const auto& connection : connections) {
+        if (connection.linkOwner.get() == &player) {
+            playerLinks.push_back(connection);
+        }
+    }
+    return playerLinks;
+}
+
 const City* GameBoard::getCity(const std::string& cityName) const {
     auto it = cities.find(cityName);
     if (it != cities.end()) {

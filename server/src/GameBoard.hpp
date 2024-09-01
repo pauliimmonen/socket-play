@@ -61,7 +61,8 @@ class GameBoard {
 private:
     std::unordered_map<std::string, std::unique_ptr<City>> cities;
     std::set<Connection> connections;
-
+    std::vector<std::string> getPlayerPlacedTiles(const Player& player) const;
+    std::vector<Connection> getPlayerPlacedLinks(const Player& player) const;
 public:
     City* addCity(const std::string& name);
     const City* getCity(const std::string& cityName) const;
