@@ -408,6 +408,19 @@ TEST_F(GameBoardTest, IsCityInPlayerNetwork) {
     ASSERT_TRUE(board.placeTile("CityE", 1, testTile));
     EXPECT_TRUE(board.isCityInPlayerNetwork(*player2, "CityE"));
 
-
+    //None existent city
+    EXPECT_FALSE(board.isCityInPlayerNetwork(*player2, "NonExistent"));
 }
+
+TEST_F(GameBoardTest, IsCityNetworkWhenNoTilesPlace) {
+    // Setup
+    board.addCity("CityA");
+    board.addCity("CityB");
+    board.addCity("CityC");
+
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player1, "CityA"));
+    EXPECT_TRUE(board.isCityInPlayerNetwork(*player2, "CityB"));
+}
+
+
 

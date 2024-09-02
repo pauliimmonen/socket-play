@@ -375,7 +375,8 @@ bool GameBoard::isCityInPlayerNetwork(const Player& player, const std::string& c
     for (const auto& tile : tiles) {
         networkCities.insert(tile);
     }
-
+    //No placed link or tiles free to place anywhere
+    if (networkCities.size()==0) return true;
     // Check if the given cityName is in the network
     return networkCities.find(cityName) != networkCities.end();
 }
