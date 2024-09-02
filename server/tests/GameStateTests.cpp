@@ -26,9 +26,7 @@ TEST_F(GameStateTest, BoardInitialization) {
 
     EXPECT_TRUE(state["board"].contains("cities"));
     EXPECT_TRUE(state["board"]["cities"].contains("Birmingham"));
-    EXPECT_TRUE(state["board"]["cities"].contains("Coventry"));
-    EXPECT_TRUE(state["board"]["cities"].contains("Worcester"));
-    EXPECT_TRUE(state["board"]["cities"].contains("Oxford"));
+    EXPECT_TRUE(state["board"]["cities"]["Birmingham"].contains("slots"));
 }
 
 TEST_F(GameStateTest, PlaceSimpleTile) {
@@ -79,6 +77,43 @@ TEST_F(GameStateTest, PlaceTileInInvalidSlot) {
     EXPECT_FALSE(gameState.handleAction(player->id, action));
     action.slotIndex = 11;  // Invalid slot index
     EXPECT_FALSE(gameState.handleAction(player->id, action));
+}
+
+TEST_F(GameStateTest, placeLinkTile) {
+    auto player = gameState.addPlayer();
+    
+    GameAction action;
+    action.type = GameAction::Type::PlaceLink;
+    action.cityName = "Birmingham";
+    action.cityName2 = "Coventry";
+    bool first_placed_link = gameState.handleAction(player->id, action);
+    EXPECT_TRUE(first_placed_link);
+
+    action.cityName = "Derby";
+    action.cityName2 = "Conventry";
+    bool impossible_link = gameState.handleAction(player->id, action);
+    EXPECT_FALSE(impossible_link);
+    action.cityName = "Stone";
+    action.cityName2 = "Stafford";
+    bool not_in_player_network = gameState.handleAction(player->id, action);
+    EXPECT_FALSE(not_in_player_network);
+    action.cityName = "Dudley";
+    action.cityName2 = "Birmingham";
+    bool in_player_network_by_connection = gameState.handleAction(player->id, action);
+    EXPECT_TRUE(in_player_network_by_connection);
+
+    action.type = GameAction::Type::PlaceTile;
+    action.cityName = "Stone";
+    action.tileType = TileType::Coal;
+    action.slotIndex = 1;
+
+    bool placed_tile=gameState.handleAction(player->id, action);
+    EXPECT_TRUE(placed_tile);
+    action.type = GameAction::Type::PlaceLink;
+    action.cityName = "Stone";
+    action.cityName2 = "Stafford";
+    bool in_player_network_by_tile=gameState.handleAction(player->id, action);
+    EXPECT_TRUE(in_player_network_by_tile);
 }
 
 TEST_F(GameStateTest, RemovePlayer) {

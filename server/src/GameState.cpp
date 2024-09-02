@@ -21,21 +21,30 @@ void GameState::removePlayer(int id) {
 }
 
 bool GameState::handleAction(int playerId, const GameAction& action) {
+
+    auto playerIt = m_players.find(playerId);
+    if (playerIt == m_players.end()) {
+        return false;  // Player not found
+    }
+    auto& player = playerIt->second;
     switch (action.type) {
         case GameAction::Type::PlaceTile: {
-            auto playerIt = m_players.find(playerId);
-            if (playerIt == m_players.end()) {
-                return false;  // Player not found
-            }
-            auto& player = playerIt->second;
-
             Tile newTile = TileFactory::createTile(action.tileType, 1, player);
             return handleTilePlacement(playerId, action.cityName, action.slotIndex, newTile);
+            break;
+        }
+        case GameAction::Type::PlaceLink: {
+            if (m_board.isCityInPlayerNetwork(*player.get(), action.cityName) || m_board.isCityInPlayerNetwork(*player.get(), action.cityName2)){
+                return m_board.placeLink(action.cityName,action.cityName2, player);
+            }else
+                return false;
+            break;
         }
         // Add other action types here as needed
         default:
             return false;
     }
+    return false;
 }
 
 int GameState::getTilePrice(const std::string& cityName, const Tile& tile){
