@@ -5,13 +5,20 @@
 struct GameAction {
     enum class Type {
         PlaceTile,
+        PlaceLink,
+        TakeLoan,
+        Develop,
+        Scout,
+        Sell,
         Unknown
     };
 
     Type type;
     std::string cityName;
+    std::string cityName2;
     TileType tileType;
     int slotIndex;
+    
 
     GameAction() : type(Type::Unknown), slotIndex(-1) {}
 };
