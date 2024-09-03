@@ -206,7 +206,7 @@ nlohmann::json GameState::getState() const {
     }
 
     state["connections"] = nlohmann::json::array();
-    for (const auto& connection : m_board.getPlacedConnections()) {
+    for (const auto& connection : m_board.getPlacedLinks()) {
         state["connections"].push_back({
             {"city1", connection.city1},
             {"city2", connection.city2},
@@ -233,7 +233,7 @@ void GameState::setupBoardForTesting(const GameBoard& board) {
     }
 
     // Copy connections
-    for (const auto& connection : board.getPlacedConnections()) {
+    for (const auto& connection : board.getPlacedLinks()) {
         m_board.addConnection(connection.city1, connection.city2);
         if (connection.linkOwner) {
             m_board.placeLink(connection.city1, connection.city2, connection.linkOwner);

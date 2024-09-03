@@ -116,7 +116,7 @@ TEST_F(GameBoardTest, GetPlacedConnections) {
     board.addConnection("CityB", "CityC");
     board.placeLink("CityA", "CityB", player1);
 
-    auto placedConnections = board.getPlacedConnections();
+    auto placedConnections = board.getPlacedLinks();
     ASSERT_EQ(placedConnections.size(), 1);
     ASSERT_EQ(placedConnections[0].city1, "CityA");
     ASSERT_EQ(placedConnections[0].city2, "CityB");

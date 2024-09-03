@@ -187,7 +187,7 @@ void GameBoard::initializeBrassBirminghamMap() {
     addSlot("Warrington", {{TileType::Merchant}, nullptr});
 }
 
-std::vector<Connection> GameBoard::getPlacedConnections() const {
+std::vector<Connection> GameBoard::getPlacedLinks() const {
     std::vector<Connection> placedConnections;
     std::copy_if(connections.begin(), connections.end(), std::back_inserter(placedConnections),
                  [](const Connection& connection) { return connection.linkOwner != nullptr; });

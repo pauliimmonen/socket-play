@@ -73,7 +73,7 @@ public:
     std::vector<std::string> getConnections(const std::string& cityName) const;
     void initializeBrassBirminghamMap();
     bool placeLink(const std::string& city1, const std::string& city2, std::shared_ptr<Player> player);
-    std::vector<Connection> getPlacedConnections() const;
+    std::vector<Connection> getPlacedLinks() const;
     std::vector<std::string> getConnectedCities(const std::string& startCity) const;
     int getTotalResourceCoal(const std::string& startCity) const;
     int getTotalResourceIron() const;
