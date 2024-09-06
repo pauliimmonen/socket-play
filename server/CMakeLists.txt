@@ -38,10 +38,12 @@ set(SOURCES
     src/Market.cpp
     src/Tile.cpp
     src/TileFactory.cpp
+    src/IncomeFunctions.cpp
 )
 
 # Add all header files
 set(HEADERS
+    src/IncomeFunctions.hpp
     src/WebSocketServer.hpp
     src/GameState.hpp
     src/GameBoard.hpp
@@ -57,6 +59,7 @@ add_executable(server src/main.cpp ${SOURCES} ${HEADERS})
 
 # Add the test executable
 add_executable(server_tests
+    tests/IncomeFunctionsTest.cpp
     tests/GameStateTests.cpp
     tests/GameBoardTests.cpp
     tests/test_main.cpp
