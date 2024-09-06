@@ -6,30 +6,21 @@
 
 // Initialize the income table
 std::vector<unsigned int> initializeIncomeTable() {
-    int k=0;
     std::vector<unsigned int> incomeTable;
     // Levels 0 to 10: Income increases by 1 per level
     for (int i = 0; i <= 10; ++i) {
-        std::cout << k << " " << i-10 << std::endl;
-        k++;
         incomeTable.push_back(i - 10);
     }
     // Levels 11 to 30: Income increases by 1 for every 2 levels
     for (int i = 11; i <= 30; ++i) {
-        std::cout << k << " " << ceil((i - 10) / 2.f) << std::endl;
-        k++;
         incomeTable.push_back(ceil((i - 10) / 2.f));
     }
     // Levels 31 to 60: Income increases by 1 for every 3 levels
     for (int i = 31; i <= 60; ++i) {
-        std::cout << k << " "<< ceil(10 + (i-30) / 3.f) << std::endl;;
-        k++;
         incomeTable.push_back(ceil(10 + (i-30) / 3.f));
     }
     // Levels 61 to 99: Income increases by 1 for every 4 levels
     for (int i = 61; i <= 99; ++i) {
-        std::cout << k << " " << ceil(20 + (i-60) / 4.f) << std::endl;;
-        k++;
         incomeTable.push_back(ceil(20 + (i-60) / 4.f));
     }
     return incomeTable;
