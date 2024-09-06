@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <math.h>
 #include <iostream>
+#include "IncomeFunctions.hpp"
 
 // Initialize the income table
 std::vector<unsigned int> initializeIncomeTable() {
@@ -30,7 +31,7 @@ std::vector<unsigned int> initializeIncomeTable() {
 const std::vector<unsigned int> INCOME_TABLE = initializeIncomeTable();
 
 // Function to get income for a given level
-unsigned int getIncome(unsigned int income_level) {
+int getIncome(unsigned int income_level) {
     if (income_level >= INCOME_TABLE.size()) {
         throw std::out_of_range("Income level out of valid range");
     }
@@ -39,10 +40,12 @@ unsigned int getIncome(unsigned int income_level) {
 
 // Function to take a loan and return the new income level
 unsigned int takeLoan(unsigned int income_level) {
-    unsigned int currentIncome = getIncome(income_level);
+    int currentIncome = getIncome(income_level);
     // Find the highest level with -3
-    int newLevel;
+    std::cout << "current income " << currentIncome << std::endl;
+    int newLevel=income_level;
     for (unsigned int i = income_level; getIncome(i) >= currentIncome-2; i--){
+        std::cout << i;
         newLevel = i-1;
     }
     return newLevel;

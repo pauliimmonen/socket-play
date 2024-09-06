@@ -36,9 +36,10 @@ TEST_F(IncomeFunctionsTest, TakeLoanAtHighLevel) {
 }
 
 TEST_F(IncomeFunctionsTest, TakeLoanAtLowLevel) {
-    int oldLevel = 5;
-    int newLevel = takeLoan(oldLevel);
-    EXPECT_EQ(newLevel, 2);
+    EXPECT_EQ(takeLoan(5), 2);
+    EXPECT_EQ(takeLoan(10), 7);
+    EXPECT_EQ(takeLoan(11), 8);
+    EXPECT_EQ(takeLoan(12), 8);
 }
 
 TEST_F(IncomeFunctionsTest, GetIncomeOutOfRange) {

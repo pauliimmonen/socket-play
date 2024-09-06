@@ -2,6 +2,7 @@
 #include "Tile.hpp"
 #include "TileFactory.hpp"
 #include "GameBoard.hpp"
+#include "IncomeFunctions.hpp"
 #include <algorithm>
 #include <random>
 #include <iostream>
@@ -12,6 +13,8 @@ GameState::GameState(){
 
 std::shared_ptr<Player> GameState::addPlayer() {
     auto new_player = std::make_shared<Player>(m_next_id++);
+    new_player->income_level=10;
+    new_player->money=30;
     m_players[new_player->id] = new_player;
     return new_player;
 }
@@ -40,6 +43,20 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
                 return false;
             break;
         }
+        case GameAction::Type::TakeLoan: {
+            if (player->income_level > 2){
+                std::cout << player->income_level << std::endl;
+                player->income_level = takeLoan(player->income_level);
+                std::cout << player->income_level << std::endl;
+                std::cout << takeLoan(player->income_level) << std::endl;
+                std::cout << takeLoan(10) << std::endl;
+                std::cout << takeLoan(30) << std::endl;
+                return true;
+            }else
+                return false;
+            break;
+        }
+ 
         // Add other action types here as needed
         default:
             return false;
@@ -175,7 +192,8 @@ nlohmann::json GameState::getState() const {
         state["players"].push_back({
             {"id", player->id},
             {"score", player->score},
-            {"money", player->money}
+            {"money", player->money},
+            {"income_level", player->income_level}
         });
     }
 

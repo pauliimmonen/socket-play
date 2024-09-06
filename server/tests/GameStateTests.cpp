@@ -116,6 +116,18 @@ TEST_F(GameStateTest, placeLinkTile) {
     EXPECT_TRUE(in_player_network_by_tile);
 }
 
+TEST_F(GameStateTest, TakeLoan) {
+    auto player = gameState.addPlayer();
+    
+    GameAction action;
+    action.type = GameAction::Type::TakeLoan;
+
+    bool loan_action_result = gameState.handleAction(player->id, action);
+    EXPECT_TRUE(loan_action_result);
+    auto state = gameState.getState();
+    EXPECT_EQ(state["players"][0]["income_level"], 7);
+}
+
 TEST_F(GameStateTest, RemovePlayer) {
     auto player1 = gameState.addPlayer();
     auto player2 = gameState.addPlayer();
