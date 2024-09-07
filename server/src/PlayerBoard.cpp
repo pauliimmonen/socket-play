@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <memory>
 
-PlayerBoard::PlayerBoard() {
-    initializeTilePiles();
+PlayerBoard::PlayerBoard(int owner) {
+    initializeTilePiles(owner);
 }
 
 std::shared_ptr<Tile> PlayerBoard::peekTile(TileType type) const {
@@ -31,74 +31,74 @@ bool PlayerBoard::hasTiles(TileType type) const {
     return (it != tilePiles.end() && !it->second.empty());
 }
 
-void PlayerBoard::initializeTilePiles() {
+void PlayerBoard::initializeTilePiles(int owner) {
     // Initialize Coal tiles
     tilePiles[TileType::Coal] = {
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 4, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 4, nullptr))
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 4, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Coal, 4, owner))
     };
 
     // Initialize Iron tiles
     tilePiles[TileType::Iron] = {
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 4, nullptr))
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Iron, 4, owner))
     };
 
     // Initialize Cotton tiles
     tilePiles[TileType::Cotton] = {
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 4, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 4, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 4, nullptr))
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 4, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 4, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Cotton, 4, owner))
     };
 
     // Initialize Manufacturer tiles
     tilePiles[TileType::Manufacturer] = {
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 4, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 5, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 5, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 6, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 7, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 8, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 8, nullptr))
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 4, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 5, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 5, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 6, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 7, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 8, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Manufacturer, 8, owner))
     };
 
     // Initialize Pottery tiles
     tilePiles[TileType::Pottery] = {
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 4, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 5, nullptr))
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 4, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Pottery, 5, owner))
     };
 
     // Initialize Brewery tiles
     tilePiles[TileType::Brewery] = {
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 1, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 2, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 3, nullptr)),
-        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 4, nullptr))
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 1, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 2, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 3, owner)),
+        std::make_shared<Tile>(TileFactory::createTile(TileType::Brewery, 4, owner))
     };
 
     // Sort each pile in descending order of level (so highest level is at the back)

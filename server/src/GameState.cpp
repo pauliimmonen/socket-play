@@ -32,7 +32,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
     auto& player = playerIt->second;
     switch (action.type) {
         case GameAction::Type::PlaceTile: {
-            Tile newTile = TileFactory::createTile(action.tileType, 1, player);
+            Tile newTile = TileFactory::createTile(action.tileType, 1, player->id);
             return handleTilePlacement(playerId, action.cityName, action.slotIndex, newTile);
             break;
         }
@@ -209,7 +209,7 @@ nlohmann::json GameState::getState() const {
                 // Nested structure if placedTile exists
                 slotJson["placedTile"] = {
                     {"type", slot.placedTile->type},
-                    {"owner", slot.placedTile->owner ? slot.placedTile->owner->id : -1},
+                    {"owner", slot.placedTile->owner},
                     {"level", slot.placedTile->level},
                     {"flipped", slot.placedTile->flipped},
                     {"resource_amount", slot.placedTile->resource_amount},

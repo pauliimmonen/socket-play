@@ -8,8 +8,8 @@ protected:
     GameState gameState;
 
     // Helper function to create a tile for testing
-    Tile createTestTile(TileType type, std::shared_ptr<Player> player) {
-        return TileFactory::createTile(type, 1, player);
+    Tile createTestTile(TileType type, int owner) {
+        return TileFactory::createTile(type, 1, owner);
     }
 };
 
@@ -33,7 +33,7 @@ TEST_F(GameStateTest, PlaceSimpleTile) {
     auto player = gameState.addPlayer();
     int initialMoney = player->money;
 
-    Tile testTile = createTestTile(TileType::Cotton, player);
+    Tile testTile = createTestTile(TileType::Cotton, player->id);
 
     GameAction action;
     action.type = GameAction::Type::PlaceTile;

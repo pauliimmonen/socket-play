@@ -341,7 +341,7 @@ std::vector<std::string> GameBoard::getPlayerPlacedTiles(const Player& player) c
     std::vector<std::string> playerTiles;
     for (const auto& [cityName, city] : cities) {
         for (const auto& slot : city->slots) {
-            if (slot.placedTile && slot.placedTile->owner.get() == &player) {
+            if (slot.placedTile && slot.placedTile->owner == player.id) {
                 playerTiles.push_back(cityName);
             }
         }

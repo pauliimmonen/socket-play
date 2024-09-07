@@ -1,7 +1,7 @@
 #include "TileFactory.hpp"
 #include <stdexcept>
 
-Tile TileFactory::createTile(TileType type, int level, std::shared_ptr<Player> owner) {
+Tile TileFactory::createTile(TileType type, int level, int owner) {
     Tile::Builder builder = Tile::create(type);
     builder.owner(owner).level(level);
 

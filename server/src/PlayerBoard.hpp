@@ -8,7 +8,7 @@
 
 class PlayerBoard {
 public:
-    PlayerBoard();
+    PlayerBoard(int owner);
     
     // Get the top tile of a specific type without removing it
     std::shared_ptr<Tile> peekTile(TileType type) const;
@@ -22,7 +22,7 @@ public:
 private:
     std::map<TileType, std::vector<std::shared_ptr<Tile>>> tilePiles;
     
-    void initializeTilePiles();
+    void initializeTilePiles(int owner);
 };
 
 #endif // PLAYERBOARD_HPP

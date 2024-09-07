@@ -46,13 +46,13 @@ protected:
         testBoard.addSlot("CityE", {{TileType::Brewery}, nullptr});
 
         // Place resource tiles
-        auto coalTileA = TileFactory::createTile(TileType::Coal, 1, player1);
+        auto coalTileA = TileFactory::createTile(TileType::Coal, 1, player1->id);
         testBoard.placeTile("CityA", 0, coalTileA);
 
-        auto ironTileB = TileFactory::createTile(TileType::Iron, 1, player2);
+        auto ironTileB = TileFactory::createTile(TileType::Iron, 1, player2->id);
         testBoard.placeTile("CityD", 1, ironTileB);
 
-        auto coalTileC = TileFactory::createTile(TileType::Coal, 1, player2);
+        auto coalTileC = TileFactory::createTile(TileType::Coal, 1, player2->id);
         testBoard.placeTile("CityD", 0, coalTileC);
 
         // Place link tiles

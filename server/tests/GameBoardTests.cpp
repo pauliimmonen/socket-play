@@ -20,8 +20,8 @@ protected:
         board.initializeBrassBirminghamMap();
     }
 
-    Tile createTestTile(TileType type, int lvl, std::shared_ptr<Player> player) {
-        return TileFactory::createTile(type, lvl, player);
+    Tile createTestTile(TileType type, int lvl, int owner) {
+        return TileFactory::createTile(type, lvl, owner);
     }
 
     void setupSimpleGameBoard() {
@@ -65,10 +65,10 @@ protected:
 };
 
 TEST_F(GameBoardTest, TileProperties) {
-    Tile testTile = createTestTile(TileType::Coal, 1, player1);
+    Tile testTile = createTestTile(TileType::Coal, 1, player1->id);
     // Verify tile properties
     EXPECT_EQ(testTile.type, TileType::Coal);
-    EXPECT_EQ(testTile.owner, player1);
+    EXPECT_EQ(testTile.owner, player1->id);
     EXPECT_EQ(testTile.level, 1);
     EXPECT_FALSE(testTile.flipped);
     EXPECT_EQ(testTile.income, 4);
@@ -83,10 +83,10 @@ TEST_F(GameBoardTest, TileProperties) {
 }
 
 TEST_F(GameBoardTest, TileProperties2) {
-    Tile testTile = createTestTile(TileType::Pottery, 4, player1);
+    Tile testTile = createTestTile(TileType::Pottery, 4, player1->id);
     // Verify tile properties
     EXPECT_EQ(testTile.type, TileType::Pottery);
-    EXPECT_EQ(testTile.owner, player1);
+    EXPECT_EQ(testTile.owner, player1->id);
     EXPECT_EQ(testTile.level, 4);
     EXPECT_FALSE(testTile.flipped);
     EXPECT_EQ(testTile.income, 1);
@@ -176,8 +176,8 @@ TEST_F(GameBoardTest, GetTotalResourceCoal) {
     board.addSlot("CityB", {{TileType::Coal}, nullptr});
     board.addSlot("CityC", {{TileType::Coal}, nullptr});
 
-    Tile Coal_a = createTestTile(TileType::Coal, 1, player1);
-    Tile Coal_b = createTestTile(TileType::Coal, 1, player2);
+    Tile Coal_a = createTestTile(TileType::Coal, 1, player1->id);
+    Tile Coal_b = createTestTile(TileType::Coal, 1, player2->id);
 
     ASSERT_TRUE(board.placeTile("CityA", 0, Coal_a));
     ASSERT_TRUE(board.placeTile("CityC", 0, Coal_b));
@@ -357,9 +357,9 @@ TEST_F(GameBoardTest, GetTotalResourceIron) {
     board.addSlot("CityC", {{TileType::Iron}, nullptr});
 
     // Create Iron tiles with different resource amounts
-    Tile ironTile1 = createTestTile(TileType::Iron, 1, player1);
-    Tile ironTile2 = createTestTile(TileType::Iron, 2, player2);
-    Tile ironTile3 = createTestTile(TileType::Iron, 3, player1);
+    Tile ironTile1 = createTestTile(TileType::Iron, 1, player1->id);
+    Tile ironTile2 = createTestTile(TileType::Iron, 2, player2->id);
+    Tile ironTile3 = createTestTile(TileType::Iron, 3, player1->id);
 
     // Place the tiles
     ASSERT_TRUE(board.placeTile("CityA", 0, ironTile1));
@@ -374,7 +374,7 @@ TEST_F(GameBoardTest, GetTotalResourceIron) {
     ASSERT_EQ(totalIron, expectedTotalIron);
 
     // Add another iron tile and test again
-    Tile ironTile4 = createTestTile(TileType::Iron, 2, player2);
+    Tile ironTile4 = createTestTile(TileType::Iron, 2, player2->id);
     ASSERT_TRUE(board.placeTile("CityC", 1, ironTile4));
 
     expectedTotalIron += ironTile4.resource_amount;
@@ -389,7 +389,7 @@ TEST_F(GameBoardTest, IsCityInPlayerNetwork) {
     // Place tiles (assuming a placeTile method exists)
     board.addSlot("CityE",{{TileType::Coal}, nullptr}); 
     board.addSlot("CityE",{{TileType::Coal}, nullptr}); 
-    Tile testTile = createTestTile(TileType::Coal, 1, player1);
+    Tile testTile = createTestTile(TileType::Coal, 1, player1->id);
     ASSERT_TRUE(board.placeTile("CityE", 0, testTile));
     // Test cases
     EXPECT_TRUE(board.isCityInPlayerNetwork(*player1, "CityA"));
@@ -404,7 +404,7 @@ TEST_F(GameBoardTest, IsCityInPlayerNetwork) {
     EXPECT_TRUE(board.isCityInPlayerNetwork(*player2, "CityB"));
     EXPECT_FALSE(board.isCityInPlayerNetwork(*player2, "CityE"));
 
-    testTile = createTestTile(TileType::Coal, 1, player2);
+    testTile = createTestTile(TileType::Coal, 1, player2->id);
     ASSERT_TRUE(board.placeTile("CityE", 1, testTile));
     EXPECT_TRUE(board.isCityInPlayerNetwork(*player2, "CityE"));
 

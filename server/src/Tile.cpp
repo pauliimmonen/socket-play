@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <iostream>
 
-Tile::Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
+Tile::Tile(TileType t, int o, int l, bool f, int i, int vp, int lp, 
            int cm, int cc, int ci, int ra, int bd)
     : type(t), owner(o), level(l), flipped(f), income(i), victory_points(vp), link_points(lp),
       cost_money(cm), cost_coal(cc), cost_iron(ci), resource_amount(ra),beer_demand(bd) {}
@@ -25,7 +25,7 @@ Tile::Builder Tile::create(TileType type) {
 
 Tile::Builder::Builder(TileType type) {
     tile.type = type;
-    tile.owner = nullptr;
+    tile.owner = -1;
     tile.level = 1;
     tile.flipped = false;
     tile.income = 0;
@@ -38,7 +38,7 @@ Tile::Builder::Builder(TileType type) {
     tile.beer_demand = 0;
 }
 
-Tile::Builder& Tile::Builder::owner(std::shared_ptr<Player> o) { tile.owner = o; return *this; }
+Tile::Builder& Tile::Builder::owner(int o) { tile.owner = o; return *this; }
 Tile::Builder& Tile::Builder::level(int l) { tile.level = l; return *this; }
 Tile::Builder& Tile::Builder::flipped(bool f) { tile.flipped = f; return *this; }
 Tile::Builder& Tile::Builder::income(int i) { tile.income = i; return *this; }

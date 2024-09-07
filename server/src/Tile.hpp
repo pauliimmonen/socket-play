@@ -3,7 +3,6 @@
 
 #include <string>
 #include <memory>
-#include "Player.hpp"
 
 enum class TileType {
     Coal,
@@ -31,7 +30,7 @@ public:
     class Builder;
 
     TileType type = TileType::NullTile;
-    std::shared_ptr<Player> owner = nullptr;
+    int owner = -1;
     int level = 0;
     bool flipped = false;
 
@@ -49,7 +48,7 @@ public:
     int resource_amount = 0;
     int beer_demand = 0;
 
-    Tile(TileType t, std::shared_ptr<Player> o, int l, bool f, int i, int vp, int lp, 
+    Tile(TileType t, int owner, int l, bool f, int i, int vp, int lp, 
          int cm, int cc, int ci, int ra, int bd);
 
     virtual ~Tile() = default;
@@ -86,7 +85,7 @@ private:
 
 public:
     Builder(TileType type);
-    Builder& owner(std::shared_ptr<Player> o);
+    Builder& owner(int o);
     Builder& level(int l);
     Builder& flipped(bool f);
     Builder& income(int i);
