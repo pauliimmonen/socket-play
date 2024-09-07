@@ -32,8 +32,10 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
     auto& player = playerIt->second;
     switch (action.type) {
         case GameAction::Type::PlaceTile: {
-            Tile newTile = TileFactory::createTile(action.tileType, 1, player->id);
-            return handleTilePlacement(playerId, action.cityName, action.slotIndex, newTile);
+            Tile *newTile = player->player_board.takeTile(action.tileType).get();
+            if (newTile==nullptr)
+            //Tile newTile = TileFactory::createTile(action.tileType, 1, player->id);
+            return handleTilePlacement(playerId, action.cityName, action.slotIndex, *newTile);
             break;
         }
         case GameAction::Type::PlaceLink: {
@@ -45,12 +47,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
         }
         case GameAction::Type::TakeLoan: {
             if (player->income_level > 2){
-                std::cout << player->income_level << std::endl;
                 player->income_level = takeLoan(player->income_level);
-                std::cout << player->income_level << std::endl;
-                std::cout << takeLoan(player->income_level) << std::endl;
-                std::cout << takeLoan(10) << std::endl;
-                std::cout << takeLoan(30) << std::endl;
                 return true;
             }else
                 return false;

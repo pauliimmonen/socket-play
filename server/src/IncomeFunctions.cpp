@@ -42,10 +42,8 @@ int getIncome(unsigned int income_level) {
 unsigned int takeLoan(unsigned int income_level) {
     int currentIncome = getIncome(income_level);
     // Find the highest level with -3
-    std::cout << "current income " << currentIncome << std::endl;
     int newLevel=income_level;
     for (unsigned int i = income_level; getIncome(i) >= currentIncome-2; i--){
-        std::cout << i;
         newLevel = i-1;
     }
     return newLevel;
