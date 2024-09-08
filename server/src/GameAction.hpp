@@ -17,6 +17,7 @@ struct GameAction {
     std::string cityName;
     std::string cityName2;
     TileType tileType;
+    TileType tileType2;
     int slotIndex;
     
 

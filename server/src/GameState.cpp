@@ -9,6 +9,8 @@
 
 GameState::GameState(){
     m_board.initializeBrassBirminghamMap();
+    coal_market.buy(1);
+    iron_market.buy(2);
 }
 
 std::shared_ptr<Player> GameState::addPlayer() {
@@ -42,6 +44,10 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
                 return m_board.placeLink(action.cityName,action.cityName2, player);
             }else
                 return false;
+            break;
+        }
+        case GameAction::Type::Develop: {
+            return handleDevelop(action.tileType,action.tileType2,*player.get());
             break;
         }
         case GameAction::Type::TakeLoan: {
@@ -267,3 +273,18 @@ void GameState::setupBoardForTesting(const GameBoard& board) {
         }
     }
 }
+bool GameState::handleDevelop(TileType a, TileType b, Player& player){
+    if (a==TileType::NullTile) return false;
+    int spent_iron;
+    b==TileType::NullTile?spent_iron=1:spent_iron=2;
+    int cost = iron_market.getPrice(spent_iron);
+    std::cout << "Cost:" << cost << " Iron:" << spent_iron << std::endl; 
+    if (cost>player.money) return false;
+    player.player_board.takeTile(a);
+    player.player_board.takeTile(b);
+    iron_market.buy(2);
+    player.money-=cost;
+    return true;
+
+}
+

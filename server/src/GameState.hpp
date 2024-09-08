@@ -27,8 +27,8 @@ private:
     std::map<int, std::shared_ptr<Player>> m_players;
     GameBoard m_board;
     int m_next_id = 1;
-    Market coal_market{2,7};
-    Market iron_market{2,5};
+    Market coal_market{7,2};
+    Market iron_market{5,2};
     ERA era = ERA::Canal;
 
 
@@ -47,6 +47,7 @@ private:
     int chooseAndConsumeResources(const std::string& cityName, TileType resourceType, int amountNeeded);
     int getTilePrice(const std::string& cityName, const Tile tile);
     void handleFlippedTile(Tile &tile);
+    bool handleDevelop(TileType a, TileType b, Player& player);
     int consumeResources(Tile& tile, int amount);
     // Add any private helper methods here if needed
 };

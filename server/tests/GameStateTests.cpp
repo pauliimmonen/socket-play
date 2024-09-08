@@ -128,6 +128,21 @@ TEST_F(GameStateTest, TakeLoan) {
     EXPECT_EQ(state["players"][0]["income_level"], 7);
 }
 
+TEST_F(GameStateTest, Develop) {
+    auto player = gameState.addPlayer();
+    
+    GameAction action;
+    action.type = GameAction::Type::Develop;
+    action.tileType= TileType::Iron;
+    action.tileType2= TileType::Iron;
+
+    bool develop_action_result = gameState.handleAction(player->id, action);
+    EXPECT_TRUE(develop_action_result);
+    Tile *irontile3 = player->player_board.peekTile(TileType::Iron).get();
+    EXPECT_EQ(irontile3->level, 3);
+    EXPECT_EQ(player->money, 26);
+}
+
 TEST_F(GameStateTest, RemovePlayer) {
     auto player1 = gameState.addPlayer();
     auto player2 = gameState.addPlayer();
