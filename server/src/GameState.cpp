@@ -34,7 +34,6 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
         case GameAction::Type::PlaceTile: {
             Tile *newTile = player->player_board.takeTile(action.tileType).get();
             if (newTile==nullptr) return false;
-            //Tile newTile = TileFactory::createTile(action.tileType, 1, player->id);
             return handleTilePlacement(playerId, action.cityName, action.slotIndex, *newTile);
             break;
         }
@@ -125,6 +124,22 @@ std::vector<ResourceOption> GameState::findAvailableResources(const std::string&
     
     return options;
 }
+int GameState::consumeResources(Tile& tile, int amount){
+    if (amount>=tile.resource_amount){
+        amount -= tile.resource_amount;
+        tile.resource_amount = 0;
+        tile.flipped = true;
+        handleFlippedTile(tile);
+        return amount;
+    }else{
+        tile.resource_amount -= amount;
+    }
+    return 0;
+}
+void GameState::handleFlippedTile(Tile& tile){
+    auto playerIt = m_players.find(tile.owner);
+    playerIt->second->income_level+=tile.income;
+}
 
 int GameState::chooseAndConsumeResources(const std::string &cityName, TileType resourceType, int amountNeeded)
 {
@@ -141,11 +156,11 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
     {
         auto city = m_board.getCity(options[0].cityName);
         auto tile = city->slots[options[0].slotIndex].placedTile;
-        amountNeeded = tile->consumeResources(amountNeeded);
+        amountNeeded = consumeResources(*tile,amountNeeded);
     } else {
         auto city = m_board.getCity(options[0].cityName);
         auto tile = city->slots[options[0].slotIndex].placedTile;
-        amountNeeded = tile->consumeResources(amountNeeded);
+        amountNeeded = consumeResources(*tile,amountNeeded);
         if (amountNeeded > 0){
             amountNeeded = chooseAndConsumeResources(cityName, resourceType, amountNeeded);
             

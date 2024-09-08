@@ -6,18 +6,6 @@ Tile::Tile(TileType t, int o, int l, bool f, int i, int vp, int lp,
            int cm, int cc, int ci, int ra, int bd)
     : type(t), owner(o), level(l), flipped(f), income(i), victory_points(vp), link_points(lp),
       cost_money(cm), cost_coal(cc), cost_iron(ci), resource_amount(ra),beer_demand(bd) {}
-    
-int Tile::consumeResources(int amount){
-    if (amount>=resource_amount){
-        amount -= resource_amount;
-        resource_amount = 0;
-        flipped = true;
-        return amount;
-    } else{
-        resource_amount -= amount;
-    }
-    return 0;
-}
 
 Tile::Builder Tile::create(TileType type) {
     return Builder(type);

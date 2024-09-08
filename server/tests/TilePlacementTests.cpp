@@ -95,7 +95,7 @@ TEST_F(TilePlacementTest, PlaceTileTestResourceConsumption) {
     state = gameState.getState();
     EXPECT_EQ(state["board"]["cities"]["CityA"]["slots"][0]["placedTile"]["resource_amount"], 0);
     EXPECT_EQ(state["board"]["cities"]["CityB"]["slots"][1]["placedTile"]["type"], TileType::Manufacturer);
-
+    EXPECT_EQ(state["players"][0]["income_level"], 14);
     placeAction.cityName = "CityA";
     placeAction.tileType = TileType::Iron;
     result = gameState.handleAction(player1->id, placeAction);

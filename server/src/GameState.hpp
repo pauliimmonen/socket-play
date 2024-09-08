@@ -24,7 +24,7 @@ struct ResourceOption {
 
 class GameState {
 private:
-    std::unordered_map<int, std::shared_ptr<Player>> m_players;
+    std::map<int, std::shared_ptr<Player>> m_players;
     GameBoard m_board;
     int m_next_id = 1;
     Market coal_market{2,7};
@@ -40,12 +40,14 @@ public:
     bool handleTilePlacement(int playerId, const std::string& cityName, int slotIndex, const Tile tile);
     nlohmann::json getState() const;
 
-    std::vector<ResourceOption> findAvailableResources(const std::string& startCity, TileType resourceType, int amountNeeded);
-    int chooseAndConsumeResources(const std::string& cityName, TileType resourceType, int amountNeeded);
     void setupBoardForTesting(const GameBoard& board);
 
 private:
+    std::vector<ResourceOption> findAvailableResources(const std::string& startCity, TileType resourceType, int amountNeeded);
+    int chooseAndConsumeResources(const std::string& cityName, TileType resourceType, int amountNeeded);
     int getTilePrice(const std::string& cityName, const Tile tile);
+    void handleFlippedTile(Tile &tile);
+    int consumeResources(Tile& tile, int amount);
     // Add any private helper methods here if needed
 };
 
