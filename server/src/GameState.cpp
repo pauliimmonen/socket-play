@@ -3,6 +3,7 @@
 #include "TileFactory.hpp"
 #include "GameBoard.hpp"
 #include "IncomeFunctions.hpp"
+#include <nlohmann/json.hpp>
 #include <algorithm>
 #include <random>
 #include <iostream>
@@ -204,12 +205,24 @@ nlohmann::json GameState::getState() const {
     state["players"] = nlohmann::json::array();
     for (const auto& pair : m_players) {
         const auto& player = pair.second;
-        state["players"].push_back({
+        nlohmann::json playerJson = {
             {"id", player->id},
             {"score", player->score},
             {"money", player->money},
-            {"income_level", player->income_level}
-        });
+            {"income_level", player->income_level},
+            {"player_board", nlohmann::json::object()}
+        };
+
+        // Add PlayerBoard status
+        nlohmann::json& boardJson = playerJson["player_board"];
+        boardJson["coal"] = player->player_board.getRemainingTileAmount(TileType::Coal);
+        boardJson["iron"] = player->player_board.getRemainingTileAmount(TileType::Iron);
+        boardJson["cotton"] = player->player_board.getRemainingTileAmount(TileType::Cotton);
+        boardJson["manufacturer"] = player->player_board.getRemainingTileAmount(TileType::Manufacturer);
+        boardJson["pottery"] = player->player_board.getRemainingTileAmount(TileType::Pottery);
+        boardJson["brewery"] = player->player_board.getRemainingTileAmount(TileType::Brewery);
+
+        state["players"].push_back(playerJson);
     }
 
     state["board"] = nlohmann::json::object();

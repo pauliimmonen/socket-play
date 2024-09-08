@@ -31,6 +31,14 @@ bool PlayerBoard::hasTiles(TileType type) const {
     return (it != tilePiles.end() && !it->second.empty());
 }
 
+size_t PlayerBoard::getRemainingTileAmount(TileType type) const {
+    auto it = tilePiles.find(type);
+    if (it != tilePiles.end()) {
+        return it->second.size();
+    }
+    return 0;
+}
+
 void PlayerBoard::initializeTilePiles(int owner) {
     // Initialize Coal tiles
     tilePiles[TileType::Coal] = {

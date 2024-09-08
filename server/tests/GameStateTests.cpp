@@ -141,6 +141,9 @@ TEST_F(GameStateTest, Develop) {
     Tile *irontile3 = player->player_board.peekTile(TileType::Iron).get();
     EXPECT_EQ(irontile3->level, 3);
     EXPECT_EQ(player->money, 26);
+
+    auto state = gameState.getState();
+    EXPECT_EQ(state["players"][0]["player_board"]["iron"],2);
 }
 
 TEST_F(GameStateTest, RemovePlayer) {

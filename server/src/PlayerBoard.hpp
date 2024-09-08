@@ -19,6 +19,9 @@ public:
     // Check if there are any tiles left of a specific type
     bool hasTiles(TileType type) const;
 
+    // Get the remaining stack size for a specific tile type
+    size_t getRemainingTileAmount(TileType type) const;
+
 private:
     std::map<TileType, std::vector<std::shared_ptr<Tile>>> tilePiles;
     
