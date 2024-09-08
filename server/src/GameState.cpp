@@ -33,7 +33,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
     switch (action.type) {
         case GameAction::Type::PlaceTile: {
             Tile *newTile = player->player_board.takeTile(action.tileType).get();
-            if (newTile==nullptr)
+            if (newTile==nullptr) return false;
             //Tile newTile = TileFactory::createTile(action.tileType, 1, player->id);
             return handleTilePlacement(playerId, action.cityName, action.slotIndex, *newTile);
             break;
@@ -61,7 +61,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
     return false;
 }
 
-int GameState::getTilePrice(const std::string& cityName, const Tile& tile){
+int GameState::getTilePrice(const std::string& cityName, const Tile tile){
     const int CANT_BUY=2147483647;//max int
     int total_cost = tile.cost_money;
     int cost_coal = tile.cost_coal;
@@ -155,11 +155,10 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
     return amountNeeded;
 }
 
-bool GameState::handleTilePlacement(int playerId, const std::string& cityName, int slotIndex, const Tile& tile) {
+bool GameState::handleTilePlacement(int playerId, const std::string& cityName, int slotIndex, const Tile tile) {
     auto playerIt = m_players.find(playerId);
     if (playerIt == m_players.end()) return false;
     auto& player = playerIt->second;
-
     // Check if the tile can be placed on the board
     if (!m_board.canPlaceTile(cityName, slotIndex, tile)) return false;
 
@@ -169,7 +168,6 @@ bool GameState::handleTilePlacement(int playerId, const std::string& cityName, i
 
     // If all checks pass, place the tile and update player state
     if (m_board.placeTile(cityName, slotIndex, tile)) {
-        /**/
         player->money -= getTilePrice(cityName, tile);
         int coal_amount = chooseAndConsumeResources(cityName, TileType::Coal, tile.cost_coal);
         int iron_amount = chooseAndConsumeResources(cityName, TileType::Iron, tile.cost_iron);
@@ -177,7 +175,6 @@ bool GameState::handleTilePlacement(int playerId, const std::string& cityName, i
         iron_market.buy(iron_amount);
         return true;
     }
-
     return false;
 }
 

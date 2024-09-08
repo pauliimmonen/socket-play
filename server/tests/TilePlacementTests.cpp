@@ -36,7 +36,7 @@ protected:
 
         // Add slots to cities
         testBoard.addSlot("CityA", {{TileType::Coal}, nullptr});
-        testBoard.addSlot("CityA", {{TileType::Manufacturer}, nullptr});
+        testBoard.addSlot("CityA", {{TileType::Iron}, nullptr});
         testBoard.addSlot("CityA", {{TileType::Brewery}, nullptr});
         testBoard.addSlot("CityB", {{TileType::Manufacturer}, nullptr});
         testBoard.addSlot("CityB", {{TileType::Manufacturer}, nullptr});
@@ -77,13 +77,17 @@ TEST_F(TilePlacementTest, PlaceTileTestResourceConsumption) {
     auto state = gameState.getState();
     //std::cout << state << std::endl;
     EXPECT_EQ(state["board"]["cities"]["CityA"]["slots"][0]["placedTile"]["resource_amount"], 2);
+
+    placeAction.tileType = TileType::Manufacturer;
     bool result = gameState.handleAction(player1->id, placeAction);
     ASSERT_TRUE(result);
 
     state = gameState.getState();
     EXPECT_EQ(state["board"]["cities"]["CityA"]["slots"][0]["placedTile"]["resource_amount"], 1);
     EXPECT_EQ(state["board"]["cities"]["CityB"]["slots"][0]["placedTile"]["type"], TileType::Manufacturer);
+
     placeAction.slotIndex=1;
+    placeAction.tileType = TileType::Manufacturer;
     result = gameState.handleAction(player2->id, placeAction);
     
     ASSERT_TRUE(result);
@@ -93,6 +97,7 @@ TEST_F(TilePlacementTest, PlaceTileTestResourceConsumption) {
     EXPECT_EQ(state["board"]["cities"]["CityB"]["slots"][1]["placedTile"]["type"], TileType::Manufacturer);
 
     placeAction.cityName = "CityA";
+    placeAction.tileType = TileType::Iron;
     result = gameState.handleAction(player1->id, placeAction);
     ASSERT_FALSE(result); //cant access to coal in slot D
 

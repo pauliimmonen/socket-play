@@ -48,7 +48,7 @@ Tile TileFactory::createTile(TileType type, int level, int owner) {
                     builder.income(3)
                            .victoryPoints(3)
                            .costMoney(5)
-                           .costIron(1)
+                           .costCoal(1)
                            .linkPoints(1)
                            .resourceAmount(4);
                     break;
@@ -56,7 +56,7 @@ Tile TileFactory::createTile(TileType type, int level, int owner) {
                     builder.income(3)
                            .victoryPoints(5)
                            .costMoney(7)
-                           .costIron(1)
+                           .costCoal(1)
                            .linkPoints(1)
                            .resourceAmount(4);
                     break;
@@ -64,7 +64,7 @@ Tile TileFactory::createTile(TileType type, int level, int owner) {
                     builder.income(2)
                            .victoryPoints(7)
                            .costMoney(9)
-                           .costIron(1)
+                           .costCoal(1)
                            .linkPoints(1)
                            .resourceAmount(5);
                     break;
@@ -72,7 +72,7 @@ Tile TileFactory::createTile(TileType type, int level, int owner) {
                     builder.income(1)
                            .victoryPoints(9)
                            .costMoney(12)
-                           .costIron(1)
+                           .costCoal(1)
                            .linkPoints(1)
                            .resourceAmount(6);
                     break;
