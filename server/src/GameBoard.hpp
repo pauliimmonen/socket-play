@@ -63,6 +63,9 @@ private:
     std::set<Connection> connections;
     std::vector<std::string> getPlayerPlacedTiles(const Player& player) const;
     std::vector<Connection> getPlayerPlacedLinks(const Player& player) const;
+    int getAvailableBeerFromMerchantSlots(const std::string& cityName, const MerchantType& allowedType) const;
+    int getAvailableBeerFromBreweries(const std::string& cityName, const Player& player) const;
+    bool hasEnoughBeer(const std::string& cityName, const Player& player, int beerDemand, const MerchantType& allowedType) const;
 public:
 
     City* addCity(const std::string& name);
@@ -79,12 +82,13 @@ public:
     int getTotalResourceIron() const;
     bool canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const;
     bool placeTile(const std::string& cityName, int slotIndex, const Tile& tile);
-    bool isCityInPlayerNetwork(const Player& player, const std::string& cityName);
+    bool isCityInPlayerNetwork(const Player& player, const std::string& cityName) const;
     const MerchantCity* getMerchantCity(const std::string& cityName) const;
     MerchantCity* addMerchantCity(const std::string& name, MerchantBonus mb);
     bool isConnectedToMerchantCity(const std::string& cityName) const;
     std::vector<const MerchantCity*> getConnectedMerchantCities(const std::string& cityName) const;
     std::set<MerchantType> getConnectedMerchantTypes(const std::string& cityName) const;
+    std::vector<std::pair<std::string, int>> findSellableTiles(const Player& player) const;
 };
 
 #endif // GAMEBOARD_HPP

@@ -8,6 +8,67 @@
 #include <stdexcept>
 #include <iostream>
 
+namespace{
+bool isSellableTileType(TileType type) {
+        return type == TileType::Cotton || type == TileType::Manufacturer || type == TileType::Pottery;
+    }
+
+    MerchantType getTileRequiredMerchantType(TileType type) {
+        switch (type) {
+            case TileType::Cotton: return MerchantType::Cotton;
+            case TileType::Manufacturer: return MerchantType::Manufacturer;
+            case TileType::Pottery: return MerchantType::Pottery;
+            default: return MerchantType::Empty;  // This should never happen
+        }
+    }
+
+    bool canSellTile(const std::set<MerchantType>& connectedMerchantTypes, TileType tileType) {
+        MerchantType requiredType = getTileRequiredMerchantType(tileType);
+        return connectedMerchantTypes.count(requiredType) > 0 || 
+               connectedMerchantTypes.count(MerchantType::Any) > 0;
+    }
+}
+
+int GameBoard::getAvailableBeerFromMerchantSlots(const std::string& cityName, const MerchantType& allowedType) const{
+    int beer = 0;
+    for (const auto* merchantCity : getConnectedMerchantCities(cityName)) {
+        for (const auto& slot : merchantCity->slots) {
+            if (slot.placedTile && slot.placedTile->type == TileType::Merchant) {
+                const MerchantTile* merchantTile = dynamic_cast<const MerchantTile*>(slot.placedTile.get());
+                if (merchantTile->merchantType == allowedType || merchantTile->merchantType == MerchantType::Any) {
+                    beer += static_cast<const MerchantSlot&>(slot).resource_beer;
+                }
+            }
+        }
+    }
+    return beer;
+}
+
+int GameBoard::getAvailableBeerFromBreweries(const std::string& cityName, const Player& player) const {
+    int beer = 0;
+    std::vector<std::string> connectedCities = getConnectedCities(cityName);
+    connectedCities.push_back(cityName);  // Include the city itself
+
+    for (const auto& city : connectedCities) {
+        const City* cityPtr = getCity(city);
+        if (!cityPtr) continue;
+
+        for (const auto& slot : cityPtr->slots) {
+            if (slot.placedTile && slot.placedTile->type == TileType::Brewery &&
+                (slot.placedTile->owner == player.id || isCityInPlayerNetwork(player, city))) {
+                beer += slot.placedTile->resource_amount;
+            }
+        }
+    }
+    return beer;
+}
+
+bool GameBoard::hasEnoughBeer(const std::string& cityName, const Player& player, int beerDemand, const  MerchantType& allowedType) const{
+    int availableBeer = getAvailableBeerFromMerchantSlots(cityName, allowedType) +
+                        getAvailableBeerFromBreweries(cityName, player);
+    return availableBeer >= beerDemand;
+}
+
 City* GameBoard::addCity(const std::string& name) {
     auto city = std::make_unique<City>(name);
     auto* cityPtr = city.get();
@@ -359,7 +420,7 @@ std::vector<Connection> GameBoard::getPlayerPlacedLinks(const Player& player) co
     return playerLinks;
 }
 
-bool GameBoard::isCityInPlayerNetwork(const Player& player, const std::string& cityName) {
+bool GameBoard::isCityInPlayerNetwork(const Player& player, const std::string& cityName) const {
     auto links = getPlayerPlacedLinks(player);
     auto tiles = getPlayerPlacedTiles(player);
 
@@ -387,4 +448,27 @@ const City* GameBoard::getCity(const std::string& cityName) const {
         return it->second.get();
     }
     return nullptr;
+}
+
+std::vector<std::pair<std::string, int>> GameBoard::findSellableTiles(const Player& player) const {
+    std::vector<std::pair<std::string, int>> sellableTiles;
+
+    for (const auto& [cityName, city] : cities) {
+        auto connectedMerchantTypes = getConnectedMerchantTypes(cityName);
+        
+        for (size_t i = 0; i < city->slots.size(); ++i) {
+            const auto& slot = city->slots[i];
+            if (!slot.placedTile || slot.placedTile->owner != player.id) continue;
+            
+            TileType tileType = slot.placedTile->type;
+            if (!isSellableTileType(tileType)) continue;
+            
+            if (canSellTile(connectedMerchantTypes, tileType) &&
+                hasEnoughBeer(cityName, player, slot.placedTile->beer_demand, getTileRequiredMerchantType(tileType))) {
+                sellableTiles.emplace_back(cityName, i);
+            }
+        }
+    }
+
+    return sellableTiles;
 }
