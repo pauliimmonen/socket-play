@@ -366,4 +366,15 @@ bool GameState::handleSell(Player& player, const GameAction& action) {
     return true;
 }
 
+bool GameState::handleLinkPlacement(Player& player, const GameAction& action) {
+    static const int LINK_COST=3;
+    if (m_board.isCityInPlayerNetwork(player, action.cityName) || m_board.isCityInPlayerNetwork(player, action.cityName2)) {
+        if (player.money >= LINK_COST && era==ERA::Canal){
+            player.money-= LINK_COST;
+        }
+        return m_board.placeLink(action.cityName, action.cityName2, std::make_shared<Player>(player));
+    }
+    return false;
+}
+
 

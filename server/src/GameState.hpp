@@ -51,6 +51,7 @@ private:
     bool handleDevelop(Player& player, const GameAction& action);
     bool handleSell(Player& player, const GameAction& action);
     int consumeResources(Tile& tile, int amount);
+    bool handleLinkPlacement(Player& player, const GameAction& action);
     // Add any private helper methods here if needed
 };
 
