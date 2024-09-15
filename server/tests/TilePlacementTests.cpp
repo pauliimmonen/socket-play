@@ -32,7 +32,7 @@ protected:
 
         // Place link tiles
         gameState.m_board.placeLink("Coventry", "Birmingham", player1);
-        gameState.m_board.placeLink("Birmingham", "Wallall", player2);
+        gameState.m_board.placeLink("Birmingham", "Walsall", player2);
 
     }
 };
@@ -75,7 +75,7 @@ TEST_F(TilePlacementTest, PlaceTileTestResourceConsumption) {
     placeAction.tileType = TileType::Iron;
     placeAction.slotIndex=2;
     result = gameState.handleAction(player1->id, placeAction);
-    ASSERT_FALSE(result); //cant access dudlye coal
+    ASSERT_FALSE(result); //cant access dudley coal
 
     placeAction.cityName = "Walsall";
     placeAction.slotIndex = 1;
@@ -86,8 +86,4 @@ TEST_F(TilePlacementTest, PlaceTileTestResourceConsumption) {
     state = gameState.getState();
     EXPECT_EQ(state["board"]["cities"]["Walsall"]["slots"][1]["placedTile"]["type"], TileType::Brewery);
     EXPECT_EQ(state["board"]["cities"]["Coalbrookdale"]["slots"][1]["placedTile"]["resource_amount"], 3);//resource consumed
-
-
 }
-
-// Add more tests here for different scenarios
