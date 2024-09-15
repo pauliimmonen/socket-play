@@ -28,7 +28,6 @@ void GameState::removePlayer(int id) {
 }
 
 bool GameState::handleAction(int playerId, const GameAction& action) {
-
     auto playerIt = m_players.find(playerId);
     if (playerIt == m_players.end()) {
         return false;  // Player not found
@@ -38,38 +37,32 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
         case GameAction::Type::PlaceTile: {
             Tile *newTile = player->player_board.takeTile(action.tileType).get();
             if (newTile==nullptr) return false;
-            return handleTilePlacement(*player, action.cityName, action.slotIndex, *newTile);
+            return handleTilePlacement(*player, action, *newTile);
             break;
         }
         case GameAction::Type::PlaceLink: {
             if (m_board.isCityInPlayerNetwork(*player.get(), action.cityName) || m_board.isCityInPlayerNetwork(*player.get(), action.cityName2)){
-                return m_board.placeLink(action.cityName,action.cityName2, player);
-            }else
-                return false;
-            break;
+                return m_board.placeLink(action.cityName, action.cityName2, player);
+            }
+            return false;
         }
         case GameAction::Type::Develop: {
-            return handleDevelop(action.tileType,action.tileType2,*player.get());
-            break;
+            return handleDevelop(*player.get(), action);
         }
         case GameAction::Type::Sell: {
-            return handleSell(action.cityName, action.slotIndex, *player.get());
-            break;
+            return handleSell(*player.get(), action);
         }
         case GameAction::Type::TakeLoan: {
             if (player->income_level > 2){
                 player->income_level = takeLoan(player->income_level);
                 return true;
-            }else
-                return false;
-            break;
+            }
+            return false;
         }
- 
         // Add other action types here as needed
         default:
             return false;
     }
-    return false;
 }
 
 int GameState::getTilePrice(const std::string& cityName, const Tile tile){
@@ -233,19 +226,18 @@ int GameState::chooseAndConsumeResources(Player& player, const std::string& city
     return amountNeeded;
 }
 
-bool GameState::handleTilePlacement(Player &player, const std::string& cityName, int slotIndex, const Tile tile) {
+bool GameState::handleTilePlacement(Player &player, const GameAction& action, const Tile tile) {
     // Check if the tile can be placed on the board
-    if (!m_board.canPlaceTile(cityName, slotIndex, tile)) return false;
-
+    if (!m_board.canPlaceTile(action.cityName, action.slotIndex, tile)) return false;
 
     // Check if player has enough money
-    if (player.money < getTilePrice(cityName, tile)) return false;
+    if (player.money < getTilePrice(action.cityName, tile)) return false;
 
     // If all checks pass, place the tile and update player state
-    if (m_board.placeTile(cityName, slotIndex, tile)) {
-        player.money -= getTilePrice(cityName, tile);
-        int coal_amount = chooseAndConsumeResources(player, cityName, TileType::Coal, tile.cost_coal);
-        int iron_amount = chooseAndConsumeResources(player, cityName, TileType::Iron, tile.cost_iron);
+    if (m_board.placeTile(action.cityName, action.slotIndex, tile)) {
+        player.money -= getTilePrice(action.cityName, tile);
+        int coal_amount = chooseAndConsumeResources(player, action.cityName, TileType::Coal, tile.cost_coal);
+        int iron_amount = chooseAndConsumeResources(player, action.cityName, TileType::Iron, tile.cost_iron);
         coal_market.buy(coal_amount);
         iron_market.buy(iron_amount);
         return true;
@@ -340,38 +332,36 @@ void GameState::setupBoardForTesting(const GameBoard& board) {
     }
 }
 
-bool GameState::handleDevelop(TileType a, TileType b, Player& player){
-    if (a==TileType::NullTile) return false;
-    int spent_iron;
-    b==TileType::NullTile?spent_iron=1:spent_iron=2;
+bool GameState::handleDevelop(Player& player, const GameAction& action){
+    if (action.tileType == TileType::NullTile) return false;
+    int spent_iron = (action.tileType2 == TileType::NullTile) ? 1 : 2;
     int cost = iron_market.getPrice(spent_iron);
     std::cout << "Cost:" << cost << " Iron:" << spent_iron << std::endl; 
-    if (cost>player.money) return false;
-    player.player_board.takeTile(a);
-    player.player_board.takeTile(b);
+    if (cost > player.money) return false;
+    player.player_board.takeTile(action.tileType);
+    player.player_board.takeTile(action.tileType2);
     iron_market.buy(2);
-    player.money-=cost;
+    player.money -= cost;
     return true;
-
 }
 int continueSelling(){
     return 0;
 }
 
-bool GameState::handleSell(std::string cityName, int slotIndex, Player& player) {
+bool GameState::handleSell(Player& player, const GameAction& action) {
     auto sellableTiles = m_board.findSellableTiles(player);
-    auto it = std::find(sellableTiles.begin(), sellableTiles.end(), std::make_pair(cityName, slotIndex));
+    auto it = std::find(sellableTiles.begin(), sellableTiles.end(), std::make_pair(action.cityName, action.slotIndex));
     if (it == sellableTiles.end()) {
         return false;
     }
-    auto city = m_board.getCity(cityName);
-    auto& slot = city->slots[slotIndex];
+    auto city = m_board.getCity(action.cityName);
+    auto& slot = city->slots[action.slotIndex];
     auto tile = slot.placedTile;
     // Update player's score and money
     // Consume beer
-    chooseAndConsumeResources(player, cityName, TileType::Brewery, tile->beer_demand);
+    chooseAndConsumeResources(player, action.cityName, TileType::Brewery, tile->beer_demand);
     sellableTiles = m_board.findSellableTiles(player);
-    if (sellableTiles.size()>1)
+    if (sellableTiles.size() > 1)
         continueSelling();
     return true;
 }

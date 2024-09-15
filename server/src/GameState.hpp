@@ -37,7 +37,7 @@ public:
     std::shared_ptr<Player> addPlayer();
     void removePlayer(int id);
     bool handleAction(int playerId, const GameAction& action);
-    bool handleTilePlacement(Player& player, const std::string& cityName, int slotIndex, const Tile tile);
+    bool handleTilePlacement(Player& player, const GameAction& action, const Tile tile);
 
     nlohmann::json getState() const;
 
@@ -48,8 +48,8 @@ private:
     int chooseAndConsumeResources(Player &player, const std::string& cityName, TileType resourceType, int amountNeeded);
     int getTilePrice(const std::string& cityName, const Tile tile);
     void handleFlippedTile(Tile &tile);
-    bool handleDevelop(TileType a, TileType b, Player& player);
-    bool handleSell(std::string cityname, int slot_index, Player& player);
+    bool handleDevelop(Player& player, const GameAction& action);
+    bool handleSell(Player& player, const GameAction& action);
     int consumeResources(Tile& tile, int amount);
     // Add any private helper methods here if needed
 };
