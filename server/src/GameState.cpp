@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <random>
 #include <iostream>
+#include <algorithm>
 
 GameState::GameState(){
     m_board.initializeBrassBirminghamMap();
@@ -37,7 +38,7 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
         case GameAction::Type::PlaceTile: {
             Tile *newTile = player->player_board.takeTile(action.tileType).get();
             if (newTile==nullptr) return false;
-            return handleTilePlacement(playerId, action.cityName, action.slotIndex, *newTile);
+            return handleTilePlacement(*player, action.cityName, action.slotIndex, *newTile);
             break;
         }
         case GameAction::Type::PlaceLink: {
@@ -49,6 +50,10 @@ bool GameState::handleAction(int playerId, const GameAction& action) {
         }
         case GameAction::Type::Develop: {
             return handleDevelop(action.tileType,action.tileType2,*player.get());
+            break;
+        }
+        case GameAction::Type::Sell: {
+            return handleSell(action.cityName, action.slotIndex, *player.get());
             break;
         }
         case GameAction::Type::TakeLoan: {
@@ -90,7 +95,7 @@ int GameState::getTilePrice(const std::string& cityName, const Tile tile){
     return total_cost;
 }
 
-std::vector<ResourceOption> GameState::findAvailableResources(const std::string& startCity, TileType resourceType, int amountNeeded) {
+std::vector<ResourceOption> GameState::findAvailableResources(const std::string& startCity,  TileType resourceType, Player &player, int amountNeeded) const {
     std::vector<ResourceOption> options;
     
     if (resourceType == TileType::Coal) {
@@ -128,6 +133,57 @@ std::vector<ResourceOption> GameState::findAvailableResources(const std::string&
             }
         }
     }
+    else if (resourceType == TileType::Brewery) {
+        // Check connected cities for Brewery tiles
+        std::vector<std::string> connectedCities = m_board.getConnectedCities(startCity);
+        connectedCities.push_back(startCity); // Include the start city itself
+        
+        for (const auto& cityName : connectedCities) {
+            const auto* city = m_board.getCity(cityName);
+            if (!city) continue;
+            
+            for (size_t i = 0; i < city->slots.size(); ++i) {
+                const auto& slot = city->slots[i];
+                if (slot.placedTile && slot.placedTile->type == TileType::Brewery) {
+                    int available = slot.placedTile->resource_amount;
+                    if (available > 0) {
+                        options.push_back({cityName, static_cast<int>(i), std::min(available, amountNeeded)});
+                    }
+                }
+            }
+        }
+
+        // Check merchant cities for available beer
+        auto connectedMerchantCities = m_board.getConnectedMerchantCities(startCity);
+        for (const auto* merchantCity : connectedMerchantCities) {
+            for (size_t i = 0; i < merchantCity->slots.size(); ++i) {
+                const auto& slot = merchantCity->slots[i];
+                if (slot.placedTile && slot.placedTile->type == TileType::Merchant) {
+                    const MerchantSlot& merchantSlot = static_cast<const MerchantSlot&>(slot);
+                    if (merchantSlot.resource_beer > 0) {
+                        options.push_back({merchantCity->name, -1, std::min(merchantSlot.resource_beer, amountNeeded)});
+                    }
+                }
+            }
+        }
+
+        // Check player's own unconnected Brewery tiles
+        for (const auto& [cityName, city] : m_board.getCities()) {
+            if (std::find(connectedCities.begin(), connectedCities.end(), cityName) != connectedCities.end()) {
+                continue; // Skip already checked connected cities
+            }
+            
+            for (size_t i = 0; i < city->slots.size(); ++i) {
+                const auto& slot = city->slots[i];
+                if (slot.placedTile && slot.placedTile->type == TileType::Brewery && slot.placedTile->owner == player.id) {
+                    int available = slot.placedTile->resource_amount;
+                    if (available > 0) {
+                        options.push_back({cityName, static_cast<int>(i), std::min(available, amountNeeded)});
+                    }
+                }
+            }
+        }
+    }
     
     return options;
 }
@@ -148,11 +204,11 @@ void GameState::handleFlippedTile(Tile& tile){
     playerIt->second->income_level+=tile.income;
 }
 
-int GameState::chooseAndConsumeResources(const std::string &cityName, TileType resourceType, int amountNeeded)
+int GameState::chooseAndConsumeResources(Player& player, const std::string& cityName, TileType resourceType, int amountNeeded)
 {
     if (amountNeeded==0) return 0;
 
-    auto options = findAvailableResources(cityName, resourceType, amountNeeded);
+    auto options = findAvailableResources(cityName, resourceType, player, amountNeeded);
     if (options.empty())
     {
         return amountNeeded; // Not resources available
@@ -169,7 +225,7 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
         auto tile = city->slots[options[0].slotIndex].placedTile;
         amountNeeded = consumeResources(*tile,amountNeeded);
         if (amountNeeded > 0){
-            amountNeeded = chooseAndConsumeResources(cityName, resourceType, amountNeeded);
+            amountNeeded = chooseAndConsumeResources(player, cityName, resourceType, amountNeeded);
             
         }
     }
@@ -177,22 +233,19 @@ int GameState::chooseAndConsumeResources(const std::string &cityName, TileType r
     return amountNeeded;
 }
 
-bool GameState::handleTilePlacement(int playerId, const std::string& cityName, int slotIndex, const Tile tile) {
-    auto playerIt = m_players.find(playerId);
-    if (playerIt == m_players.end()) return false;
-    auto& player = playerIt->second;
+bool GameState::handleTilePlacement(Player &player, const std::string& cityName, int slotIndex, const Tile tile) {
     // Check if the tile can be placed on the board
     if (!m_board.canPlaceTile(cityName, slotIndex, tile)) return false;
 
 
     // Check if player has enough money
-    if (player->money < getTilePrice(cityName, tile)) return false;
+    if (player.money < getTilePrice(cityName, tile)) return false;
 
     // If all checks pass, place the tile and update player state
     if (m_board.placeTile(cityName, slotIndex, tile)) {
-        player->money -= getTilePrice(cityName, tile);
-        int coal_amount = chooseAndConsumeResources(cityName, TileType::Coal, tile.cost_coal);
-        int iron_amount = chooseAndConsumeResources(cityName, TileType::Iron, tile.cost_iron);
+        player.money -= getTilePrice(cityName, tile);
+        int coal_amount = chooseAndConsumeResources(player, cityName, TileType::Coal, tile.cost_coal);
+        int iron_amount = chooseAndConsumeResources(player, cityName, TileType::Iron, tile.cost_iron);
         coal_market.buy(coal_amount);
         iron_market.buy(iron_amount);
         return true;
@@ -286,6 +339,7 @@ void GameState::setupBoardForTesting(const GameBoard& board) {
         }
     }
 }
+
 bool GameState::handleDevelop(TileType a, TileType b, Player& player){
     if (a==TileType::NullTile) return false;
     int spent_iron;
@@ -300,4 +354,26 @@ bool GameState::handleDevelop(TileType a, TileType b, Player& player){
     return true;
 
 }
+int continueSelling(){
+    return 0;
+}
+
+bool GameState::handleSell(std::string cityName, int slotIndex, Player& player) {
+    auto sellableTiles = m_board.findSellableTiles(player);
+    auto it = std::find(sellableTiles.begin(), sellableTiles.end(), std::make_pair(cityName, slotIndex));
+    if (it == sellableTiles.end()) {
+        return false;
+    }
+    auto city = m_board.getCity(cityName);
+    auto& slot = city->slots[slotIndex];
+    auto tile = slot.placedTile;
+    // Update player's score and money
+    // Consume beer
+    chooseAndConsumeResources(player, cityName, TileType::Brewery, tile->beer_demand);
+    sellableTiles = m_board.findSellableTiles(player);
+    if (sellableTiles.size()>1)
+        continueSelling();
+    return true;
+}
+
 
