@@ -218,7 +218,7 @@ Tile TileFactory::createTile(TileType type, int level, int owner) {
             }
             break;
         case TileType::Brewery:
-            builder.linkPoints(2).costIron(1);
+            builder.linkPoints(2).costIron(1).resourceAmount(1); //canal default resource amount
             switch (level) {
                 case 1:
                     builder.income(4)

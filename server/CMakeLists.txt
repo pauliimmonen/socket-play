@@ -68,6 +68,7 @@ add_executable(server_tests
     tests/test_main.cpp
     tests/MarketTests.cpp
     tests/TilePlacementTests.cpp
+    tests/TileSellTests.cpp
     ${SOURCES}
     ${HEADERS}
 )

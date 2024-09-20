@@ -8,35 +8,50 @@
 #include <stdexcept>
 #include <iostream>
 
-namespace{
-bool isSellableTileType(TileType type) {
+namespace
+{
+    bool isSellableTileType(const TileType type)
+    {
         return type == TileType::Cotton || type == TileType::Manufacturer || type == TileType::Pottery;
     }
 
-    MerchantType getTileRequiredMerchantType(TileType type) {
-        switch (type) {
-            case TileType::Cotton: return MerchantType::Cotton;
-            case TileType::Manufacturer: return MerchantType::Manufacturer;
-            case TileType::Pottery: return MerchantType::Pottery;
-            default: return MerchantType::Empty;  // This should never happen
+    MerchantType getTileRequiredMerchantType(const TileType type)
+    {
+        switch (type)
+        {
+        case TileType::Cotton:
+            return MerchantType::Cotton;
+        case TileType::Manufacturer:
+            return MerchantType::Manufacturer;
+        case TileType::Pottery:
+            return MerchantType::Pottery;
+        default:
+            return MerchantType::Empty; // This should never happen
         }
     }
 
-    bool canSellTile(const std::set<MerchantType>& connectedMerchantTypes, TileType tileType) {
+    bool canSellTile(const std::set<MerchantType> &connectedMerchantTypes, const TileType tileType)
+    {
         MerchantType requiredType = getTileRequiredMerchantType(tileType);
-        return connectedMerchantTypes.count(requiredType) > 0 || 
+        return connectedMerchantTypes.count(requiredType) > 0 ||
                connectedMerchantTypes.count(MerchantType::Any) > 0;
     }
 }
 
-int GameBoard::getAvailableBeerFromMerchantSlots(const std::string& cityName, const MerchantType& allowedType) const{
+int GameBoard::getAvailableBeerFromMerchantSlots(const std::string &cityName, const MerchantType &allowedType) const
+{
     int beer = 0;
-    for (const auto* merchantCity : getConnectedMerchantCities(cityName)) {
-        for (const auto& slot : merchantCity->slots) {
-            if (slot.placedTile && slot.placedTile->type == TileType::Merchant) {
-                const MerchantTile* merchantTile = dynamic_cast<const MerchantTile*>(slot.placedTile.get());
-                if (merchantTile->merchantType == allowedType || merchantTile->merchantType == MerchantType::Any) {
-                    beer += static_cast<const MerchantSlot&>(slot).resource_beer;
+    for (const auto *merchantCity : getConnectedMerchantCities(cityName))
+    {
+        for (const auto &slot : merchantCity->slots)
+        {
+            if (slot.placedTile && slot.placedTile->type == TileType::Merchant)
+            {
+                const MerchantTile *merchantTile = dynamic_cast<const MerchantTile *>(slot.placedTile.get());
+                if (merchantTile->merchantType == allowedType || merchantTile->merchantType == MerchantType::Any)
+                {
+
+                    beer += merchantTile->resource_amount;
                 }
             }
         }
@@ -44,18 +59,23 @@ int GameBoard::getAvailableBeerFromMerchantSlots(const std::string& cityName, co
     return beer;
 }
 
-int GameBoard::getAvailableBeerFromBreweries(const std::string& cityName, const Player& player) const {
+int GameBoard::getAvailableBeerFromBreweries(const std::string &cityName, const Player &player) const
+{
     int beer = 0;
     std::vector<std::string> connectedCities = getConnectedCities(cityName);
-    connectedCities.push_back(cityName);  // Include the city itself
+    connectedCities.push_back(cityName); // Include the city itself
 
-    for (const auto& city : connectedCities) {
-        const City* cityPtr = getCity(city);
-        if (!cityPtr) continue;
+    for (const auto &city : connectedCities)
+    {
+        const City *cityPtr = getCity(city);
+        if (!cityPtr)
+            continue;
 
-        for (const auto& slot : cityPtr->slots) {
+        for (const auto &slot : cityPtr->slots)
+        {
             if (slot.placedTile && slot.placedTile->type == TileType::Brewery &&
-                (slot.placedTile->owner == player.id || isCityInPlayerNetwork(player, city))) {
+                (slot.placedTile->owner == player.id || isCityInPlayerNetwork(player, city)))
+            {
                 beer += slot.placedTile->resource_amount;
             }
         }
@@ -63,48 +83,61 @@ int GameBoard::getAvailableBeerFromBreweries(const std::string& cityName, const 
     return beer;
 }
 
-bool GameBoard::hasEnoughBeer(const std::string& cityName, const Player& player, int beerDemand, const  MerchantType& allowedType) const{
+bool GameBoard::hasEnoughBeer(const std::string &cityName, const Player &player, int beerDemand, const MerchantType &allowedType) const
+{
+    // This does not work same every time
     int availableBeer = getAvailableBeerFromMerchantSlots(cityName, allowedType) +
                         getAvailableBeerFromBreweries(cityName, player);
+    std::cout << "beer" << availableBeer << std::endl;
     return availableBeer >= beerDemand;
 }
 
-City* GameBoard::addCity(const std::string& name) {
+City *GameBoard::addCity(const std::string &name)
+{
     auto city = std::make_unique<City>(name);
-    auto* cityPtr = city.get();
+    auto *cityPtr = city.get();
     cities[name] = std::move(city);
     return cityPtr;
 }
 
-MerchantCity* GameBoard::addMerchantCity(const std::string& name, MerchantBonus mb) {
+MerchantCity *GameBoard::addMerchantCity(const std::string &name, MerchantBonus mb)
+{
     auto city = std::make_unique<MerchantCity>(name, mb);
-    auto* cityPtr = city.get();
+    auto *cityPtr = city.get();
     cities[name] = std::move(city);
     return cityPtr;
 }
 
-Connection& GameBoard::addConnection(const std::string& city1, const std::string& city2) {
+Connection &GameBoard::addConnection(const std::string &city1, const std::string &city2)
+{
     auto conn = connections.insert(Connection(city1, city2));
-    return const_cast<Connection&>(*conn.first);
+    return const_cast<Connection &>(*conn.first);
 }
 
-void GameBoard::addSlot(const std::string& cityName, const Slot& slot) {
+void GameBoard::addSlot(const std::string &cityName, const Slot &slot)
+{
     cities[cityName]->slots.push_back(slot);
 }
 
-std::vector<std::string> GameBoard::getConnections(const std::string& cityName) const {
+std::vector<std::string> GameBoard::getConnections(const std::string &cityName) const
+{
     std::vector<std::string> connectedCities;
-    for (const auto& connection : connections) {
-        if (connection.city1 == cityName) {
+    for (const auto &connection : connections)
+    {
+        if (connection.city1 == cityName)
+        {
             connectedCities.push_back(connection.city2);
-        } else if (connection.city2 == cityName) {
+        }
+        else if (connection.city2 == cityName)
+        {
             connectedCities.push_back(connection.city1);
         }
     }
     return connectedCities;
 }
 
-void GameBoard::initializeBrassBirminghamMap() {
+void GameBoard::initializeBrassBirminghamMap()
+{
     // Add all cities
     addCity("Birmingham");
     addCity("Coventry");
@@ -142,8 +175,8 @@ void GameBoard::initializeBrassBirminghamMap() {
     addConnection("Redditch", "Gloucester");
     addConnection("Worcester", "Gloucester");
     addConnection("Worcester", "Kidderminster");
-    addConnection("Kidderminster","Dudley");
-    addConnection("Kidderminster","Coalbrookdale");
+    addConnection("Kidderminster", "Dudley");
+    addConnection("Kidderminster", "Coalbrookdale");
     addConnection("Coalbrookdale", "Wolverhampton");
     addConnection("Coalbrookdale", "Sherewsbury");
     addConnection("Dudley", "Wolverhampton");
@@ -163,8 +196,7 @@ void GameBoard::initializeBrassBirminghamMap() {
     addConnection("Derby", "Nottingham");
     addConnection("Belper", "Leek");
 
-
-    // Add slots 
+    // Add slots
     addSlot("Birmingham", {{TileType::Manufacturer, TileType::Cotton}, nullptr});
     addSlot("Birmingham", {{TileType::Manufacturer}, nullptr});
     addSlot("Birmingham", {{TileType::Iron}, nullptr});
@@ -232,7 +264,7 @@ void GameBoard::initializeBrassBirminghamMap() {
     addSlot("Belper", {{TileType::Coal}, nullptr});
     addSlot("Belper", {{TileType::Pottery}, nullptr});
 
-    //Merhcant cities slots
+    // Merhcant cities slots
     addSlot("Oxford", {{TileType::Merchant}, nullptr});
     addSlot("Oxford", {{TileType::Merchant}, nullptr});
 
@@ -248,16 +280,20 @@ void GameBoard::initializeBrassBirminghamMap() {
     addSlot("Warrington", {{TileType::Merchant}, nullptr});
 }
 
-std::vector<Connection> GameBoard::getPlacedLinks() const {
+std::vector<Connection> GameBoard::getPlacedLinks() const
+{
     std::vector<Connection> placedConnections;
     std::copy_if(connections.begin(), connections.end(), std::back_inserter(placedConnections),
-                 [](const Connection& connection) { return connection.linkOwner != nullptr; });
+                 [](const Connection &connection)
+                 { return connection.linkOwner != nullptr; });
     return placedConnections;
 }
 
-bool GameBoard::placeLink(const std::string& city1, const std::string& city2, std::shared_ptr<Player> player) {
+bool GameBoard::placeLink(const std::string &city1, const std::string &city2, std::shared_ptr<Player> player)
+{
     auto it = connections.find(Connection(city1, city2));
-    if (it != connections.end() && it->linkOwner == nullptr) {
+    if (it != connections.end() && it->linkOwner == nullptr)
+    {
         Connection updatedConnection = *it;
         updatedConnection.linkOwner = player;
         connections.erase(it);
@@ -267,7 +303,8 @@ bool GameBoard::placeLink(const std::string& city1, const std::string& city2, st
     return false;
 }
 
-std::vector<std::string> GameBoard::getConnectedCities(const std::string& startCity) const {
+std::vector<std::string> GameBoard::getConnectedCities(const std::string &startCity) const
+{
     std::vector<std::string> connectedCities;
     std::set<std::string> visited;
     std::queue<std::string> queue;
@@ -275,24 +312,35 @@ std::vector<std::string> GameBoard::getConnectedCities(const std::string& startC
     visited.insert(startCity);
     queue.push(startCity);
 
-    while (!queue.empty()) {
+    while (!queue.empty())
+    {
         std::string currentCity = queue.front();
         queue.pop();
         connectedCities.push_back(currentCity);
 
-        for (const auto& connection : connections) {
-            if (connection.linkOwner == nullptr) continue;  // Skip if no link is placed
+        // std::cout << "Start city" << currentCity << std::endl;
+        for (const auto &connection : connections)
+        {
+            if (connection.linkOwner == nullptr)
+                continue; // Skip if no link is placed
 
             std::string nextCity;
-            if (connection.city1 == currentCity) {
+            if (connection.city1 == currentCity)
+            {
                 nextCity = connection.city2;
-            } else if (connection.city2 == currentCity) {
+            }
+            else if (connection.city2 == currentCity)
+            {
                 nextCity = connection.city1;
-            } else {
-                continue;  // This connection doesn't involve the current city
+            }
+            else
+            {
+                continue; // This connection doesn't involve the current city
             }
 
-            if (visited.find(nextCity) == visited.end()) {
+            // std::cout << "Connected" << nextCity << std::endl;
+            if (visited.find(nextCity) == visited.end())
+            {
                 visited.insert(nextCity);
                 queue.push(nextCity);
             }
@@ -302,14 +350,18 @@ std::vector<std::string> GameBoard::getConnectedCities(const std::string& startC
     return connectedCities;
 }
 
-int GameBoard::getTotalResourceCoal(const std::string& startCity) const {
+int GameBoard::getTotalResourceCoal(const std::string &startCity) const
+{
     int totalCoal = 0;
     std::vector<std::string> connectedCities = getConnectedCities(startCity);
 
-    for (const auto& cityName : connectedCities) {
-        const auto& city = cities.at(cityName);
-        for (const auto& slot : city->slots) {
-            if (slot.placedTile && slot.placedTile->type == TileType::Coal) {
+    for (const auto &cityName : connectedCities)
+    {
+        const auto &city = cities.at(cityName);
+        for (const auto &slot : city->slots)
+        {
+            if (slot.placedTile && slot.placedTile->type == TileType::Coal)
+            {
                 totalCoal += slot.placedTile->resource_amount;
             }
         }
@@ -317,11 +369,15 @@ int GameBoard::getTotalResourceCoal(const std::string& startCity) const {
     return totalCoal;
 }
 
-int GameBoard::getTotalResourceIron() const {
+int GameBoard::getTotalResourceIron() const
+{
     int totalIron = 0;
-    for (const auto& [cityName, city] : cities) {
-        for (const auto& slot : city->slots) {
-            if (slot.placedTile && slot.placedTile->type == TileType::Iron) {
+    for (const auto &[cityName, city] : cities)
+    {
+        for (const auto &slot : city->slots)
+        {
+            if (slot.placedTile && slot.placedTile->type == TileType::Iron)
+            {
                 totalIron += slot.placedTile->resource_amount;
             }
         }
@@ -329,66 +385,93 @@ int GameBoard::getTotalResourceIron() const {
     return totalIron;
 }
 
-bool GameBoard::canPlaceTile(const std::string& cityName, int slotIndex, const Tile& tile) const {
+bool GameBoard::canPlaceTile(const std::string &cityName, int slotIndex, const Tile &tile) const
+{
     auto cityIt = cities.find(cityName);
-    if (cityIt == cities.end()) return false;
-    const auto& city = cityIt->second;
-    if (slotIndex < 0 || slotIndex >= static_cast<int>(city->slots.size())) return false;
-    const auto& slot = city->slots[slotIndex];
-    if (slot.placedTile) return false;
+    if (cityIt == cities.end())
+        return false;
+    const auto &city = cityIt->second;
+    if (slotIndex < 0 || slotIndex >= static_cast<int>(city->slots.size()))
+        return false;
+    const auto &slot = city->slots[slotIndex];
+    if (slot.placedTile)
+        return false;
     return std::find(slot.allowedTileTypes.begin(), slot.allowedTileTypes.end(), tile.type) != slot.allowedTileTypes.end();
 }
 
-bool GameBoard::placeTile(const std::string& cityName, int slotIndex, const Tile& tile) {
-    if (!canPlaceTile(cityName, slotIndex, tile)) return false;
-    auto& slot = cities[cityName]->slots[slotIndex];
-    slot.placedTile = tile.clone();  // Use the clone method instead of direct copying
+bool GameBoard::placeTile(const std::string &cityName, int slotIndex, const Tile &tile)
+{
+    if (!canPlaceTile(cityName, slotIndex, tile))
+        return false;
+    auto &slot = cities[cityName]->slots[slotIndex];
+    slot.placedTile = tile.clone(); // Use the clone method instead of direct copying
     return true;
 }
 
-const MerchantCity* GameBoard::getMerchantCity(const std::string& cityName) const {
+const MerchantCity *GameBoard::getMerchantCity(const std::string &cityName) const
+{
     auto it = cities.find(cityName);
-    if (it != cities.end()) {
-        const auto& city = it->second;
-        return dynamic_cast<const MerchantCity*>(city.get());
+    if (it != cities.end())
+    {
+        const auto &city = it->second;
+        return dynamic_cast<const MerchantCity *>(city.get());
     }
     return nullptr;
 }
 
-bool GameBoard::isConnectedToMerchantCity(const std::string& cityName) const {
+bool GameBoard::isConnectedToMerchantCity(const std::string &cityName) const
+{
     std::vector<std::string> connectedCities = getConnectedCities(cityName);
-    
-    for (const auto& connectedCity : connectedCities) {
-        if (getMerchantCity(connectedCity) != nullptr) {
+
+    for (const auto &connectedCity : connectedCities)
+    {
+        if (getMerchantCity(connectedCity) != nullptr)
+        {
             return true;
         }
     }
-    
+
     return false;
 }
+void printVector(const std::vector<std::string> &vec)
+{
+    std::cout << "City";
+    for (const auto &p : vec)
+    {
+        std::cout << " " << p;
+    }
+    std::cout << std::endl;
+}
 
-std::vector<const MerchantCity*> GameBoard::getConnectedMerchantCities(const std::string& cityName) const {
-    std::vector<const MerchantCity*> connectedMerchantCities;
+std::vector<const MerchantCity *> GameBoard::getConnectedMerchantCities(const std::string &cityName) const
+{
+    std::vector<const MerchantCity *> connectedMerchantCities;
     std::vector<std::string> connectedCities = getConnectedCities(cityName);
-
-    for (const auto& connectedCity : connectedCities) {
-        const MerchantCity* merchantCity = getMerchantCity(connectedCity);
-        if (merchantCity != nullptr) {
+    for (const auto &connectedCity : connectedCities)
+    {
+        const MerchantCity *merchantCity = getMerchantCity(connectedCity);
+        if (merchantCity != nullptr)
+        {
             connectedMerchantCities.push_back(merchantCity);
         }
     }
     return connectedMerchantCities;
 }
 
-std::set<MerchantType> GameBoard::getConnectedMerchantTypes(const std::string& cityName) const {
+std::set<MerchantType> GameBoard::getConnectedMerchantTypes(const std::string &cityName) const
+{
     std::set<MerchantType> merchantTypes;
-    std::vector<const MerchantCity*> connectedMerchantCities = getConnectedMerchantCities(cityName);
+    std::vector<const MerchantCity *> connectedMerchantCities = getConnectedMerchantCities(cityName);
 
-    for (const auto* merchantCity : connectedMerchantCities) {
-        for (const auto& slot : merchantCity->slots) {
-            if (slot.placedTile && slot.placedTile->type == TileType::Merchant) {
-                const MerchantTile* merchantTile = dynamic_cast<const MerchantTile*>(slot.placedTile.get());
-                if (merchantTile) {
+    for (const auto *merchantCity : connectedMerchantCities)
+    {
+        for (const auto &slot : merchantCity->slots)
+        {
+            if (slot.placedTile && slot.placedTile->type == TileType::Merchant)
+            {
+                const MerchantTile *merchantTile = dynamic_cast<const MerchantTile *>(slot.placedTile.get());
+                if (merchantTile)
+                {
                     merchantTypes.insert(merchantTile->merchantType);
                 }
             }
@@ -398,11 +481,15 @@ std::set<MerchantType> GameBoard::getConnectedMerchantTypes(const std::string& c
     return merchantTypes;
 }
 
-std::vector<std::string> GameBoard::getPlayerPlacedTiles(const Player& player) const {
+std::vector<std::string> GameBoard::getPlayerPlacedTiles(const Player &player) const
+{
     std::vector<std::string> playerTiles;
-    for (const auto& [cityName, city] : cities) {
-        for (const auto& slot : city->slots) {
-            if (slot.placedTile && slot.placedTile->owner == player.id) {
+    for (const auto &[cityName, city] : cities)
+    {
+        for (const auto &slot : city->slots)
+        {
+            if (slot.placedTile && slot.placedTile->owner == player.id)
+            {
                 playerTiles.push_back(cityName);
             }
         }
@@ -410,65 +497,87 @@ std::vector<std::string> GameBoard::getPlayerPlacedTiles(const Player& player) c
     return playerTiles;
 }
 
-std::vector<Connection> GameBoard::getPlayerPlacedLinks(const Player& player) const {
+std::vector<Connection> GameBoard::getPlayerPlacedLinks(const Player &player) const
+{
     std::vector<Connection> playerLinks;
-    for (const auto& connection : connections) {
-        if (connection.linkOwner.get() == &player) {
+    for (const auto &connection : connections)
+    {
+        if (connection.linkOwner.get() == &player)
+        {
             playerLinks.push_back(connection);
         }
     }
     return playerLinks;
 }
 
-bool GameBoard::isCityInPlayerNetwork(const Player& player, const std::string& cityName) const {
+bool GameBoard::isCityInPlayerNetwork(const Player &player, const std::string &cityName) const
+{
     auto links = getPlayerPlacedLinks(player);
     auto tiles = getPlayerPlacedTiles(player);
 
     std::set<std::string> networkCities;
 
     // Add cities from links
-    for (const auto& link : links) {
+    for (const auto &link : links)
+    {
         networkCities.insert(link.city1);
         networkCities.insert(link.city2);
     }
 
     // Add cities from tiles
-    for (const auto& tile : tiles) {
+    for (const auto &tile : tiles)
+    {
         networkCities.insert(tile);
     }
-    //No placed link or tiles free to place anywhere
-    if (networkCities.size()==0) return true;
+    // No placed link or tiles free to place anywhere
+    if (networkCities.size() == 0)
+        return true;
     // Check if the given cityName is in the network
     return networkCities.find(cityName) != networkCities.end();
 }
 
-const City* GameBoard::getCity(const std::string& cityName) const {
+const City *GameBoard::getCity(const std::string &cityName) const
+{
     auto it = cities.find(cityName);
-    if (it != cities.end()) {
+    if (it != cities.end())
+    {
         return it->second.get();
     }
     return nullptr;
 }
 
-std::vector<std::pair<std::string, int>> GameBoard::findSellableTiles(const Player& player) const {
+std::vector<std::pair<std::string, int>> GameBoard::findSellableTiles(const Player &player) const
+{
     std::vector<std::pair<std::string, int>> sellableTiles;
 
-    for (const auto& [cityName, city] : cities) {
+    for (const auto &[cityName, city] : cities)
+    {
         auto connectedMerchantTypes = getConnectedMerchantTypes(cityName);
-        
-        for (size_t i = 0; i < city->slots.size(); ++i) {
-            const auto& slot = city->slots[i];
-            if (!slot.placedTile || slot.placedTile->owner != player.id) continue;
-            
+        if (connectedMerchantTypes.size() > 0)
+        {
+            std::cout << "connectedMearchantTypes " << connectedMerchantTypes.size() << std::endl;
+        }
+        if (connectedMerchantTypes.size() == 0)
+            continue;
+        for (size_t i = 0; i < city->slots.size(); i++)
+        {
+            const auto &slot = city->slots[i];
+            if (!slot.placedTile || slot.placedTile->owner != player.id)
+                continue;
+
             TileType tileType = slot.placedTile->type;
-            if (!isSellableTileType(tileType)) continue;
-            
+            if (!isSellableTileType(tileType))
+                continue;
+
+            std::cout << "x";
             if (canSellTile(connectedMerchantTypes, tileType) &&
-                hasEnoughBeer(cityName, player, slot.placedTile->beer_demand, getTileRequiredMerchantType(tileType))) {
+                hasEnoughBeer(cityName, player, slot.placedTile->beer_demand, getTileRequiredMerchantType(tileType)))
+            {
                 sellableTiles.emplace_back(cityName, i);
             }
         }
     }
-
+    std::cout << "Sellable tiles " << sellableTiles.size() << std::endl;
+    std::cout << "Sellable tiles " << sellableTiles.size() << std::endl;
     return sellableTiles;
 }
