@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,17 +13,20 @@
             max-width: 800px;
             margin: 0 auto;
         }
+
         .city {
             border: 1px solid black;
             padding: 10px;
             text-align: center;
         }
+
         .city-slots {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-top: 10px;
         }
+
         .slot {
             border: 1px solid #ccc;
             padding: 5px;
@@ -34,9 +38,11 @@
             align-items: center;
             cursor: pointer;
         }
+
         .slot:hover {
             background-color: #f0f0f0;
         }
+
         .tile {
             background-color: #ddd;
             padding: 5px;
@@ -47,10 +53,12 @@
             justify-content: center;
             align-items: center;
         }
+
         .allowed-tiles {
             font-size: 0.8em;
             color: #666;
         }
+
         #tile-selection {
             display: none;
             position: fixed;
@@ -64,6 +72,7 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Simplified Brass Birmingham</h1>
     <div id="game-board"></div>
@@ -146,15 +155,16 @@
                 if (!this.gameState) return;
                 this.gameBoard.innerHTML = '';
 
-                for (const [cityName, cityData] of Object.entries(this.gameState.cities)) {
+                for (const [cityName, cityData] of Object.entries(this.gameState.board.cities)) {
                     const cityElement = document.createElement('div');
                     cityElement.className = 'city';
                     cityElement.innerHTML = `
                         <h3>${cityName}</h3>
-                        <p>Connections: ${cityData.connections.join(', ')}</p>
+                        <p>Connections: ${cityData.connections ? cityData.connections.join(', ') : 'None'}</p>
+
                         <div class="city-slots"></div>
                     `;
-                    
+
                     const slotsContainer = cityElement.querySelector('.city-slots');
                     cityData.slots.forEach((slot, index) => {
                         const slotElement = document.createElement('div');
@@ -165,7 +175,7 @@
                             slotElement.innerHTML = `
                                 Slot ${index + 1}<br>
                                 <span class="allowed-tiles">
-                                    Allowed: ${slot.allowedTileTypes.join(', ')}
+                                    Allowed: ${slot.allowedTileTypes ? slot.allowedTileTypes.join(', ') : 'None'}
                                 </span>
                             `;
                             slotElement.onclick = () => this.handleSlotClick(cityName, index, slot.allowedTileTypes);
@@ -224,4 +234,5 @@
         };
     </script>
 </body>
+
 </html>

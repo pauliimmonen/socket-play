@@ -360,6 +360,7 @@ nlohmann::json GameState::getState() const
                 // No placedTile
                 slotJson["placedTile"] = nullptr;
             }
+            slotJson["allowedTileTypes"] = slot.allowedTileTypes;
             cityJson["slots"].push_back(slotJson);
         }
         state["board"]["cities"][cityPtr->name] = cityJson;
@@ -373,6 +374,7 @@ nlohmann::json GameState::getState() const
                                         {"owner", connection.linkOwner ? connection.linkOwner->id : -1}});
     }
 
+    std::cout << state.dump(4) << std::endl; // `4` is the indentation level for pretty-printing
     return state;
 }
 
