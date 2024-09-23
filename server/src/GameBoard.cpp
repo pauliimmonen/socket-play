@@ -237,10 +237,10 @@ void GameBoard::initializeBrassBirminghamMap()
     addSlot("Cannock", {{TileType::Manufacturer, TileType::Coal}, nullptr});
     addSlot("Cannock", {{TileType::Coal}, nullptr});
 
-    addSlot("Burton-on-Trent", {{TileType::Manufacturer, TileType::Brewery}, nullptr});
+    addSlot("Burton-on-Trent", {{TileType::Manufacturer, TileType::Coal}, nullptr});
     addSlot("Burton-on-Trent", {{TileType::Pottery}, nullptr});
 
-    addSlot("Stafford", {{TileType::Manufacturer, TileType::Coal}, nullptr});
+    addSlot("Stafford", {{TileType::Manufacturer, TileType::Brewery}, nullptr});
     addSlot("Stafford", {{TileType::Coal}, nullptr});
 
     addSlot("Stone", {{TileType::Cotton, TileType::Brewery}, nullptr});
