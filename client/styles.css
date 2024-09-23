@@ -1,50 +1,171 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+body, html {
     margin: 0;
-    background-color: #f0f0f0;
+    padding: 0;
+    background-color:#333333;
 }
 
-#game-container {
-    text-align: center;
-}
-
-#game-area {
-    width: 400px;
-    height: 400px;
-    border: 2px solid #333;
-    position: relative;
-    background-color: #fff;
-    margin: 20px auto;
-}
-
-#player {
-    width: 20px;
-    height: 20px;
-    background-color: #ff0000;
+.tile{
     position: absolute;
-    border-radius: 50%;
+    width: 4.35%;
+    height: 4.35%;
+    background-color: rgba(205, 205, 205, 0.25); 
+    background-size: cover;
+    box-shadow: 3px 3px 12px 5px rgba(44, 44, 75, 0.8);
+    position: absolute;
+    width: 4.35%;
+    width: 4.35%;
 }
 
-#controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+.birmingham_1{
+    top: 63%;
+    left: 58.4%;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
+.coventry_1{
+    top: 66.1%;
+    left: 78.6%;
 }
 
-button:hover {
-    background-color: #45a049;
+.coventry_2{
+    top: 70.7%;
+    left: 76.2%;
+}
+
+.nuneaton_1{
+    top: 57.7%;
+    left: 74%;
+}
+
+.redditch_1{
+    top: 79.4%;
+    left: 53.6%;
+}
+
+.dudley_1{
+    top: 63.8%;
+    left: 37.4%;
+}
+
+.coalbrookdale_1{
+    top: 51.4%;
+    left: 21.5%;
+}
+
+.wolverhampton_1{
+    top: 51.7%;
+    left: 32.7%;
+}
+
+.kidderminster_1{
+    top: 74%;
+    left: 30.5%;
+}
+
+.worcester_1{
+    top: 86.8%;
+    left: 31.8%;
+}
+
+.walsall_1{
+    top: 54%;
+    left: 48.65%;
+}
+
+.cannock_1{
+    top: 42.6%;
+    left: 43.1%;
+}
+
+.tamworth_1{
+    top: 47.8%;
+    left: 65.1%;
+}
+
+.burton-on-trent_1{
+    top: 35.5%;
+    left: 63.7%;
+}
+
+.stafford_1{
+    top: 32.7%;
+    left: 35.8%;
+}
+
+.stone_1{
+    top: 23.3%;
+    left: 26.68%;
+}
+
+.uttoxeter_1{
+    top: 21.7%;
+    left: 52.1%;
+}
+
+.stoke-on-trent_1{
+    top: 8.3%;
+    left: 39.3%;
+}
+
+.leek_1{
+    top: 5.8%;
+    left: 50.8%;
+}
+
+.belper_1{
+    top: 8.6%;
+    left: 69%;
+}
+
+.derby_1{
+    top: 19.3%;
+    left: 73.5%;
+}
+.walsall_1{
+    top: 54%;
+    left: 48.65%;
+}
+
+
+.tile.manufacturer{
+    background-image:url("images/manufacturer_1.jpg");
+}
+.tile.cotton{
+    background-image:url("images/cotton_1.jpg");
+}
+.tile.pottery{
+    background-image:url("images/pottery_1.jpg");
+}
+.tile.coal{
+    background-image:url("images/coal_1.jpg");
+}
+.tile.iron{
+    background-image:url("images/iron_1.jpg");
+}
+.tile.brewery{
+    background-image:url("images/brewery_1.jpg");
+}
+
+#board_img {
+    float:left;
+    width: auto;
+    height: 100%;
+    object-fit: cover;
+}
+#board{
+    position:relative;
+    float:left;
+    width: auto;
+    height: 100%;
+}
+
+#container {
+    width: 100%;
+    height: 100vh;
+}
+
+#rightbar {
+    float:left;
+    width: 300px;
+    height: 100vh;
+    background-color:#000000;
 }

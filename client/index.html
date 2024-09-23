@@ -1,99 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simplified Brass Birmingham</title>
+    <title>Brass Birmingham Combined</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        #game-board {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-gap: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+        #rightbar {
+            padding: 20px;
+            color: white;
+            overflow-y: auto;
         }
-
-        .city {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
+        #player-info, #game-controls {
+            margin-bottom: 20px;
         }
-
-        .city-slots {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
         .slot {
-            border: 1px solid #ccc;
-            padding: 5px;
-            min-width: 80px;
-            min-height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             cursor: pointer;
         }
-
         .slot:hover {
-            background-color: #f0f0f0;
-        }
-
-        .tile {
-            background-color: #ddd;
-            padding: 5px;
-            margin: 2px 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .allowed-tiles {
-            font-size: 0.8em;
-            color: #666;
-        }
-
-        #tile-selection {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            border: 1px solid black;
-            padding: 20px;
-            z-index: 1000;
+            box-shadow: 0 0 10px white;
         }
     </style>
 </head>
-
 <body>
-    <h1>Simplified Brass Birmingham</h1>
-    <div id="game-board"></div>
-    <div id="player-info"></div>
-    <div id="tile-selection">
-        <h2>Select a Tile to Place</h2>
-        <div id="tile-options"></div>
-        <button id="cancel-tile-selection">Cancel</button>
+    <div id="container">
+        <div id="rightbar">
+            <div id="player-info"></div>
+            <div id="game-controls">
+                <h3>Game Controls</h3>
+                <button id="end-turn">End Turn</button>
+            </div>
+            <div id="tile-selection" style="display: none;">
+                <h3>Select a Tile to Place</h3>
+                <div id="tile-options"></div>
+                <button id="cancel-tile-selection">Cancel</button>
+            </div>
+            <p id="connection-status">Connecting...</p>
+        </div>
+        <div id="board"> 
+            <div class="tile birmingham_1 slot" data-city="Birmingham" data-slot="0"></div>
+            <div class="tile coventry_1 slot" data-city="Coventry" data-slot="0"></div>
+            <div class="tile nuneaton_1 slot" data-city="Nuneaton" data-slot="0"></div>
+            <div class="tile redditch_1 slot" data-city="Redditch" data-slot="0"></div>
+            <div class="tile dudley_1 slot" data-city="Dudley" data-slot="0"></div>
+            <div class="tile coalbrookdale_1 slot" data-city="Coalbrookdale" data-slot="0"></div>
+            <div class="tile wolverhampton_1 slot" data-city="Wolverhampton" data-slot="0"></div>
+            <div class="tile kidderminster_1 slot" data-city="Kidderminster" data-slot="0"></div>
+            <div class="tile worcester_1 slot" data-city="Worcester" data-slot="0"></div>
+            <div class="tile walsall_1 slot" data-city="Walsall" data-slot="0"></div>
+            <div class="tile cannock_1 slot" data-city="Cannock" data-slot="0"></div>
+            <div class="tile tamworth_1 slot" data-city="Tamworth" data-slot="0"></div>
+            <div class="tile burton-on-trent_1 slot" data-city="Burton-on-Trent" data-slot="0"></div>
+            <div class="tile stafford_1 slot" data-city="Stafford" data-slot="0"></div>
+            <div class="tile stone_1 slot" data-city="Stone" data-slot="0"></div>
+            <div class="tile uttoxeter_1 slot" data-city="Uttoxeter" data-slot="0"></div>
+            <div class="tile stoke-on-trent_1 slot" data-city="Stoke-on-Trent" data-slot="0"></div>
+            <div class="tile leek_1 slot" data-city="Leek" data-slot="0"></div>
+            <div class="tile belper_1 slot" data-city="Belper" data-slot="0"></div>
+            <div class="tile derby_1 slot" data-city="Derby" data-slot="0"></div>
+            <img id="board_img" src="images/brass_board.jpg" alt="Brass Board">
+        </div>
     </div>
-    <p id="connection-status">Connecting...</p>
 
     <script>
         class Game {
             constructor() {
                 this.socket = new WebSocket('ws://localhost:9002');
-                this.gameBoard = document.getElementById('game-board');
                 this.playerInfo = document.getElementById('player-info');
                 this.tileSelection = document.getElementById('tile-selection');
                 this.tileOptions = document.getElementById('tile-options');
                 this.cancelTileSelection = document.getElementById('cancel-tile-selection');
                 this.connectionStatus = document.getElementById('connection-status');
+                this.endTurnButton = document.getElementById('end-turn');
                 this.playerId = null;
                 this.gameState = null;
                 this.selectedCity = null;
@@ -101,6 +79,8 @@
 
                 this.initializeSocketListeners();
                 this.initializeTileSelection();
+                this.initializeSlotListeners();
+                this.initializeEndTurnButton();
             }
 
             initializeSocketListeners() {
@@ -113,11 +93,12 @@
                     console.log('Received message:', event.data);
                     try {
                         this.gameState = JSON.parse(event.data);
-                        this.updateGameBoard();
-                        this.updatePlayerInfo();
+
                     } catch (error) {
                         console.error('Error parsing server message:', error);
                     }
+                        this.updateGameBoard();
+                        this.updatePlayerInfo();
                 };
 
                 this.socket.onclose = () => {
@@ -137,12 +118,28 @@
                 };
             }
 
+            initializeSlotListeners() {
+                document.querySelectorAll('.slot').forEach(slot => {
+                    slot.addEventListener('click', () => {
+                        const cityName = slot.dataset.city;
+                        const slotIndex = slot.dataset.slot;
+                        this.handleSlotClick(cityName, slotIndex);
+                    });
+                });
+            }
+
+            initializeEndTurnButton() {
+                this.endTurnButton.onclick = () => {
+                    this.sendEndTurn();
+                };
+            }
+
             sendPlaceTile(cityName, slotIndex, tileType) {
                 if (this.socket.readyState === WebSocket.OPEN) {
                     const placeTileMessage = {
                         action: "placeTile",
                         cityName: cityName,
-                        slotIndex: slotIndex,
+                        slotIndex: parseInt(slotIndex),
                         tileType: tileType
                     };
                     this.socket.send(JSON.stringify(placeTileMessage));
@@ -151,46 +148,48 @@
                 }
             }
 
+            sendEndTurn() {
+                if (this.socket.readyState === WebSocket.OPEN) {
+                    const endTurnMessage = {
+                        action: "endTurn"
+                    };
+                    this.socket.send(JSON.stringify(endTurnMessage));
+                } else {
+                    console.warn('Cannot send end turn: WebSocket is not open');
+                }
+            }
+            tileTypeToString(tileType) {
+                switch(Number(tileType)) {
+                    case 0: return 'coal';
+                    case 1: return 'iron';
+                    case 2: return 'cotton';
+                    case 3: return 'manufacturer';
+                    case 4: return 'pottery';
+                    case 5: return 'brewery';
+                    case 6: return 'merchant';
+                    case 7: return 'null-tile';
+                    default: return 'unknown-tile';
+                }
+            }
             updateGameBoard() {
                 if (!this.gameState) return;
-                this.gameBoard.innerHTML = '';
-
                 for (const [cityName, cityData] of Object.entries(this.gameState.board.cities)) {
-                    const cityElement = document.createElement('div');
-                    cityElement.className = 'city';
-                    cityElement.innerHTML = `
-                        <h3>${cityName}</h3>
-                        <p>Connections: ${cityData.connections ? cityData.connections.join(', ') : 'None'}</p>
-
-                        <div class="city-slots"></div>
-                    `;
-
-                    const slotsContainer = cityElement.querySelector('.city-slots');
-                    cityData.slots.forEach((slot, index) => {
-                        const slotElement = document.createElement('div');
-                        slotElement.className = 'slot';
-                        if (slot.placedTile) {
-                            slotElement.innerHTML = `<div class="tile">${slot.placedTile}</div>`;
-                        } else {
-                            slotElement.innerHTML = `
-                                Slot ${index + 1}<br>
-                                <span class="allowed-tiles">
-                                    Allowed: ${slot.allowedTileTypes ? slot.allowedTileTypes.join(', ') : 'None'}
-                                </span>
-                            `;
-                            slotElement.onclick = () => this.handleSlotClick(cityName, index, slot.allowedTileTypes);
-                        }
-                        slotsContainer.appendChild(slotElement);
-                    });
-
-                    this.gameBoard.appendChild(cityElement);
+                    const cityElement = document.querySelector(`.slot[data-city="${cityName}"]`);
+                    if (cityElement && cityData.slots[0].placedTile) {
+                        const tileClass = this.tileTypeToString(cityData.slots[0].placedTile.type);
+                        cityElement.classList.add(tileClass);
+                    }
                 }
             }
 
-            handleSlotClick(cityName, slotIndex, allowedTileTypes) {
-                this.selectedCity = cityName;
-                this.selectedSlot = slotIndex;
-                this.showTileSelection(allowedTileTypes);
+            handleSlotClick(cityName, slotIndex) {
+                if (!this.gameState) return;
+                const cityData = this.gameState.board.cities[cityName];
+                if (cityData && cityData.slots[slotIndex] && !cityData.slots[slotIndex].placedTile) {
+                    this.selectedCity = cityName;
+                    this.selectedSlot = slotIndex;
+                    this.showTileSelection(cityData.slots[slotIndex].allowedTileTypes);
+                }
             }
 
             showTileSelection(allowedTileTypes) {
@@ -234,5 +233,4 @@
         };
     </script>
 </body>
-
 </html>
