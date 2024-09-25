@@ -1,14 +1,15 @@
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
-    background-color:#333333;
+    background-color: #333333;
 }
 
-.tile{
+.tile {
     position: absolute;
     width: 4.35%;
     height: 4.35%;
-    background-color: rgba(205, 205, 205, 0.25); 
+    background-color: rgba(205, 205, 205, 0.25);
     background-size: cover;
     box-shadow: 3px 3px 12px 5px rgba(44, 44, 75, 0.8);
     position: absolute;
@@ -16,144 +17,277 @@ body, html {
     width: 4.35%;
 }
 
-.birmingham_1{
+.birmingham_0 {
     top: 63%;
     left: 58.4%;
 }
 
-.coventry_1{
+.birmingham_1 {
+    top: 63%;
+    left: 62.8%;
+}
+
+.birmingham_2 {
+    top: 67.5%;
+    left: 58.4%;
+}
+
+.birmingham_3 {
+    top: 67.5%;
+    left: 62.8%;
+}
+
+.coventry_0 {
     top: 66.1%;
     left: 78.6%;
 }
 
-.coventry_2{
-    top: 70.7%;
+.coventry_1 {
+    top: 70.6%;
     left: 76.2%;
 }
 
-.nuneaton_1{
+.coventry_2 {
+    top: 70.6%;
+    left: 80.8%;
+}
+
+
+.nuneaton_0 {
     top: 57.7%;
     left: 74%;
 }
 
-.redditch_1{
+.nuneaton_1 {
+    top: 57.7%;
+    left: 78.7%;
+}
+
+.redditch_0 {
     top: 79.4%;
     left: 53.6%;
 }
 
-.dudley_1{
+.redditch_1 {
+    top: 79.4%;
+    left: 58.2%;
+}
+
+.dudley_0 {
     top: 63.8%;
     left: 37.4%;
 }
 
-.coalbrookdale_1{
+.dudley_1 {
+    top: 63.8%;
+    left: 41.9%;
+}
+
+.coalbrookdale_0 {
     top: 51.4%;
     left: 21.5%;
 }
 
-.wolverhampton_1{
+.coalbrookdale_1 {
+    top: 55.9%;
+    left: 19.2%;
+}
+
+.coalbrookdale_2 {
+    top: 55.9%;
+    left: 23.7%;
+}
+
+.wolverhampton_0 {
     top: 51.7%;
     left: 32.7%;
 }
 
-.kidderminster_1{
+.wolverhampton_1 {
+    top: 51.7%;
+    left: 37.3%;
+}
+
+.kidderminster_0 {
     top: 74%;
     left: 30.5%;
 }
 
-.worcester_1{
+.kidderminster_1 {
+    top: 74%;
+    left: 35.0%;
+}
+
+.worcester_0 {
     top: 86.8%;
     left: 31.8%;
 }
 
-.walsall_1{
+.worcester_1 {
+    top: 86.8%;
+    left: 36.4%;
+}
+
+.walsall_0 {
     top: 54%;
     left: 48.65%;
 }
 
-.cannock_1{
+.walsall_1 {
+    top: 54%;
+    left: 53.05%;
+}
+
+.cannock_0 {
     top: 42.6%;
     left: 43.1%;
 }
 
-.tamworth_1{
+.cannock_1 {
+    top: 42.6%;
+    left: 47.6%;
+}
+
+.tamworth_0 {
     top: 47.8%;
     left: 65.1%;
 }
 
-.burton-on-trent_1{
+.tamworth_1 {
+    top: 47.8%;
+    left: 69.6%;
+}
+
+.burton-on-trent_0 {
     top: 35.5%;
     left: 63.7%;
 }
 
-.stafford_1{
+.burton-on-trent_1 {
+    top: 35.5%;
+    left: 68.1%;
+}
+
+.stafford_0 {
     top: 32.7%;
     left: 35.8%;
 }
 
-.stone_1{
-    top: 23.3%;
-    left: 26.68%;
+.stafford_1 {
+    top: 32.7%;
+    left: 40.4%;
 }
 
-.uttoxeter_1{
+.stone_0 {
+    top: 23.3%;
+    left: 26.7%;
+}
+
+.stone_1 {
+    top: 23.3%;
+    left: 31.2%;
+}
+
+.uttoxeter_0 {
     top: 21.7%;
     left: 52.1%;
 }
 
-.stoke-on-trent_1{
+.uttoxeter_1 {
+    top: 21.7%;
+    left: 56.6%;
+}
+
+.stoke-on-trent_0 {
     top: 8.3%;
     left: 39.3%;
 }
 
-.leek_1{
+.stoke-on-trent_1 {
+    top: 12.9%;
+    left: 36.9%;
+}
+
+.stoke-on-trent_2 {
+    top: 12.9%;
+    left: 41.5%;
+}
+
+.leek_0 {
     top: 5.8%;
     left: 50.8%;
 }
 
-.belper_1{
+.leek_1 {
+    top: 5.8%;
+    left: 55.4%;
+}
+
+.belper_0 {
     top: 8.6%;
     left: 69%;
 }
 
-.derby_1{
+.belper_1 {
+    top: 8.6%;
+    left: 73.5%;
+}
+
+.belper_2 {
+    top: 8.6%;
+    left: 78.1%;
+}
+
+.derby_0 {
     top: 19.3%;
     left: 73.5%;
 }
-.walsall_1{
-    top: 54%;
-    left: 48.65%;
+
+.derby_1 {
+    top: 23.8%;
+    left: 71.4%;
+}
+
+.derby_2 {
+    top: 23.8%;
+    left: 75.8%;
 }
 
 
-.tile.manufacturer{
-    background-image:url("images/manufacturer_1.jpg");
+.tile.manufacturer {
+    background-image: url("images/manufacturer_1.jpg");
 }
-.tile.cotton{
-    background-image:url("images/cotton_1.jpg");
+
+.tile.cotton {
+    background-image: url("images/cotton_1.jpg");
 }
-.tile.pottery{
-    background-image:url("images/pottery_1.jpg");
+
+.tile.pottery {
+    background-image: url("images/pottery_1.jpg");
 }
-.tile.coal{
-    background-image:url("images/coal_1.jpg");
+
+.tile.coal {
+    background-image: url("images/coal_1.jpg");
 }
-.tile.iron{
-    background-image:url("images/iron_1.jpg");
+
+.tile.iron {
+    background-image: url("images/iron_1.jpg");
 }
-.tile.brewery{
-    background-image:url("images/brewery_1.jpg");
+
+.tile.brewery {
+    background-image: url("images/brewery_1.jpg");
 }
 
 #board_img {
-    float:left;
+    float: left;
     width: auto;
     height: 100%;
     object-fit: cover;
 }
-#board{
-    position:relative;
-    float:left;
+
+#board {
+    position: relative;
+    float: left;
     width: auto;
     height: 100%;
 }
@@ -164,8 +298,8 @@ body, html {
 }
 
 #rightbar {
-    float:left;
+    float: left;
     width: 300px;
     height: 100vh;
-    background-color:#000000;
+    background-color: #000000;
 }

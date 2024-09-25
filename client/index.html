@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,17 +12,22 @@
             color: white;
             overflow-y: auto;
         }
-        #player-info, #game-controls {
+
+        #player-info,
+        #game-controls {
             margin-bottom: 20px;
         }
+
         .slot {
             cursor: pointer;
         }
+
         .slot:hover {
             box-shadow: 0 0 10px white;
         }
     </style>
 </head>
+
 <body>
     <div id="container">
         <div id="rightbar">
@@ -37,27 +43,54 @@
             </div>
             <p id="connection-status">Connecting...</p>
         </div>
-        <div id="board"> 
-            <div class="tile birmingham_1 slot" data-city="Birmingham" data-slot="0"></div>
-            <div class="tile coventry_1 slot" data-city="Coventry" data-slot="0"></div>
-            <div class="tile nuneaton_1 slot" data-city="Nuneaton" data-slot="0"></div>
-            <div class="tile redditch_1 slot" data-city="Redditch" data-slot="0"></div>
-            <div class="tile dudley_1 slot" data-city="Dudley" data-slot="0"></div>
-            <div class="tile coalbrookdale_1 slot" data-city="Coalbrookdale" data-slot="0"></div>
-            <div class="tile wolverhampton_1 slot" data-city="Wolverhampton" data-slot="0"></div>
-            <div class="tile kidderminster_1 slot" data-city="Kidderminster" data-slot="0"></div>
-            <div class="tile worcester_1 slot" data-city="Worcester" data-slot="0"></div>
-            <div class="tile walsall_1 slot" data-city="Walsall" data-slot="0"></div>
-            <div class="tile cannock_1 slot" data-city="Cannock" data-slot="0"></div>
-            <div class="tile tamworth_1 slot" data-city="Tamworth" data-slot="0"></div>
-            <div class="tile burton-on-trent_1 slot" data-city="Burton-on-Trent" data-slot="0"></div>
-            <div class="tile stafford_1 slot" data-city="Stafford" data-slot="0"></div>
-            <div class="tile stone_1 slot" data-city="Stone" data-slot="0"></div>
-            <div class="tile uttoxeter_1 slot" data-city="Uttoxeter" data-slot="0"></div>
-            <div class="tile stoke-on-trent_1 slot" data-city="Stoke-on-Trent" data-slot="0"></div>
-            <div class="tile leek_1 slot" data-city="Leek" data-slot="0"></div>
-            <div class="tile belper_1 slot" data-city="Belper" data-slot="0"></div>
-            <div class="tile derby_1 slot" data-city="Derby" data-slot="0"></div>
+        <div id="board">
+            <div class="tile birmingham_0" data-city="Birmingham" data-slot="0"></div>
+            <div class="tile birmingham_1" data-city="Birmingham" data-slot="1"></div>
+            <div class="tile birmingham_2" data-city="Birmingham" data-slot="2"></div>
+            <div class="tile birmingham_3" data-city="Birmingham" data-slot="3"></div>
+            <div class="tile coventry_0" data-city="Coventry" data-slot="0"></div>
+            <div class="tile coventry_1" data-city="Coventry" data-slot="1"></div>
+            <div class="tile coventry_2" data-city="Coventry" data-slot="2"></div>
+            <div class="tile nuneaton_0" data-city="Nuneaton" data-slot="0"></div>
+            <div class="tile nuneaton_1" data-city="Nuneaton" data-slot="1"></div>
+            <div class="tile redditch_0" data-city="Redditch" data-slot="0"></div>
+            <div class="tile redditch_1" data-city="Redditch" data-slot="1"></div>
+            <div class="tile dudley_0" data-city="Dudley" data-slot="0"></div>
+            <div class="tile dudley_1" data-city="Dudley" data-slot="1"></div>
+            <div class="tile coalbrookdale_0" data-city="Coalbrookdale" data-slot="0"></div>
+            <div class="tile coalbrookdale_1" data-city="Coalbrookdale" data-slot="1"></div>
+            <div class="tile coalbrookdale_2" data-city="Coalbrookdale" data-slot="2"></div>
+            <div class="tile wolverhampton_0" data-city="Wolverhampton" data-slot="0"></div>
+            <div class="tile wolverhampton_1" data-city="Wolverhampton" data-slot="1"></div>
+            <div class="tile kidderminster_0" data-city="Kidderminster" data-slot="0"></div>
+            <div class="tile kidderminster_1" data-city="Kidderminster" data-slot="1"></div>
+            <div class="tile worcester_0" data-city="Worcester" data-slot="0"></div>
+            <div class="tile worcester_1" data-city="Worcester" data-slot="1"></div>
+            <div class="tile walsall_0" data-city="Walsall" data-slot="0"></div>
+            <div class="tile walsall_1" data-city="Walsall" data-slot="1"></div>
+            <div class="tile cannock_0" data-city="Cannock" data-slot="0"></div>
+            <div class="tile cannock_1" data-city="Cannock" data-slot="1"></div>
+            <div class="tile tamworth_0" data-city="Tamworth" data-slot="0"></div>
+            <div class="tile tamworth_1" data-city="Tamworth" data-slot="1"></div>
+            <div class="tile burton-on-trent_0" data-city="Burton-on-Trent" data-slot="0"></div>
+            <div class="tile burton-on-trent_1" data-city="Burton-on-Trent" data-slot="1"></div>
+            <div class="tile stafford_0" data-city="Stafford" data-slot="0"></div>
+            <div class="tile stafford_1" data-city="Stafford" data-slot="1"></div>
+            <div class="tile stone_0" data-city="Stone" data-slot="0"></div>
+            <div class="tile stone_1" data-city="Stone" data-slot="1"></div>
+            <div class="tile uttoxeter_0" data-city="Uttoxeter" data-slot="0"></div>
+            <div class="tile uttoxeter_1" data-city="Uttoxeter" data-slot="1"></div>
+            <div class="tile stoke-on-trent_0" data-city="Stoke-on-Trent" data-slot="0"></div>
+            <div class="tile stoke-on-trent_1" data-city="Stoke-on-Trent" data-slot="1"></div>
+            <div class="tile stoke-on-trent_2" data-city="Stoke-on-Trent" data-slot="2"></div>
+            <div class="tile leek_0" data-city="Leek" data-slot="0"></div>
+            <div class="tile leek_1" data-city="Leek" data-slot="1"></div>
+            <div class="tile belper_0" data-city="Belper" data-slot="0"></div>
+            <div class="tile belper_1" data-city="Belper" data-slot="1"></div>
+            <div class="tile belper_2" data-city="Belper" data-slot="2"></div>
+            <div class="tile derby_0" data-city="Derby" data-slot="0"></div>
+            <div class="tile derby_1" data-city="Derby" data-slot="1"></div>
+            <div class="tile derby_2" data-city="Derby" data-slot="2"></div>
             <img id="board_img" src="images/brass_board.jpg" alt="Brass Board">
         </div>
     </div>
@@ -97,8 +130,8 @@
                     } catch (error) {
                         console.error('Error parsing server message:', error);
                     }
-                        this.updateGameBoard();
-                        this.updatePlayerInfo();
+                    this.updateGameBoard();
+                    this.updatePlayerInfo();
                 };
 
                 this.socket.onclose = () => {
@@ -159,7 +192,7 @@
                 }
             }
             tileTypeToString(tileType) {
-                switch(Number(tileType)) {
+                switch (Number(tileType)) {
                     case 0: return 'coal';
                     case 1: return 'iron';
                     case 2: return 'cotton';
@@ -233,4 +266,5 @@
         };
     </script>
 </body>
+
 </html>
