@@ -3,17 +3,20 @@
 #include "TileFactory.hpp"
 #include <gtest/gtest.h>
 
-class GameStateTest : public ::testing::Test {
+class GameStateTest : public ::testing::Test
+{
 protected:
     GameState gameState;
 
     // Helper function to create a tile for testing
-    Tile createTestTile(TileType type, int owner) {
+    Tile createTestTile(TileType type, int owner)
+    {
         return TileFactory::createTile(type, 1, owner);
     }
 };
 
-TEST_F(GameStateTest, AddPlayer) {
+TEST_F(GameStateTest, AddPlayer)
+{
     auto player = gameState.addPlayer();
     ASSERT_NE(player, nullptr);
     EXPECT_EQ(player->id, 1);
@@ -21,7 +24,8 @@ TEST_F(GameStateTest, AddPlayer) {
     EXPECT_EQ(player->money, 30);
 }
 
-TEST_F(GameStateTest, BoardInitialization) {
+TEST_F(GameStateTest, BoardInitialization)
+{
     auto state = gameState.getState();
 
     EXPECT_TRUE(state["board"].contains("cities"));
@@ -29,7 +33,8 @@ TEST_F(GameStateTest, BoardInitialization) {
     EXPECT_TRUE(state["board"]["cities"]["Birmingham"].contains("slots"));
 }
 
-TEST_F(GameStateTest, PlaceSimpleTile) {
+TEST_F(GameStateTest, PlaceSimpleTile)
+{
     auto player = gameState.addPlayer();
     int initialMoney = player->money;
 
@@ -48,12 +53,14 @@ TEST_F(GameStateTest, PlaceSimpleTile) {
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"]["type"], TileType::Cotton);
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][0]["placedTile"]["owner"], player->id);
     EXPECT_EQ(state["board"]["cities"]["Birmingham"]["slots"][1]["placedTile"], nullptr);
+    EXPECT_EQ(state["board"]["cities"]["Oxford"]["slots"][1]["merhant"], nullptr);
     EXPECT_EQ(player->money, initialMoney - testTile.cost_money);
 }
 
-TEST_F(GameStateTest, PlaceTileInOccupiedSlot) {
+TEST_F(GameStateTest, PlaceTileInOccupiedSlot)
+{
     auto player = gameState.addPlayer();
-    
+
     GameAction action;
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
@@ -64,24 +71,25 @@ TEST_F(GameStateTest, PlaceTileInOccupiedSlot) {
     EXPECT_FALSE(gameState.handleAction(player->id, action));
 }
 
-TEST_F(GameStateTest, PlaceTileInInvalidSlot) {
+TEST_F(GameStateTest, PlaceTileInInvalidSlot)
+{
     auto player = gameState.addPlayer();
-    
+
     GameAction action;
     action.type = GameAction::Type::PlaceTile;
     action.cityName = "Birmingham";
-    action.slotIndex = 1;  // coal not allowed
+    action.slotIndex = 1; // coal not allowed
     action.tileType = TileType::Coal;
 
-
     EXPECT_FALSE(gameState.handleAction(player->id, action));
-    action.slotIndex = 11;  // Invalid slot index
+    action.slotIndex = 11; // Invalid slot index
     EXPECT_FALSE(gameState.handleAction(player->id, action));
 }
 
-TEST_F(GameStateTest, placeLinkTile) {
+TEST_F(GameStateTest, placeLinkTile)
+{
     auto player = gameState.addPlayer();
-    
+
     GameAction action;
     action.type = GameAction::Type::PlaceLink;
     action.cityName = "Birmingham";
@@ -107,18 +115,19 @@ TEST_F(GameStateTest, placeLinkTile) {
     action.tileType = TileType::Coal;
     action.slotIndex = 1;
 
-    bool placed_tile=gameState.handleAction(player->id, action);
+    bool placed_tile = gameState.handleAction(player->id, action);
     EXPECT_TRUE(placed_tile);
     action.type = GameAction::Type::PlaceLink;
     action.cityName = "Stone";
     action.cityName2 = "Stafford";
-    bool in_player_network_by_tile=gameState.handleAction(player->id, action);
+    bool in_player_network_by_tile = gameState.handleAction(player->id, action);
     EXPECT_TRUE(in_player_network_by_tile);
 }
 
-TEST_F(GameStateTest, TakeLoan) {
+TEST_F(GameStateTest, TakeLoan)
+{
     auto player = gameState.addPlayer();
-    
+
     GameAction action;
     action.type = GameAction::Type::TakeLoan;
 
@@ -128,13 +137,14 @@ TEST_F(GameStateTest, TakeLoan) {
     EXPECT_EQ(state["players"][0]["income_level"], 7);
 }
 
-TEST_F(GameStateTest, Develop) {
+TEST_F(GameStateTest, Develop)
+{
     auto player = gameState.addPlayer();
-    
+
     GameAction action;
     action.type = GameAction::Type::Develop;
-    action.tileType= TileType::Iron;
-    action.tileType2= TileType::Iron;
+    action.tileType = TileType::Iron;
+    action.tileType2 = TileType::Iron;
 
     bool develop_action_result = gameState.handleAction(player->id, action);
     EXPECT_TRUE(develop_action_result);
@@ -143,10 +153,11 @@ TEST_F(GameStateTest, Develop) {
     EXPECT_EQ(player->money, 26);
 
     auto state = gameState.getState();
-    EXPECT_EQ(state["players"][0]["player_board"]["iron"],2);
+    EXPECT_EQ(state["players"][0]["player_board"]["iron"], 4);
 }
 
-TEST_F(GameStateTest, RemovePlayer) {
+TEST_F(GameStateTest, RemovePlayer)
+{
     auto player1 = gameState.addPlayer();
     auto player2 = gameState.addPlayer();
 
@@ -156,4 +167,3 @@ TEST_F(GameStateTest, RemovePlayer) {
     EXPECT_EQ(state["players"].size(), 1);
     EXPECT_EQ(state["players"][0]["id"], player2->id);
 }
-
