@@ -39,7 +39,7 @@ public:
     std::shared_ptr<Player> addPlayer();
     void removePlayer(int id);
     bool handleAction(int playerId, const GameAction &action);
-    bool handleTilePlacement(Player &player, const GameAction &action, const Tile tile);
+    bool handleTilePlacement(Player &player, const GameAction &action);
     nlohmann::json getState() const;
 
     void setupBoardForTesting(const GameBoard &board);

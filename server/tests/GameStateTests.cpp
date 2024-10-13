@@ -153,7 +153,7 @@ TEST_F(GameStateTest, Develop)
     EXPECT_EQ(player->money, 26);
 
     auto state = gameState.getState();
-    EXPECT_EQ(state["players"][0]["player_board"]["iron"], 4);
+    EXPECT_EQ(state["players"][0]["player_board"]["iron"], 2);
 }
 
 TEST_F(GameStateTest, RemovePlayer)

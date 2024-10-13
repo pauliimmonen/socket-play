@@ -88,7 +88,6 @@ bool GameBoard::hasEnoughBeer(const std::string &cityName, const Player &player,
     // This does not work same every time
     int availableBeer = getAvailableBeerFromMerchantSlots(cityName, allowedType) +
                         getAvailableBeerFromBreweries(cityName, player);
-    std::cout << "beer" << availableBeer << std::endl;
     return availableBeer >= beerDemand;
 }
 
@@ -553,10 +552,6 @@ std::vector<std::pair<std::string, int>> GameBoard::findSellableTiles(const Play
     for (const auto &[cityName, city] : cities)
     {
         auto connectedMerchantTypes = getConnectedMerchantTypes(cityName);
-        if (connectedMerchantTypes.size() > 0)
-        {
-            std::cout << "connectedMearchantTypes " << connectedMerchantTypes.size() << std::endl;
-        }
         if (connectedMerchantTypes.size() == 0)
             continue;
         for (size_t i = 0; i < city->slots.size(); i++)
@@ -569,7 +564,6 @@ std::vector<std::pair<std::string, int>> GameBoard::findSellableTiles(const Play
             if (!isSellableTileType(tileType))
                 continue;
 
-            std::cout << "x";
             if (canSellTile(connectedMerchantTypes, tileType) &&
                 hasEnoughBeer(cityName, player, slot.placedTile->beer_demand, getTileRequiredMerchantType(tileType)))
             {
@@ -577,7 +571,5 @@ std::vector<std::pair<std::string, int>> GameBoard::findSellableTiles(const Play
             }
         }
     }
-    std::cout << "Sellable tiles " << sellableTiles.size() << std::endl;
-    std::cout << "Sellable tiles " << sellableTiles.size() << std::endl;
     return sellableTiles;
 }

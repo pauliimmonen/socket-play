@@ -42,10 +42,7 @@ bool GameState::handleAction(int playerId, const GameAction &action)
     {
     case GameAction::Type::PlaceTile:
     {
-        Tile *newTile = player->player_board.takeTile(action.tileType).get();
-        if (newTile == nullptr)
-            return false;
-        return handleTilePlacement(*player, action, *newTile);
+        return handleTilePlacement(*player, action);
         break;
     }
     case GameAction::Type::PlaceLink:
@@ -178,7 +175,6 @@ std::vector<ResourceOption> GameState::findAvailableResources(const std::string 
                     int available = slot.placedTile->resource_amount;
                     if (available > 0)
                     {
-                        std::cout << "Brewery option" << std::endl;
                         options.push_back({cityName, static_cast<int>(i), std::min(available, amountNeeded)});
                     }
                 }
@@ -196,7 +192,6 @@ std::vector<ResourceOption> GameState::findAvailableResources(const std::string 
                 {
                     if (slot.placedTile->resource_amount > 0)
                     {
-                        std::cout << "Merchant option" << std::endl;
                         options.push_back({merchantCity->name, -1, std::min(slot.placedTile->resource_amount, amountNeeded)});
                     }
                 }
@@ -268,9 +263,7 @@ int GameState::chooseAndConsumeResources(Player &player, const std::string &city
     {
         auto city = m_board.getCity(options[0].cityName);
         auto tile = city->slots[options[0].slotIndex].placedTile;
-        std::cout << "city" << city->name << " resource" << tile->resource_amount << " " << amountNeeded << std::endl;
         amountNeeded = consumeResources(*tile, amountNeeded);
-        std::cout << "city" << city->name << " resource" << tile->resource_amount << " " << amountNeeded << std::endl;
     }
     else
     {
@@ -286,22 +279,26 @@ int GameState::chooseAndConsumeResources(Player &player, const std::string &city
     return amountNeeded;
 }
 
-bool GameState::handleTilePlacement(Player &player, const GameAction &action, const Tile tile)
+bool GameState::handleTilePlacement(Player &player, const GameAction &action)
 {
+    Tile *tile = player.player_board.peekTile(action.tileType).get();
+    if (tile == nullptr)
+        return false;
     // Check if the tile can be placed on the board
-    if (!m_board.canPlaceTile(action.cityName, action.slotIndex, tile))
+    if (!m_board.canPlaceTile(action.cityName, action.slotIndex, *tile))
         return false;
 
     // Check if player has enough money
-    if (player.money < getTilePrice(action.cityName, tile))
+    if (player.money < getTilePrice(action.cityName, *tile))
         return false;
 
     // If all checks pass, place the tile and update player state
-    if (m_board.placeTile(action.cityName, action.slotIndex, tile))
+    if (m_board.placeTile(action.cityName, action.slotIndex, *tile))
     {
-        player.money -= getTilePrice(action.cityName, tile);
-        int coal_amount = chooseAndConsumeResources(player, action.cityName, TileType::Coal, tile.cost_coal);
-        int iron_amount = chooseAndConsumeResources(player, action.cityName, TileType::Iron, tile.cost_iron);
+        tile = player.player_board.takeTile(action.tileType).get();
+        player.money -= getTilePrice(action.cityName, *tile);
+        int coal_amount = chooseAndConsumeResources(player, action.cityName, TileType::Coal, tile->cost_coal);
+        int iron_amount = chooseAndConsumeResources(player, action.cityName, TileType::Iron, tile->cost_iron);
         coal_market.buy(coal_amount);
         iron_market.buy(iron_amount);
         return true;
@@ -374,7 +371,7 @@ nlohmann::json GameState::getState() const
                                         {"owner", connection.linkOwner ? connection.linkOwner->id : -1}});
     }
 
-    std::cout << state.dump(4) << std::endl; // `4` is the indentation level for pretty-printing
+    // std::cout << state.dump(4) << std::endl; // `4` is the indentation level for pretty-printing
     return state;
 }
 
@@ -438,12 +435,9 @@ void printVector(const std::vector<std::pair<std::string, int>> &vec)
 bool GameState::handleSell(Player &player, const GameAction &action)
 {
     auto sellableTiles = m_board.findSellableTiles(player);
-    std::cout << "len " << sellableTiles.size() << std::endl;
-    printVector(sellableTiles);
     auto it = std::find(sellableTiles.begin(), sellableTiles.end(), std::make_pair(action.cityName, action.slotIndex));
     if (it == sellableTiles.end())
     {
-        std::cout << "No sellable tiles" << std::endl;
         return false;
     }
     auto city = m_board.getCity(action.cityName);
