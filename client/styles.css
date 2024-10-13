@@ -15,6 +15,12 @@ html {
     position: absolute;
     width: 4.35%;
     width: 4.35%;
+    cursor: pointer;
+}
+
+.tile:hover {
+    box-shadow: 0 0 10px white;
+
 }
 
 .birmingham_0 {
@@ -255,27 +261,27 @@ html {
 
 
 .tile.manufacturer {
-    background-image: url("images/manufacturer_1.jpg");
+    background-image: url("images/manufacturer_1.png");
 }
 
 .tile.cotton {
-    background-image: url("images/cotton_1.jpg");
+    background-image: url("images/cotton_1.png");
 }
 
 .tile.pottery {
-    background-image: url("images/pottery_1.jpg");
+    background-image: url("images/pottery_1.png");
 }
 
 .tile.coal {
-    background-image: url("images/coal_1.jpg");
+    background-image: url("images/coal_1.png");
 }
 
 .tile.iron {
-    background-image: url("images/iron_1.jpg");
+    background-image: url("images/iron_1.png");
 }
 
 .tile.brewery {
-    background-image: url("images/brewery_1.jpg");
+    background-image: url("images/brewery_1.png");
 }
 
 #board_img {
@@ -289,7 +295,6 @@ html {
     position: relative;
     float: left;
     width: auto;
-    height: 100%;
 }
 
 #container {
@@ -298,8 +303,16 @@ html {
 }
 
 #rightbar {
+    padding: 20px;
+    color: white;
+    overflow-y: auto;
     float: left;
     width: 300px;
     height: 100vh;
     background-color: #000000;
+}
+
+#player-info,
+#game-controls {
+    margin-bottom: 20px;
 }

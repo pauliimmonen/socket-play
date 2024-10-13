@@ -6,26 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brass Birmingham Combined</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        #rightbar {
-            padding: 20px;
-            color: white;
-            overflow-y: auto;
-        }
-
-        #player-info,
-        #game-controls {
-            margin-bottom: 20px;
-        }
-
-        .slot {
-            cursor: pointer;
-        }
-
-        .slot:hover {
-            box-shadow: 0 0 10px white;
-        }
-    </style>
 </head>
 
 <body>
@@ -152,7 +132,7 @@
             }
 
             initializeSlotListeners() {
-                document.querySelectorAll('.slot').forEach(slot => {
+                document.querySelectorAll('.tile').forEach(slot => {
                     slot.addEventListener('click', () => {
                         const cityName = slot.dataset.city;
                         const slotIndex = slot.dataset.slot;
@@ -207,7 +187,7 @@
             updateGameBoard() {
                 if (!this.gameState) return;
                 for (const [cityName, cityData] of Object.entries(this.gameState.board.cities)) {
-                    const cityElement = document.querySelector(`.slot[data-city="${cityName}"]`);
+                    const cityElement = document.querySelector(`.tile[data-city="${cityName}"]`);
                     if (cityElement && cityData.slots[0].placedTile) {
                         const tileClass = this.tileTypeToString(cityData.slots[0].placedTile.type);
                         cityElement.classList.add(tileClass);
