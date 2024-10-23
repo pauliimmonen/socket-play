@@ -171,6 +171,14 @@
                     console.warn('Cannot send end turn: WebSocket is not open');
                 }
             }
+            playerToColor(playrid) {
+                switch (Number(playrid % 3)) {
+                    case 0: return 'gray';
+                    case 1: return 'yellow';
+                    case 2: return 'purple';
+                    case 3: return 'red';
+                }
+            }
             tileTypeToString(tileType) {
                 switch (Number(tileType)) {
                     case 0: return 'coal';
@@ -187,11 +195,18 @@
             updateGameBoard() {
                 if (!this.gameState) return;
                 for (const [cityName, cityData] of Object.entries(this.gameState.board.cities)) {
-                    const cityElement = document.querySelector(`.tile[data-city="${cityName}"]`);
-                    if (cityElement && cityData.slots[0].placedTile) {
-                        const tileClass = this.tileTypeToString(cityData.slots[0].placedTile.type);
-                        cityElement.classList.add(tileClass);
-                    }
+                    cityData.slots.forEach((slot, index) => {
+                        const cityElement = document.querySelector(`.tile[data-city="${cityName}"][data-slot="${index}"]`);
+                        if (cityElement) {
+                            cityElement.className = `tile ${cityName.toLowerCase()}_${index}`;
+                            if (slot.placedTile) {
+                                const tileClass = this.tileTypeToString(slot.placedTile.type);
+                                const playrClass = this.playerToColor(slot.placedTile.owner);
+                                cityElement.classList.add(tileClass);
+                                cityElement.classList.add(playrClass);
+                            }
+                        }
+                    });
                 }
             }
 
